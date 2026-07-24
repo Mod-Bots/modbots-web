@@ -5,9 +5,20 @@
 // remaining space on its own.
 .modbots-fit {
   --modbots-fit-scale: min(1, calc(100vw / 880px));
+  --modbots-fit-height: 100dvh;
 
   zoom: var(--modbots-fit-scale);
-  height: calc(100dvh / var(--modbots-fit-scale));
+  height: calc(var(--modbots-fit-height) / var(--modbots-fit-scale));
+}
+
+.modbots-fit-with-menu {
+  --modbots-fit-height: calc(100dvh - 2.75rem);
+}
+
+@media (min-width: 640px) {
+  .modbots-fit-with-menu {
+    --modbots-fit-height: calc(100dvh - 2rem);
+  }
 }
 
 .modbots-scroll {
