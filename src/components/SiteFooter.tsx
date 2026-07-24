@@ -17,7 +17,7 @@ export const SiteFooter = (): React.ReactElement => {
 
   return (
     <footer className="relative mx-auto mt-4 w-full max-w-[420px] shrink-0 px-6 pb-6 text-center text-[11px] leading-5 text-zinc-600">
-      Copyright &copy; {currentYear} William Sawyerr. All rights reserved.
+      Copyright &copy; {currentYear} The Mod Bots Project. All rights reserved.
     </footer>
   );
 };
