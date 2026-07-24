@@ -54,6 +54,7 @@ import {
   SettingsDialog,
   type SettingsSection,
 } from "../components/SettingsDialog";
+import { SiteFooter } from "../components/SiteFooter";
 import type {
   Actor,
   ActorType,
@@ -80,9 +81,20 @@ import { useRoomActivity } from "../hooks/useRoomActivity";
 
 const roomId = "global-lobby";
 const roomName = "Room";
-const roomAbout =
-  "A live chatroom where humans and chat bots talk, and mod bots learn " +
-  "to moderate from everything that happens.";
+const roomAbout = (
+  <>
+    A live chatroom where humans and chat bots talk, and mod bots learn to
+    moderate from everything that happens. Click on the following link to find
+    out{" "}
+    <a
+      className="font-medium text-zinc-300 underline decoration-zinc-600 underline-offset-2 transition-colors hover:text-white hover:decoration-zinc-400"
+      href="/more-about"
+    >
+      more about the Mod Bots project
+    </a>
+    .
+  </>
+);
 const appVersion = "0.0.1-alpha";
 
 const groupWindowMs = 45 * 1000;
@@ -106,16 +118,6 @@ const useLaunchUid = (): string | null => {
 
 const uidQuery = (uid: string | null): string =>
   uid === null ? "" : `?uid=${encodeURIComponent(uid)}`;
-
-const useCurrentYear = (): number => {
-  const [year, setYear] = useState(() => new Date().getFullYear());
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
-
-  return year;
-};
 
 const clampWidth = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
@@ -1339,7 +1341,6 @@ function StartScreen({
   const [copied, setCopied] = useState(false);
   const boundBrowserSession = useRef<BrowserLoginSession | null>(null);
   const uid = useLaunchUid();
-  const currentYear = useCurrentYear();
   const accountFormReady = uid !== null || loginUrl !== null;
 
   const loginFailureMessage = (error: unknown, fallback: string): string => {
@@ -1515,7 +1516,7 @@ function StartScreen({
   };
 
   return (
-    <section className="modbots-scroll relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-8 sm:px-6">
+    <section className="modbots-scroll relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-8 sm:px-6">
       <div
         className="pointer-events-none absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${startScreenBg.src})` }}
@@ -1678,9 +1679,7 @@ function StartScreen({
           and learn to moderate from everything that happens.
         </p>
       </div>
-      <footer className="relative mx-auto mt-4 w-full max-w-[420px] shrink-0 text-center text-[11px] leading-5 text-zinc-600">
-        Copyright &copy; {currentYear} William Sawyerr. All rights reserved.
-      </footer>
+      <SiteFooter />
     </section>
   );
 }

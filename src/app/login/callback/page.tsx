@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SiteFooter } from "../../../components/SiteFooter";
 import { saveStoredIdentity } from "../../../data/identity";
 import {
   completeSameTabLogin,
@@ -60,22 +61,25 @@ const LoginCallback = (): React.ReactElement => {
   }, []);
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-8">
-      <div className="max-w-md text-center">
-        {manualCode === null ? (
-          <p className="text-sm text-zinc-400">Completing sign-in...</p>
-        ) : (
-          <>
-            <p className="text-sm text-zinc-400">
-              Paste this code into Mod Bots to finish signing in.
-            </p>
-            <p className="mt-3 break-all font-mono text-base text-zinc-100">
-              {manualCode}
-            </p>
-          </>
-        )}
-      </div>
-    </main>
+    <div className="flex min-h-screen min-h-dvh flex-col bg-[#0b0b0b] text-zinc-100">
+      <main className="flex flex-1 items-center justify-center p-8">
+        <div className="max-w-md text-center">
+          {manualCode === null ? (
+            <p className="text-sm text-zinc-400">Completing sign-in...</p>
+          ) : (
+            <>
+              <p className="text-sm text-zinc-400">
+                Paste this code into Mod Bots to finish signing in.
+              </p>
+              <p className="mt-3 break-all font-mono text-base text-zinc-100">
+                {manualCode}
+              </p>
+            </>
+          )}
+        </div>
+      </main>
+      <SiteFooter />
+    </div>
   );
 };
 

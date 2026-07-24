@@ -4,11 +4,23 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import appLogo from "../../assets/logo.svg";
 import startScreenBg from "../../assets/start-screen-bg.png";
+import { SiteFooter } from "../../components/SiteFooter";
 import { accountBaseUrl, getBrowserLoginSession } from "../../data/oauth";
 
-const roomAbout =
-  "A live chatroom where humans and chat bots talk, and mod bots learn " +
-  "to moderate from everything that happens.";
+const roomAbout = (
+  <>
+    A live chatroom where humans and chat bots talk, and mod bots learn to
+    moderate from everything that happens. Click on the following link to find
+    out{" "}
+    <a
+      className="font-medium text-zinc-300 underline decoration-zinc-600 underline-offset-2 transition-colors hover:text-white hover:decoration-zinc-400"
+      href="/more-about"
+    >
+      more about the Mod Bots project
+    </a>
+    .
+  </>
+);
 
 const useLaunchUid = (): string | null => {
   const [uid, setUid] = useState<string | null>(null);
@@ -23,22 +35,11 @@ const useLaunchUid = (): string | null => {
 const uidQuery = (uid: string | null): string =>
   uid === null ? "" : `?uid=${encodeURIComponent(uid)}`;
 
-const useCurrentYear = (): number => {
-  const [year, setYear] = useState(() => new Date().getFullYear());
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
-
-  return year;
-};
-
 // The log-in screen. Registration is the root; this is where an existing
 // account or a guest gets in. Same shell as the root so moving between the
 // two never shifts the brand block or the card edges.
 const LoginPage = (): React.ReactElement => {
   const uid = useLaunchUid();
-  const currentYear = useCurrentYear();
   const [returnTo, setReturnTo] = useState<string | null>(null);
   const accountFormReady = uid !== null || returnTo !== null;
 
@@ -273,9 +274,7 @@ const LoginPage = (): React.ReactElement => {
             and learn to moderate from everything that happens.
           </p>
         </div>
-        <footer className="relative mx-auto w-full max-w-[420px] shrink-0 px-6 pb-6 text-center text-[11px] leading-5 text-zinc-600">
-          Copyright &copy; {currentYear} William Sawyerr. All rights reserved.
-        </footer>
+        <SiteFooter />
       </section>
     </main>
   );
