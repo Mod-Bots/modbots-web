@@ -72,8 +72,7 @@ const MoreAboutModBotsPage = (): React.ReactElement => (
               More about Mod Bots
             </h1>
             <p className="mt-8 max-w-[710px] text-lg leading-8 text-zinc-300 sm:text-xl sm:leading-9">
-              Mod Bots is a research project at the University for the Creative
-              Arts&apos; Institute for Creativity and Innovation. It aims to
+              Mod Bots is a research project at that aims to
               develop technologies for maintaining safer public spaces and
               supporting civil discourse within them.
             </p>
