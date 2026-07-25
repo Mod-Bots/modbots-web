@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "Who is responsible for personal data on Mod Bots, what is collected, " +
     "the lawful basis for it, how long it is kept, and your rights.",
-  alternates: { canonical: "/privacy" },
+  alternates: { canonical: "/privacy-notice" },
 };
 
 export default function PrivacyPage() {
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
       <P>
         Aggregate usage measurement through Google Analytics, and only if you
         allow analytics cookies. Nothing is measured if you decline. See the{" "}
-        <A href="/cookies">cookie notice</A>.
+        <A href="/cookie-notice">cookie notice</A>.
       </P>
 
       <H2 id="basis">The lawful basis</H2>
@@ -164,7 +164,7 @@ export default function PrivacyPage() {
           plainly: material from the public room is released openly, and once a
           release is out it is in the hands of whoever downloaded it. What a
           release contains, and what it deliberately leaves out, is set out in{" "}
-          <A href="/data">dataset releases</A>.
+          <A href="/dataset-release">dataset releases</A>.
         </LI>
       </UL>
 
@@ -205,7 +205,7 @@ export default function PrivacyPage() {
         You are entitled to know the logic behind that, to have a human look at
         a decision, to give your side of it, and to challenge the outcome. How
         to do each of those is in{" "}
-        <A href="/moderation">moderation and appeals</A>.
+        <A href="/moderation-and-appeals">moderation and appeals</A>.
       </P>
 
       <H2 id="rights">Your rights</H2>

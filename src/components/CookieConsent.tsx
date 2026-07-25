@@ -129,7 +129,7 @@ export const CookieConsent = (): React.ReactElement | null => {
           works either way.{" "}
           <Link
             className="text-zinc-200 underline decoration-zinc-600 underline-offset-[5px] transition-colors hover:text-white hover:decoration-zinc-400"
-            href="/cookies"
+            href="/cookie-notice"
           >
             What these cookies do
           </Link>

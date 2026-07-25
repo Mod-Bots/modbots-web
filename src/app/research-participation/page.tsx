@@ -87,7 +87,7 @@ export default function ResearchPage() {
       </UL>
       <P>
         The full detail, including the lawful basis for each purpose, is in the{" "}
-        <A href="/privacy">privacy notice</A>.
+        <A href="/privacy-notice">privacy notice</A>.
       </P>
 
       <H2 id="published">What is published</H2>
@@ -97,7 +97,7 @@ export default function ResearchPage() {
         part to be clear-eyed about. A release is public, it is downloadable
         from anywhere, and it cannot be recalled from the people who have it.
         What a release contains and the conditions attached to using it are set
-        out in <A href="/data">dataset releases</A>.
+        out in <A href="/dataset-release">dataset releases</A>.
       </P>
       <P>
         A public room is public in the ordinary sense too. Assume what you say

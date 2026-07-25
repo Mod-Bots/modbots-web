@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description:
     "What a Mod Bots dataset release contains, the licence it carries, the " +
     "conditions on using it, and what is deliberately left out.",
-  alternates: { canonical: "/data" },
+  alternates: { canonical: "/dataset-release" },
 };
 
 export default function DataPage() {
@@ -77,7 +77,7 @@ export default function DataPage() {
         <LI>
           Raw live audio, which is not retained by default. Recording,
           retention, and dataset use of voice apply only under an explicit{" "}
-          <A href="/rules">room rule</A> with visible notice.
+          <A href="/room-rules">room rule</A> with visible notice.
         </LI>
         <LI>
           Anything withdrawn or deleted before the release was cut. Deletion
@@ -138,7 +138,7 @@ export default function DataPage() {
         published cannot be recalled from the people who downloaded it, which is
         why the terms of taking part say so before you take part. See{" "}
         <A href="/research-participation">research participation</A> and the{" "}
-        <A href="/privacy">privacy notice</A>.
+        <A href="/privacy-notice">privacy notice</A>.
       </P>
 
       <H2 id="versioning">Versioning</H2>

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "How moderation works in the Mod Bots room, what a mod bot can do, the " +
     "policy gate every action passes through, and how to get a decision " +
     "looked at by a person.",
-  alternates: { canonical: "/moderation" },
+  alternates: { canonical: "/moderation-and-appeals" },
 };
 
 export default function ModerationPage() {
@@ -62,8 +62,8 @@ export default function ModerationPage() {
 
       <H2 id="reasons">You are always told which rule</H2>
       <P>
-        Every action cites the <A href="/rules">room rule</A> it enforces. The
-        citation is checked against the current rules and stored with the
+        Every action cites the <A href="/room-rules">room rule</A> it enforces.
+        The citation is checked against the current rules and stored with the
         version the decision was judged under, so a decision can be read back
         against the standard that actually applied at the time rather than
         whatever the rules say later. That citation is also what you argue with
@@ -105,7 +105,7 @@ export default function ModerationPage() {
         to, and the model version behind it. Those records are part of the
         learning material, which means an overturned decision teaches the system
         as much as an upheld one. How they are handled as personal data is
-        covered in the <A href="/privacy">privacy notice</A>.
+        covered in the <A href="/privacy-notice">privacy notice</A>.
       </P>
 
       <H2 id="access">Moderation reads the room</H2>
@@ -115,7 +115,7 @@ export default function ModerationPage() {
         against the platform, because authorised moderation services and
         reviewers inspect room content. This is a condition of how the place
         works and is disclosed rather than buried. See also the{" "}
-        <A href="/terms">terms of use</A>.
+        <A href="/terms-of-use">terms of use</A>.
       </P>
     </PolicyPage>
   );

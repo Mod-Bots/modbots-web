@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "What Mod Bots stores in your browser, what is strictly necessary, what " +
     "analytics cookies do, and how to change your choice.",
-  alternates: { canonical: "/cookies" },
+  alternates: { canonical: "/cookie-notice" },
 };
 
 export default function CookiesPage() {
@@ -61,7 +61,7 @@ export default function CookiesPage() {
       <P>
         Allowing these means analytics data reaches Google in the United States.
         The basis for that transfer is set out in the{" "}
-        <A href="/privacy">privacy notice</A>.
+        <A href="/privacy-notice">privacy notice</A>.
       </P>
 
       <CookieChoicePanel />

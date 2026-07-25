@@ -164,7 +164,7 @@ export default function WhyPage() {
               A mod bot watches the room, talks to the people in it, and acts.
               It learns to moderate from what happens next, and it never stops
               learning.
-              <PolicyLink href="/moderation">
+              <PolicyLink href="/moderation-and-appeals">
                 What a mod bot may do, and how to appeal it
               </PolicyLink>
             </figcaption>
@@ -234,7 +234,7 @@ export default function WhyPage() {
                   way because the unit a mod bot has to learn from is a
                   situation, not a message.
                 </p>
-                <PolicyLink href="/privacy">
+                <PolicyLink href="/privacy-notice">
                   What is held about you, and for how long
                 </PolicyLink>
               </div>
@@ -261,7 +261,7 @@ export default function WhyPage() {
                 <p className="mt-4 text-[17px] leading-8 text-zinc-400 sm:text-[19px] sm:leading-9">
                   Raw live audio is not retained by default. Recording,
                   retention, and any dataset use of voice apply only under an{" "}
-                  <Link href="/rules" className={inlineLink}>
+                  <Link href="/room-rules" className={inlineLink}>
                     explicit room rule
                   </Link>{" "}
                   with visible notice. Deletion propagates: when something is
@@ -280,7 +280,7 @@ export default function WhyPage() {
                   posted, because that is what the mod bots are learning from.
                   It is written here rather than left to be discovered.
                 </p>
-                <PolicyLink href="/terms">
+                <PolicyLink href="/terms-of-use">
                   The terms you accept by taking part
                 </PolicyLink>
               </div>
@@ -296,7 +296,7 @@ export default function WhyPage() {
                 site with its terms of use, the period and activity it covers,
                 and the model versions that were running while it was collected.
               </p>
-              <PolicyLink href="/data">
+              <PolicyLink href="/dataset-release">
                 Dataset licence and terms of use
               </PolicyLink>
             </div>

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "The terms you accept by taking part in Mod Bots: eligibility, " +
     "acceptable use, what you grant over what you post, and the limits of " +
     "what is promised in return.",
-  alternates: { canonical: "/terms" },
+  alternates: { canonical: "/terms-of-use" },
 };
 
 export default function TermsPage() {
@@ -65,7 +65,7 @@ export default function TermsPage() {
 
       <H2 id="conduct">How to behave</H2>
       <P>
-        The <A href="/rules">room rules</A> are the standard, they are
+        The <A href="/room-rules">room rules</A> are the standard, they are
         versioned, and they are what mod bots cite when they act. Read them when
         you want to; nobody is made to read them at the door. Beyond them, do
         not attempt to break, overload, or reverse the platform, do not evade a
@@ -93,7 +93,8 @@ export default function TermsPage() {
         non-exclusive licence to store your contributions, process them, derive
         machine representations from them, use them to train and evaluate
         moderation agents, and publish them as part of open research datasets
-        under the terms described in <A href="/data">dataset releases</A>.
+        under the terms described in{" "}
+        <A href="/dataset-release">dataset releases</A>.
       </P>
       <P>
         You keep ownership of what you write. The licence is what makes the
@@ -114,7 +115,7 @@ export default function TermsPage() {
         review. A moderated room also cannot be private from the service
         moderating it: authorised moderation services read what is posted. Your
         right to have a decision looked at by a person is real and is described
-        in <A href="/moderation">moderation and appeals</A>.
+        in <A href="/moderation-and-appeals">moderation and appeals</A>.
       </P>
 
       <H2 id="warranty">What is not promised</H2>
@@ -143,7 +144,7 @@ export default function TermsPage() {
         or where the research requires it. Ending your participation does not by
         itself remove what you have already contributed; ask for removal and it
         will be handled as described in{" "}
-        <A href="/privacy">the privacy notice</A>.
+        <A href="/privacy-notice">the privacy notice</A>.
       </P>
 
       <H2 id="law">Governing law</H2>

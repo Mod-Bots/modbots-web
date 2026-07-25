@@ -24,10 +24,10 @@ export interface PolicyPageLink {
 export const policyPages: readonly PolicyPageLink[] = [
   { href: "/why-mod-bots-exists", label: "Why Mod Bots exists" },
   { href: "/research-participation", label: "Research participation" },
-  { href: "/data", label: "Dataset releases" },
-  { href: "/moderation", label: "Moderation and appeals" },
-  { href: "/rules", label: "Room rules" },
-  { href: "/terms", label: "Terms of use" },
-  { href: "/privacy", label: "Privacy notice" },
-  { href: "/cookies", label: "Cookies" },
+  { href: "/dataset-release", label: "Dataset releases" },
+  { href: "/moderation-and-appeals", label: "Moderation and appeals" },
+  { href: "/room-rules", label: "Room rules" },
+  { href: "/terms-of-use", label: "Terms of use" },
+  { href: "/privacy-notice", label: "Privacy notice" },
+  { href: "/cookie-notice", label: "Cookies" },
 ];

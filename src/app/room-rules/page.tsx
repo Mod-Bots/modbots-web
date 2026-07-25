@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "The values of the Mod Bots room: what this small society considers " +
     "acceptable speech, behaviour, and decorum, and how mod bots cite them.",
-  alternates: { canonical: "/rules" },
+  alternates: { canonical: "/room-rules" },
 };
 
 const rules = [
@@ -89,7 +89,7 @@ export default function RulesPage() {
         which rule a decision enforced rather than only that something was
         removed. That is also what makes an appeal possible: there is always a
         stated reason to argue with. See{" "}
-        <A href="/moderation">moderation and appeals</A>.
+        <A href="/moderation-and-appeals">moderation and appeals</A>.
       </P>
 
       <H2 id="source">Where these come from</H2>
