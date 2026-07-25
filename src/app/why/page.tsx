@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import appLogo from "../../assets/logo.svg";
 import modBotPortrait from "../../assets/mod-bot-portrait.png";
 import startScreenBg from "../../assets/start-screen-bg.png";
@@ -17,6 +18,34 @@ export const metadata: Metadata = {
     canonical: "/why",
   },
 };
+
+const inlineLink =
+  "text-zinc-200 underline decoration-zinc-600 underline-offset-[5px] " +
+  "transition-colors hover:text-white hover:decoration-zinc-400";
+
+function PolicyLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}): React.ReactElement {
+  return (
+    <Link
+      href={href}
+      className="group mt-6 inline-flex items-center gap-2 text-base font-medium text-[#4aa8ff] transition-colors hover:text-[#8cc8ff]"
+    >
+      <span className="underline decoration-[#4aa8ff]/30 underline-offset-[5px] transition-colors group-hover:decoration-[#8cc8ff]/60">
+        {children}
+      </span>
+      <ArrowRight
+        aria-hidden="true"
+        className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+        strokeWidth={2}
+      />
+    </Link>
+  );
+}
 
 export default function WhyPage() {
   return (
@@ -135,6 +164,9 @@ export default function WhyPage() {
               A mod bot watches the room, talks to the people in it, and acts.
               It learns to moderate from what happens next, and it never stops
               learning.
+              <PolicyLink href="/moderation">
+                What a mod bot may do, and how to appeal it
+              </PolicyLink>
             </figcaption>
           </div>
         </figure>
@@ -167,6 +199,9 @@ export default function WhyPage() {
                 choose how to respond, and learn from what happens next.
               </p>
             </div>
+            <PolicyLink href="/research">
+              How participation, consent, and research ethics are handled
+            </PolicyLink>
           </section>
 
           <section className="mx-auto max-w-[720px] border-t border-white/[0.07] py-24">
@@ -199,6 +234,9 @@ export default function WhyPage() {
                   way because the unit a mod bot has to learn from is a
                   situation, not a message.
                 </p>
+                <PolicyLink href="/privacy">
+                  What is held about you, and for how long
+                </PolicyLink>
               </div>
 
               <div>
@@ -222,10 +260,13 @@ export default function WhyPage() {
                 </h3>
                 <p className="mt-4 text-[17px] leading-8 text-zinc-400 sm:text-[19px] sm:leading-9">
                   Raw live audio is not retained by default. Recording,
-                  retention, and any dataset use of voice apply only under an
-                  explicit room policy with visible notice. Deletion propagates:
-                  when something is removed it is removed from the derived data
-                  and from later releases, not only from the room.
+                  retention, and any dataset use of voice apply only under an{" "}
+                  <Link href="/rules" className={inlineLink}>
+                    explicit room rule
+                  </Link>{" "}
+                  with visible notice. Deletion propagates: when something is
+                  removed it is removed from the derived data and from later
+                  releases, not only from the room.
                 </p>
               </div>
 
@@ -239,6 +280,9 @@ export default function WhyPage() {
                   posted, because that is what the mod bots are learning from.
                   It is written here rather than left to be discovered.
                 </p>
+                <PolicyLink href="/terms">
+                  The terms you accept by taking part
+                </PolicyLink>
               </div>
             </div>
 
@@ -252,6 +296,9 @@ export default function WhyPage() {
                 site with its terms of use, the period and activity it covers,
                 and the model versions that were running while it was collected.
               </p>
+              <PolicyLink href="/data">
+                Dataset licence and terms of use
+              </PolicyLink>
             </div>
           </section>
 
