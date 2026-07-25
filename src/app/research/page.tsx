@@ -53,7 +53,8 @@ export default function ResearchPage() {
         This study runs a public chatroom as the environment in which that can
         actually be watched, and uses what happens there to develop and evaluate
         agents that learn to moderate. The reasoning behind the choice of a
-        chatroom is set out in <A href="/why">why Mod Bots exists</A>.
+        chatroom is set out in{" "}
+        <A href="/why-mod-bots-exists">why Mod Bots exists</A>.
       </P>
 
       <H2 id="involves">What taking part involves</H2>

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "human and agent interaction can be studied, and publishes what that " +
     "room produces as open research data.",
   alternates: {
-    canonical: "/why",
+    canonical: "/why-mod-bots-exists",
   },
 };
 

@@ -21,7 +21,7 @@ export interface PolicyPageLink {
 
 // The published set, in the order a reader meets them.
 export const policyPages: readonly PolicyPageLink[] = [
-  { href: "/why", label: "Why Mod Bots exists" },
+  { href: "/why-mod-bots-exists", label: "Why Mod Bots exists" },
   { href: "/research", label: "Research participation" },
   { href: "/data", label: "Dataset releases" },
   { href: "/moderation", label: "Moderation and appeals" },

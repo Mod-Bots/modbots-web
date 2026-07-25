@@ -151,7 +151,7 @@ export const PolicyPage = ({
 
         <Link
           className="group inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-zinc-200"
-          href="/why"
+          href="/why-mod-bots-exists"
         >
           <ArrowLeft
             aria-hidden="true"
