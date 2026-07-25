@@ -143,10 +143,10 @@ export default function TermsPage() {
       <P>
         You can stop at any time, and you can ask for your account to be closed.
         Access can be withdrawn where these terms or the room rules are broken,
-        or where the research requires it. Ending your participation does not by
-        itself remove what you have already contributed; ask for removal and it
-        will be handled as described in{" "}
-        <A href="/privacy-notice">the privacy notice</A>.
+        or where the research requires it. Ending your participation ends
+        further collection. It does not remove what you have already
+        contributed, for the reasons set out in the{" "}
+        <A href="/privacy-notice">privacy notice</A>.
       </P>
 
       <H2 id="law">Governing law</H2>
