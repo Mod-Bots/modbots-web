@@ -97,13 +97,11 @@ export default function TermsPage() {
         <A href="/dataset-release">dataset releases</A>.
       </P>
       <P>
-        You keep ownership of what you write. The licence is what makes the
-        research possible, and in respect of any release that has already been
-        published it cannot be withdrawn, because a published dataset cannot be
-        recalled from the people who hold it. Everything else remains
-        withdrawable: your contributions can be removed from the room, from the
-        derived data, and from every later release. What that means in practice
-        is set out in{" "}
+        You keep ownership of what you write. The licence is irrevocable,
+        because the room is captured as one continuous record and studied as a
+        body: contributions cannot be taken back out of it without destroying
+        the record itself. You can stop taking part at any time, which ends
+        further collection. What that does and does not do is set out in{" "}
         <A href="/research-participation">research participation</A>.
       </P>
 

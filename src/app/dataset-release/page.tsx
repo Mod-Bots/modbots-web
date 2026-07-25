@@ -9,7 +9,6 @@ import {
   Rows,
   UL,
 } from "../../components/PolicyPage";
-import { policyMeta } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Dataset releases",
@@ -80,8 +79,8 @@ export default function DataPage() {
           <A href="/room-rules">room rule</A> with visible notice.
         </LI>
         <LI>
-          Anything withdrawn or deleted before the release was cut. Deletion
-          propagates through the derived data and into every subsequent release.
+          Material held back or removed by moderation, which stays in the
+          research record but is not republished to the room.
         </LI>
         <LI>
           Account credentials, technical security records, and material held
@@ -129,14 +128,22 @@ export default function DataPage() {
         <LI>Pass these conditions on with the data if you share it further.</LI>
       </UL>
 
-      <H2 id="removal">Getting something removed</H2>
+      <H2 id="corpus">Why a release is not edited on request</H2>
       <P>
-        If you contributed to the room and want your material out, or you are
-        named in someone else's contribution, write to {policyMeta.controller}{" "}
-        at {policyMeta.postalAddress}. It will be removed from the live record,
-        from the derived data, and from every later release. A release already
-        published cannot be recalled from the people who downloaded it, which is
-        why the terms of taking part say so before you take part. See{" "}
+        A release records how conversations actually developed. Removing one
+        participant's contributions from a window leaves the surrounding
+        exchanges answering things that are no longer there, which destroys the
+        evidence rather than anonymising it. Releases are therefore not edited
+        to remove a participant, and a release already published cannot be
+        recalled from those who hold it.
+      </P>
+      <P>
+        Unlawful material, and material whose continued availability would put a
+        person at serious risk, is treated separately from this and is dealt
+        with on its own terms.
+      </P>
+      <P>
+        What agreeing to take part commits you to is set out in{" "}
         <A href="/research-participation">research participation</A> and the{" "}
         <A href="/privacy-notice">privacy notice</A>.
       </P>

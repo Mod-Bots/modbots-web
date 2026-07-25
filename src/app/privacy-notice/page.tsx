@@ -43,7 +43,10 @@ export default function PrivacyPage() {
       <H2 id="collected">What is collected</H2>
       <P>
         The room is the research instrument, so what happens in it is recorded
-        rather than sampled. Six categories cover it.
+        rather than sampled, and it is studied in bulk. The purpose is to show
+        how situations develop across a room, not to build a picture of any
+        individual, and no profile of a participant is constructed from it. Six
+        categories cover what is held.
       </P>
 
       <H3>Identity</H3>
@@ -187,9 +190,9 @@ export default function PrivacyPage() {
         are useful for security and no longer.
       </P>
       <P>
-        Deletion propagates. When something is removed it is removed from the
-        derived records and excluded from later releases, not only hidden in the
-        room.
+        Research ends. Collection stops when the study does, after which the
+        record is kept as the evidence behind the published findings, under the
+        provisions that apply to material archived for research purposes.
       </P>
 
       <H2 id="automated">Decisions taken about you by machines</H2>
@@ -212,7 +215,7 @@ export default function PrivacyPage() {
       <UL>
         <LI>Access: a copy of what is held about you.</LI>
         <LI>Rectification: correction of what is wrong.</LI>
-        <LI>Erasure: deletion, within the limits below.</LI>
+        <LI>Erasure: deletion, subject to the research exemption below.</LI>
         <LI>Restriction: a pause on processing while something is disputed.</LI>
         <LI>Objection: to processing carried out under public task.</LI>
         <LI>Portability: your data in a reusable form, where it applies.</LI>
@@ -222,17 +225,30 @@ export default function PrivacyPage() {
           time and without going through us first.
         </LI>
       </UL>
-      <H3>Limits on these rights</H3>
+      <H3>How research qualifies them</H3>
       <P>
-        Research processing carries exemptions under Schedule 2 of the Data
-        Protection Act 2018 where meeting a request in full would prevent or
-        seriously impair the research. Where an exemption is relied on, you will
-        be told that it has been applied and why.
+        Erasure does not extend to the research record. Article 17(3)(d) of the
+        UK GDPR disapplies the right where processing is necessary for
+        scientific research under Article 89(1) and erasure would render that
+        research impossible or seriously impair it. Access, rectification,
+        restriction, and objection carry comparable exemptions under Schedule 2
+        Part 6 of the Data Protection Act 2018. Where an exemption is relied on,
+        you will be told that it applies and on what basis.
+      </P>
+
+      <H3>What stopping does</H3>
+      <P>
+        Participation is voluntary and you may stop at any time. Stopping ends
+        further collection. It does not remove what has already been recorded.
+        The room is captured as one continuous record of how conversations
+        developed, and contributions cannot be extracted from it without
+        destroying the evidence the study rests on. A release that has already
+        been published cannot be recalled from those who hold it.
       </P>
       <P>
-        A dataset that has already been published cannot be recalled from those
-        who have downloaded it. On request, material will be removed from the
-        live record, from the derived data, and from every subsequent release.
+        Unlawful material, and material whose continued availability would put a
+        person at serious risk, is treated separately from this and is dealt
+        with on its own terms.
       </P>
       <P>
         To exercise any of these, write to {policyMeta.controller} at{" "}

@@ -264,9 +264,8 @@ export default function WhyPage() {
                   <Link href="/room-rules" className={inlineLink}>
                     explicit room rule
                   </Link>{" "}
-                  with visible notice. Deletion propagates: when something is
-                  removed it is removed from the derived data and from later
-                  releases, not only from the room.
+                  with visible notice. Account credentials and technical
+                  security records are never part of a release.
                 </p>
               </div>
 

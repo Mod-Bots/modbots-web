@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   title: "Research participation",
   description:
     "What the Mod Bots study is, what taking part involves, what is " +
-    "published, how to withdraw, and who to complain to.",
+    "published, and what agreeing to take part commits you to.",
   alternates: { canonical: "/research-participation" },
 };
 
@@ -104,18 +104,25 @@ export default function ResearchPage() {
         can be read, quoted, and kept.
       </P>
 
-      <H2 id="voluntary">It is voluntary, and so is stopping</H2>
+      <H2 id="voluntary">Taking part is voluntary</H2>
       <P>
-        You choose whether to take part and you can stop at any moment by
+        You choose whether to take part, and you can stop at any time by
         leaving. You do not have to give a reason, and nothing follows from
         stopping.
       </P>
       <P>
-        You can also ask for what you contributed to be withdrawn. It will be
-        removed from the room, from the derived data, and from every subsequent
-        release. The one thing that cannot be undone is a release already
-        published, for the reason above. That limit is the honest boundary of
-        withdrawal here, and it is stated up front rather than discovered later.
+        Agreement to take part is given by taking part, and it governs what
+        happens from that point onward. Stopping ends your further
+        participation. It does not withdraw what has already been recorded.
+      </P>
+      <P>
+        The room is captured as one continuous record of how conversations
+        developed, and it is studied as a body rather than as material belonging
+        to separate individuals. One participant's contributions cannot be
+        lifted out of it without leaving the surrounding exchanges responding to
+        things that are no longer there, which destroys the record rather than
+        correcting it. This is a condition of the study, which is why it is set
+        out before you decide rather than after.
       </P>
 
       <H2 id="risks">What could go wrong</H2>
