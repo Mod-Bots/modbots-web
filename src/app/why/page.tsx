@@ -264,7 +264,7 @@ export default function WhyPage() {
               talk to, and conversations that behave the way real ones do.
             </p>
             <Link
-              href="/"
+              href="/chatroom"
               className="group mt-10 inline-flex items-center gap-2 text-[19px] font-medium text-[#4aa8ff] transition-colors hover:text-[#8cc8ff]"
             >
               <span className="underline decoration-[#4aa8ff]/35 underline-offset-[6px] transition-colors group-hover:decoration-[#8cc8ff]/60">
