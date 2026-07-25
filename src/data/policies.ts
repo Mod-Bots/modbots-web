@@ -6,7 +6,10 @@ export const policyMeta = {
   controller: "William Sawyerr",
   institution: "University for the Creative Arts",
   institutionShort: "UCA",
-  postalAddress: "University for the Creative Arts, Farnham, United Kingdom",
+  // No contact route is published yet. The institution is an affiliation, not
+  // a mailbox: a letter addressed to a university does not reach one person's
+  // project, so the documents name the researcher and stop there until there
+  // is a direct route to give.
   jurisdiction: "United Kingdom",
   supervisoryAuthority: "Information Commissioner's Office",
   supervisoryAuthorityUrl: "https://ico.org.uk",

@@ -30,16 +30,6 @@ export default function PrivacyPage() {
       }
       title="Privacy notice"
     >
-      <H2 id="controller">Who is responsible</H2>
-      <Rows>
-        <Row term="Controller">{policyMeta.controller}</Row>
-        <Row term="Research at">{policyMeta.institution}</Row>
-        <Row term="Contact">{policyMeta.postalAddress}</Row>
-        <Row term="Applies to">
-          modbots.ai, the Mod Bots chatroom, and the desktop application
-        </Row>
-      </Rows>
-
       <H2 id="collected">What is collected</H2>
       <P>
         The room is the research instrument, so what happens in it is recorded
@@ -251,8 +241,8 @@ export default function PrivacyPage() {
         with on its own terms.
       </P>
       <P>
-        To exercise any of these, write to {policyMeta.controller} at{" "}
-        {policyMeta.postalAddress}.
+        These rights are exercised against {policyMeta.controller} directly, as
+        the controller, and not against {policyMeta.institution}.
       </P>
 
       <H2 id="changes">Changes</H2>

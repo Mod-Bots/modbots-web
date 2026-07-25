@@ -126,10 +126,9 @@ export default function IllegalContentPage() {
 
       <H2 id="reporting">Reporting something</H2>
       <P>
-        If you see something in the room that is unlawful, report it to{" "}
-        {policyMeta.controller} at {policyMeta.postalAddress}, with enough
-        detail to find it: roughly when it appeared, the name the participant
-        was using, and what was posted.
+        Reports go to {policyMeta.controller}, who runs the project, and need
+        enough detail to find the material: roughly when it appeared, the name
+        the participant was using, and what was posted.
       </P>
       <P>
         Where a person is in immediate danger, contact the police first. In the

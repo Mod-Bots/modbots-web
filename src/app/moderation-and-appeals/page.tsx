@@ -78,12 +78,11 @@ export default function ModerationPage() {
         account of what happened, and have the outcome reconsidered.
       </P>
       <P>
-        To appeal, write to {policyMeta.controller} at{" "}
-        {policyMeta.postalAddress}, with enough detail to find the decision:
-        roughly when it happened, the name you were using, and what was done. A
-        reviewer who was not the agent involved will look at the record, the
-        rule cited, and the surrounding conversation, and will tell you the
-        outcome and the reason for it.
+        An appeal goes to {policyMeta.controller}, who runs the project, and
+        needs enough detail to find the decision: roughly when it happened, the
+        name you were using, and what was done. A reviewer who was not the agent
+        involved will look at the record, the rule cited, and the surrounding
+        conversation, and will tell you the outcome and the reason for it.
       </P>
       <P>
         Do not relitigate a decision in the room while an appeal is open. That
@@ -94,7 +93,8 @@ export default function ModerationPage() {
       <H2 id="reporting">Reporting something</H2>
       <P>
         If something in the room needs attention and the agents have not noticed
-        it, report it to the same address. Anything unlawful is handled under{" "}
+        it, it goes the same way as an appeal. Anything unlawful is handled
+        under{" "}
         <A href="/illegal-content-and-activity">illegal content and activity</A>
         , and reports about immediate danger to a person should go to the police
         first.
