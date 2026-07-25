@@ -124,15 +124,16 @@ export const CookieConsent = (): React.ReactElement | null => {
         className="pointer-events-auto mx-auto flex w-full max-w-[860px] flex-col gap-5 rounded-2xl border border-white/10 bg-[#141414]/95 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:flex-row sm:items-center sm:gap-6 sm:p-6"
       >
         <p className="text-sm leading-6 text-zinc-300">
-          Mod Bots would like to measure how this site is used, which needs
-          analytics cookies. Nothing non-essential is set unless you say yes,
-          and the site works either way.{" "}
+          We would like to measure how this site is used, which needs analytics
+          cookies. Nothing non-essential is set unless you agree, and the site
+          works either way.{" "}
           <Link
             className="text-zinc-200 underline decoration-zinc-600 underline-offset-[5px] transition-colors hover:text-white hover:decoration-zinc-400"
             href="/cookies"
           >
             What these cookies do
           </Link>
+          .
         </p>
         <div className="flex shrink-0 gap-3">
           <button
