@@ -7,7 +7,6 @@ import {
   CalendarDays,
   ChevronDown,
   CircleAlert,
-  Copy,
   CornerUpLeft,
   DoorOpen,
   FileText,
@@ -41,7 +40,6 @@ import {
   memo,
   useCallback,
   useEffect,
-  useEffectEvent,
   useMemo,
   useRef,
   useState,
@@ -54,27 +52,19 @@ import {
   SettingsDialog,
   type SettingsSection,
 } from "../components/SettingsDialog";
-import { SiteFooter } from "../components/SiteFooter";
 import type {
   Actor,
   ActorType,
   ContentAddress,
   RoomEvent,
 } from "../data/contracts";
-import { saveStoredIdentity } from "../data/identity";
-import type { BrowserLoginOutcome, BrowserLoginSession } from "../data/oauth";
 import {
   accountBaseUrl,
   consumeEnterAfterLogin,
-  getBrowserLoginSession,
-  markEnterAfterLogin,
-  openInBrowser,
-  resetBrowserLoginSession,
 } from "../data/oauth";
 import {
   isMutedError,
   mediaAssetDataUrl,
-  setSessionToken,
 } from "../data/platform";
 import { actorLabel, actorRole } from "../data/room-state";
 import { useRoomActivity } from "../hooks/useRoomActivity";
@@ -98,26 +88,12 @@ const roomAbout = (
 const appVersion = "0.0.1-alpha";
 
 const groupWindowMs = 45 * 1000;
-const browserLoginWaitMs = 90_000;
 const participantActiveWindowMs = 5 * 60 * 1000;
 const conversationPageSize = 100;
 
 const participantsPanel = { min: 200, max: 360, initial: 260 };
 const aboutPanel = { min: 230, max: 400, initial: 280 };
 const panelResizeStep = 16;
-
-const useLaunchUid = (): string | null => {
-  const [uid, setUid] = useState<string | null>(null);
-
-  useEffect(() => {
-    setUid(new URLSearchParams(window.location.search).get("uid"));
-  }, []);
-
-  return uid;
-};
-
-const uidQuery = (uid: string | null): string =>
-  uid === null ? "" : `?uid=${encodeURIComponent(uid)}`;
 
 const clampWidth = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
@@ -1323,364 +1299,6 @@ function RegisteredMark({ className = "h-3.5 w-3.5" }: { className?: string }) {
         strokeLinejoin="round"
       />
     </svg>
-  );
-}
-
-function StartScreen({
-  onSignedIn,
-}: {
-  onSignedIn: (outcome: BrowserLoginOutcome) => void;
-}) {
-  const [session, setSession] = useState<BrowserLoginSession | null>(null);
-  const [loginUrl, setLoginUrl] = useState<string | null>(null);
-  const [authCode, setAuthCode] = useState("");
-  const [codePending, setCodePending] = useState(false);
-  const [preparingSession, setPreparingSession] = useState(false);
-  const [waitingForBrowser, setWaitingForBrowser] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const boundBrowserSession = useRef<BrowserLoginSession | null>(null);
-  const uid = useLaunchUid();
-  const accountFormReady = uid !== null || loginUrl !== null;
-
-  const loginFailureMessage = (error: unknown, fallback: string): string => {
-    if (error instanceof Error) {
-      return error.message;
-    }
-
-    return typeof error === "string" && error.trim().length > 0
-      ? error
-      : fallback;
-  };
-
-  const bindBrowserSession = (prepared: BrowserLoginSession) => {
-    setSession(prepared);
-    setLoginUrl(prepared.authorizeUrl);
-
-    if (boundBrowserSession.current === prepared) {
-      return prepared;
-    }
-
-    boundBrowserSession.current = prepared;
-    prepared.automatic.then(
-      (outcome) => {
-        if (boundBrowserSession.current === prepared) {
-          onSignedIn(outcome);
-        }
-      },
-      (error: unknown) => {
-        if (boundBrowserSession.current !== prepared) {
-          return;
-        }
-
-        boundBrowserSession.current = null;
-        setSession((current) => (current === prepared ? null : current));
-        setWaitingForBrowser(false);
-        setLoginError(
-          loginFailureMessage(error, "The Browser log-in did not complete."),
-        );
-      },
-    );
-
-    return prepared;
-  };
-
-  const ensureBrowserSession = async (): Promise<BrowserLoginSession> => {
-    if (session !== null) {
-      return session;
-    }
-
-    setPreparingSession(true);
-
-    try {
-      return bindBrowserSession(await getBrowserLoginSession("register"));
-    } finally {
-      setPreparingSession(false);
-    }
-  };
-
-  useEffect(() => {
-    let cancelled = false;
-
-    setPreparingSession(true);
-
-    void getBrowserLoginSession("register")
-      .then((prepared) => {
-        if (cancelled) {
-          return;
-        }
-
-        bindBrowserSession(prepared);
-      })
-      .catch((error: unknown) => {
-        if (cancelled) {
-          return;
-        }
-
-        setLoginError(
-          loginFailureMessage(error, "The log-in link could not be prepared."),
-        );
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setPreparingSession(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const resetLoginFlow = useEffectEvent(async (message: string | null) => {
-    boundBrowserSession.current = null;
-    setAuthCode("");
-    setCodePending(false);
-    setPreparingSession(false);
-    setWaitingForBrowser(false);
-    setCopied(false);
-    setSession(null);
-    setLoginUrl(null);
-
-    await resetBrowserLoginSession();
-    setLoginError(message);
-  });
-
-  useEffect(() => {
-    if (!waitingForBrowser || loginError !== null) {
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      void resetLoginFlow(
-        "The Browser log-in took too long and was reset. Start again when you are ready.",
-      );
-    }, browserLoginWaitMs);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [loginError, resetLoginFlow, waitingForBrowser]);
-
-  const copyLoginUrl = async () => {
-    setLoginError(null);
-
-    try {
-      const url = loginUrl ?? (await ensureBrowserSession()).authorizeUrl;
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1_500);
-    } catch (error) {
-      setLoginError(
-        loginFailureMessage(error, "The log-in link could not be prepared."),
-      );
-    }
-  };
-
-  const continueInBrowser = async () => {
-    setLoginError(null);
-    setWaitingForBrowser(true);
-
-    try {
-      const prepared = await ensureBrowserSession();
-      await openInBrowser(prepared.authorizeUrl);
-    } catch (error) {
-      setWaitingForBrowser(false);
-      setLoginError(
-        loginFailureMessage(error, "The Browser log-in could not be started."),
-      );
-    }
-  };
-
-  const submitCode = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (codePending || authCode.trim().length === 0) {
-      return;
-    }
-
-    setLoginError(null);
-    setCodePending(true);
-
-    try {
-      const prepared = await ensureBrowserSession();
-      const outcome = await prepared.completeWithCode(authCode);
-      onSignedIn(outcome);
-    } catch (error) {
-      setLoginError(
-        loginFailureMessage(error, "The authorization code was not accepted."),
-      );
-    } finally {
-      setCodePending(false);
-    }
-  };
-
-  return (
-    <section className="modbots-scroll relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-8 sm:px-6">
-      <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${startScreenBg.src})` }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/35 to-black/60"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(620px 720px at 50% 50%, rgba(0,0,0,0.8), rgba(0,0,0,0.35) 58%, transparent 78%)",
-        }}
-        aria-hidden="true"
-      />
-      <div className="relative mx-auto flex w-full max-w-[420px] flex-1 flex-col justify-center">
-        <div className="text-center">
-          <img
-            src={appLogo.src}
-            alt=""
-            className="mx-auto h-12 w-12 rounded-lg shadow-[0_8px_24px_rgba(0,143,255,0.2)]"
-          />
-          <h1 className="mt-5 text-[26px] font-semibold tracking-tight text-white">
-            Mod Bots
-          </h1>
-          <p className="mx-auto mt-2 max-w-[34ch] text-sm leading-6 text-zinc-500">
-            {roomAbout}
-          </p>
-        </div>
-
-        <form
-          method="post"
-          action={`${accountBaseUrl}/register`}
-          onSubmit={(event) => {
-            if (!accountFormReady) {
-              event.preventDefault();
-            }
-          }}
-          noValidate
-          className="mt-8 rounded-2xl border border-white/10 bg-[#141414] p-6 shadow-[0_16px_50px_rgba(0,0,0,0.35)]"
-        >
-          {uid !== null ? <input type="hidden" name="uid" value={uid} /> : null}
-          {uid === null && loginUrl !== null ? (
-            <input type="hidden" name="returnTo" value={loginUrl} />
-          ) : null}
-          <input type="hidden" name="screen" value="register" />
-
-          <label
-            className="block text-sm font-medium text-zinc-300"
-            htmlFor="username"
-          >
-            Username
-          </label>
-          <input
-            className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
-            id="username"
-            name="username"
-            type="text"
-            autoComplete="username"
-            autoFocus
-            aria-invalid="false"
-            defaultValue=""
-          />
-          <p className="mt-1 text-xs text-zinc-600">
-            3 to 64 letters, numbers, underscores, or hyphens. This is yours
-            alone.
-          </p>
-
-          <label
-            className="mt-4 block text-sm font-medium text-zinc-300"
-            htmlFor="displayName"
-          >
-            Display name{" "}
-            <span className="font-normal text-zinc-600">(optional)</span>
-          </label>
-          <input
-            className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
-            id="displayName"
-            name="displayName"
-            type="text"
-            autoComplete="nickname"
-            defaultValue=""
-          />
-
-          <label
-            className="mt-4 block text-sm font-medium text-zinc-300"
-            htmlFor="password"
-          >
-            Password
-          </label>
-          <input
-            className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            aria-invalid="false"
-          />
-          <p className="mt-1 text-xs text-zinc-600">8 to 200 characters.</p>
-
-          <label className="mt-5 flex items-start gap-2.5 text-sm text-zinc-400">
-            <input
-              className="mt-0.5 h-4 w-4 rounded border-white/20 bg-[#0f0f0f]"
-              type="checkbox"
-              name="acceptPolicy"
-            />
-            <span>
-              I accept the{" "}
-              <a
-                className="font-medium text-zinc-200 underline decoration-zinc-600 underline-offset-2 hover:text-white"
-                href={`${accountBaseUrl}/policy`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Participation Policy
-              </a>
-            </span>
-          </label>
-          <p className="mt-1 min-h-[1rem] text-xs text-zinc-200" />
-
-          <button
-            className="mt-6 w-full rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 disabled:pointer-events-none disabled:opacity-60"
-            type="submit"
-            disabled={!accountFormReady}
-          >
-            Create account
-          </button>
-        </form>
-
-        {uid !== null ? (
-          <form
-            method="post"
-            action={`${accountBaseUrl}/login/cancel`}
-            className="mt-5 text-center"
-          >
-            <input type="hidden" name="uid" value={uid} />
-            <button
-              className="text-sm text-zinc-500 transition hover:text-zinc-300"
-              type="submit"
-            >
-              Cancel and return to the app
-            </button>
-          </form>
-        ) : null}
-
-        <p className="mt-5 text-center text-sm text-zinc-500">
-          <a
-            className="font-medium text-zinc-300 hover:text-white"
-            href={`/login${uidQuery(uid)}`}
-          >
-            Log in
-          </a>{" "}
-          with an account or as a guest.
-        </p>
-
-        <p className="mt-6 text-center text-[11px] leading-5 text-zinc-400">
-          Humans come and go; the chat bots live here. Mod bots watch the room
-          and learn to moderate from everything that happens.
-        </p>
-      </div>
-      <SiteFooter />
-    </section>
   );
 }
 
@@ -3952,26 +3570,6 @@ export function Chatroom() {
           </div>
         ) : null}
       </main>
-    </div>
-  );
-}
-
-export function StartPage() {
-  const router = useRouter();
-
-  const enterChatroom = (outcome: BrowserLoginOutcome) => {
-    saveStoredIdentity({
-      actorId: outcome.actor.id,
-      token: outcome.session.token,
-    });
-    setSessionToken(outcome.session.token);
-    markEnterAfterLogin();
-    router.replace("/chatroom");
-  };
-
-  return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#0b0b0b] text-zinc-100">
-      <StartScreen onSignedIn={enterChatroom} />
     </div>
   );
 }
