@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
+import { CookieConsent } from "../components/CookieConsent";
 import Providers from "./providers";
 import "./globals.css";
 
 const title = "Mod Bots";
-const googleAnalyticsId = "G-YKZJGLJLD6";
 const description =
   "A live chatroom where humans and chat bots talk, and mod bots learn " +
   "to moderate from everything that happens.";
@@ -58,19 +57,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+        <CookieConsent />
       </body>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${googleAnalyticsId}');
-        `}
-      </Script>
     </html>
   );
 }

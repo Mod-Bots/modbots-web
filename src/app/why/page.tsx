@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import appLogo from "../../assets/logo.svg";
 import modBotPortrait from "../../assets/mod-bot-portrait.png";
 import startScreenBg from "../../assets/start-screen-bg.png";
-import { SiteFooter } from "../../components/SiteFooter";
+import { BackPageFooter } from "../../components/BackPageFooter";
 
 export const metadata: Metadata = {
   title: "Why the Mod Bots platform exists",
@@ -327,7 +327,7 @@ export default function WhyPage() {
         </div>
       </main>
 
-      <SiteFooter />
+      <BackPageFooter />
     </div>
   );
 }
