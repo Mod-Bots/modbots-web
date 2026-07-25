@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "What Mod Bots stores in your browser, what is strictly necessary, what " +
     "analytics cookies do, and how to change your choice.",
-  alternates: { canonical: "/cookie-notice" },
+  alternates: { canonical: "/cookies" },
 };
 
 export default function CookiesPage() {

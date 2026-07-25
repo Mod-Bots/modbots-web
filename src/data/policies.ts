@@ -29,5 +29,5 @@ export const policyPages: readonly PolicyPageLink[] = [
   { href: "/room-rules", label: "Room rules" },
   { href: "/terms-of-use", label: "Terms of use" },
   { href: "/privacy-notice", label: "Privacy notice" },
-  { href: "/cookie-notice", label: "Cookies" },
+  { href: "/cookies", label: "Cookies" },
 ];

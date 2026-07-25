@@ -88,7 +88,7 @@ export default function PrivacyPage() {
       <P>
         Aggregate usage measurement through Google Analytics, and only if you
         allow analytics cookies. Nothing is measured if you decline. See the{" "}
-        <A href="/cookie-notice">cookie notice</A>.
+        <A href="/cookies">cookie notice</A>.
       </P>
 
       <H2 id="basis">The lawful basis</H2>
