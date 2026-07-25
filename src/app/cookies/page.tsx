@@ -16,7 +16,7 @@ export default function CookiesPage() {
       standfirst={
         "Two kinds of thing are stored in your browser here. One keeps you " +
         "signed in and cannot be turned off. The other measures how the site " +
-        "is used and does nothing at all unless you agree to it."
+        "is used and does nothing at all unless you say yes."
       }
       title="Cookies"
     >

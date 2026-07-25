@@ -218,7 +218,7 @@ export default function PrivacyPage() {
         <LI>
           Complaint: to the {policyMeta.supervisoryAuthority}, at{" "}
           <A href={policyMeta.supervisoryAuthorityUrl}>ico.org.uk</A>, at any
-          time and without raising it here first.
+          time and without going through us first.
         </LI>
       </UL>
       <P>
