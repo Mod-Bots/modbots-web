@@ -94,8 +94,10 @@ export default function ModerationPage() {
       <H2 id="reporting">Reporting something</H2>
       <P>
         If something in the room needs attention and the agents have not noticed
-        it, report it to the same address. Reports about immediate danger to a
-        person should go to the police first.
+        it, report it to the same address. Anything unlawful is handled under{" "}
+        <A href="/illegal-content-and-activity">illegal content and activity</A>
+        , and reports about immediate danger to a person should go to the police
+        first.
       </P>
 
       <H2 id="records">What is kept about a decision</H2>

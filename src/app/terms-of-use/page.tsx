@@ -68,8 +68,11 @@ export default function TermsPage() {
         The <A href="/room-rules">room rules</A> are the standard, they are
         versioned, and they are what mod bots cite when they act. Read them when
         you want to; nobody is made to read them at the door. Beyond them, do
-        not attempt to break, overload, or reverse the platform, do not evade a
-        moderation action, and do not use the room to do something unlawful.
+        not attempt to break, overload, or reverse the platform, and do not
+        evade a moderation action. Anything unlawful is a separate matter from
+        the rules and is covered by{" "}
+        <A href="/illegal-content-and-activity">illegal content and activity</A>
+        .
       </P>
 
       <H2 id="uploads">What you upload</H2>

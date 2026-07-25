@@ -27,6 +27,10 @@ export const policyPages: readonly PolicyPageLink[] = [
   { href: "/dataset-release", label: "Dataset releases" },
   { href: "/moderation-and-appeals", label: "Moderation and appeals" },
   { href: "/room-rules", label: "Room rules" },
+  {
+    href: "/illegal-content-and-activity",
+    label: "Illegal content and activity",
+  },
   { href: "/terms-of-use", label: "Terms of use" },
   { href: "/privacy-notice", label: "Privacy notice" },
   { href: "/cookies", label: "Cookies" },
