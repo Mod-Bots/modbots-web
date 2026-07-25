@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description:
     "What the Mod Bots study is, what taking part involves, what is " +
     "published, how to withdraw, and who to complain to.",
-  alternates: { canonical: "/research" },
+  alternates: { canonical: "/research-participation" },
 };
 
 export default function ResearchPage() {
@@ -32,11 +32,13 @@ export default function ResearchPage() {
       <H2 id="study">The study</H2>
       <Rows>
         <Row term="Researcher">{policyMeta.controller}</Row>
-        <Row term="Institution">{policyMeta.institution}</Row>
-        <Row term="Ethics">
-          Approved by the research ethics process at {policyMeta.institution}
+        <Row term="Institution">
+          {policyMeta.institution} ({policyMeta.institutionShort})
         </Row>
-        <Row term="Contact">{policyMeta.postalAddress}</Row>
+        <Row term="Ethics">
+          Approved by the Research Ethics Committee at{" "}
+          {policyMeta.institutionShort}
+        </Row>
       </Rows>
 
       <H2 id="about">What it is about</H2>
@@ -145,17 +147,6 @@ export default function ResearchPage() {
         into the open, which is the closest thing to a direct benefit on offer:
         the data and the findings become available to anyone working on the same
         problem.
-      </P>
-
-      <H2 id="complaints">If you are unhappy</H2>
-      <P>
-        Raise it with {policyMeta.controller} at {policyMeta.postalAddress}. If
-        that does not resolve it, the research ethics process at{" "}
-        {policyMeta.institution} will take a complaint about the conduct of the
-        study. For anything about your personal data specifically, you can go
-        directly to the {policyMeta.supervisoryAuthority} at{" "}
-        <A href={policyMeta.supervisoryAuthorityUrl}>ico.org.uk</A> without
-        raising it here first.
       </P>
     </PolicyPage>
   );

@@ -102,7 +102,8 @@ export default function TermsPage() {
         recalled from the people who hold it. Everything else remains
         withdrawable: your contributions can be removed from the room, from the
         derived data, and from every later release. What that means in practice
-        is set out in <A href="/research">research participation</A>.
+        is set out in{" "}
+        <A href="/research-participation">research participation</A>.
       </P>
 
       <H2 id="moderation">Moderation applies to you</H2>

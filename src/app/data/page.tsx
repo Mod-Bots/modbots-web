@@ -137,7 +137,7 @@ export default function DataPage() {
         from the derived data, and from every later release. A release already
         published cannot be recalled from the people who downloaded it, which is
         why the terms of taking part say so before you take part. See{" "}
-        <A href="/research">research participation</A> and the{" "}
+        <A href="/research-participation">research participation</A> and the{" "}
         <A href="/privacy">privacy notice</A>.
       </P>
 

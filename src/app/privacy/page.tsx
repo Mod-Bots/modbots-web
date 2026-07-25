@@ -119,7 +119,8 @@ export default function PrivacyPage() {
         task is the appropriate basis and is the standard one for university
         research. That is a separate question from research ethics, where your
         informed agreement is still required and still yours to withdraw. How
-        that works is set out in <A href="/research">research participation</A>.
+        that works is set out in{" "}
+        <A href="/research-participation">research participation</A>.
       </P>
 
       <H3>Sensitive categories</H3>

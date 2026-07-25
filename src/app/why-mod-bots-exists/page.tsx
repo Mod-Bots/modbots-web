@@ -199,7 +199,7 @@ export default function WhyPage() {
                 choose how to respond, and learn from what happens next.
               </p>
             </div>
-            <PolicyLink href="/research">
+            <PolicyLink href="/research-participation">
               How participation, consent, and research ethics are handled
             </PolicyLink>
           </section>

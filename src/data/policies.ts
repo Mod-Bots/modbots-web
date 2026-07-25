@@ -5,6 +5,7 @@
 export const policyMeta = {
   controller: "William Sawyerr",
   institution: "University for the Creative Arts",
+  institutionShort: "UCA",
   postalAddress: "University for the Creative Arts, Farnham, United Kingdom",
   jurisdiction: "United Kingdom",
   supervisoryAuthority: "Information Commissioner's Office",
@@ -22,7 +23,7 @@ export interface PolicyPageLink {
 // The published set, in the order a reader meets them.
 export const policyPages: readonly PolicyPageLink[] = [
   { href: "/why-mod-bots-exists", label: "Why Mod Bots exists" },
-  { href: "/research", label: "Research participation" },
+  { href: "/research-participation", label: "Research participation" },
   { href: "/data", label: "Dataset releases" },
   { href: "/moderation", label: "Moderation and appeals" },
   { href: "/rules", label: "Room rules" },
