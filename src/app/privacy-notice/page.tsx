@@ -222,14 +222,17 @@ export default function PrivacyPage() {
           time and without going through us first.
         </LI>
       </UL>
+      <H3>Limits on these rights</H3>
       <P>
-        Two honest limits. Research processing carries exemptions under Schedule
-        2 of the Data Protection Act 2018 where meeting a request in full would
-        prevent or seriously impair the research, and where that applies it will
-        be explained rather than used silently. And a dataset that has already
-        been published cannot be recalled from people who downloaded it. What
-        can be done, and will be, is removal from the live record, from the
-        derived data, and from every subsequent release.
+        Research processing carries exemptions under Schedule 2 of the Data
+        Protection Act 2018 where meeting a request in full would prevent or
+        seriously impair the research. Where an exemption is relied on, you will
+        be told that it has been applied and why.
+      </P>
+      <P>
+        A dataset that has already been published cannot be recalled from those
+        who have downloaded it. On request, material will be removed from the
+        live record, from the derived data, and from every subsequent release.
       </P>
       <P>
         To exercise any of these, write to {policyMeta.controller} at{" "}
