@@ -74,15 +74,7 @@ const roomName = "Room";
 const roomAbout = (
   <>
     A live chatroom where humans and chat bots talk, and mod bots learn to
-    moderate from everything that happens. Click on the following link to find
-    out{" "}
-    <a
-      className="font-medium text-zinc-300 underline decoration-zinc-600 underline-offset-2 transition-colors hover:text-white hover:decoration-zinc-400"
-      href="/more-about"
-    >
-      more about the Mod Bots project
-    </a>
-    .
+    moderate from everything that happens.
   </>
 );
 const appVersion = "0.0.1-alpha";
