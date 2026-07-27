@@ -11,7 +11,7 @@ import {
   Rows,
   UL,
 } from "../../components/PolicyPage";
-import { policyContacts, policyMeta } from "../../data/policies";
+import { policyContacts } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Privacy notice",
@@ -261,11 +261,6 @@ export default function PrivacyPage() {
         <LI>Restriction: a pause on processing while something is disputed.</LI>
         <LI>Objection: to processing carried out under public task.</LI>
         <LI>Portability: your data in a reusable form, where it applies.</LI>
-        <LI>
-          Complaint: to the {policyMeta.supervisoryAuthority}, at{" "}
-          <A href={policyMeta.supervisoryAuthorityUrl}>ico.org.uk</A>, at any
-          time and without going through us first.
-        </LI>
       </UL>
       <P>
         Requests are handled by <Contact route={policyContacts.privacy} />. Say

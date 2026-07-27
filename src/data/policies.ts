@@ -8,8 +8,6 @@
 export const policyMeta = {
   operator: "Mod Bots",
   jurisdiction: "United Kingdom",
-  supervisoryAuthority: "Information Commissioner's Office",
-  supervisoryAuthorityUrl: "https://ico.org.uk",
   version: "1",
   updated: "26 July 2026",
   minimumAge: 18,
