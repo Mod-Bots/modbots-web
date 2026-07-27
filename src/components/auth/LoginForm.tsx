@@ -131,7 +131,7 @@ export function LoginForm() {
 
         <div className="my-5 flex items-center gap-3">
           <span className="h-px flex-1 bg-white/[0.08]" />
-          <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-zinc-600">
+          <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-zinc-400">
             OR
           </span>
           <span className="h-px flex-1 bg-white/[0.08]" />
@@ -142,7 +142,7 @@ export function LoginForm() {
         <label className="mt-3 block" htmlFor="displayName">
           <span className="text-xs font-medium text-zinc-400">
             Display name{" "}
-            <span className="font-normal text-zinc-600">(optional)</span>
+            <span className="font-normal text-zinc-400">(optional)</span>
           </span>
           <input
             className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-[#181818] px-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-white/25"

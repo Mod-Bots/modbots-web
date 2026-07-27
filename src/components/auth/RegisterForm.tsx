@@ -248,7 +248,7 @@ export function RegisterForm() {
           aria-invalid="false"
           defaultValue=""
         />
-        <p className="mt-1 text-xs text-zinc-600">
+        <p className="mt-1 text-xs text-zinc-400">
           3 to 64 letters, numbers, underscores, or hyphens. This is yours
           alone.
         </p>
@@ -258,7 +258,7 @@ export function RegisterForm() {
           htmlFor="displayName"
         >
           Display name{" "}
-          <span className="font-normal text-zinc-600">(optional)</span>
+          <span className="font-normal text-zinc-400">(optional)</span>
         </label>
         <input
           className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
@@ -283,7 +283,7 @@ export function RegisterForm() {
           autoComplete="new-password"
           aria-invalid="false"
         />
-        <p className="mt-1 text-xs text-zinc-600">8 to 200 characters.</p>
+        <p className="mt-1 text-xs text-zinc-400">8 to 200 characters.</p>
 
         <label className="mt-5 flex items-start gap-2.5 text-sm text-zinc-400">
           <input
