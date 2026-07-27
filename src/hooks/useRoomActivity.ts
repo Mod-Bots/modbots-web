@@ -35,6 +35,7 @@ import {
   removeActorProfilePicture,
   setRoomPresence,
   setSessionToken,
+  translateTexts,
   updateActorProfile,
   uploadActorProfilePicture,
 } from "../data/platform";
@@ -285,6 +286,7 @@ export const useRoomActivity = (roomId: string) => {
   const sendMessage = useMutation({
     mutationFn: async (message: {
       content: string;
+      source?: { text: string; language: string };
       replyTo?: { contentItemId: string };
       addressedTo?: ContentAddress[];
     }) => {
@@ -298,6 +300,7 @@ export const useRoomActivity = (roomId: string) => {
         message.content,
         message.replyTo,
         message.addressedTo,
+        message.source,
       );
     },
     onSuccess: (event) => {
@@ -310,6 +313,7 @@ export const useRoomActivity = (roomId: string) => {
   const sendContent = useMutation({
     mutationFn: async (message: {
       content: string;
+      source?: { text: string; language: string };
       file: File;
       replyTo?: { contentItemId: string };
       addressedTo?: ContentAddress[];
@@ -326,7 +330,19 @@ export const useRoomActivity = (roomId: string) => {
       const parts = [
         ...(message.content.length === 0
           ? []
-          : [{ kind: "text" as const, text: message.content }]),
+          : [
+              {
+                kind: "text" as const,
+                text: message.content,
+                language: "en",
+                ...(message.source === undefined
+                  ? {}
+                  : {
+                      sourceText: message.source.text,
+                      sourceLanguage: message.source.language,
+                    }),
+              },
+            ]),
         {
           kind: asset.mediaKind,
           mediaAssetId: asset.mediaAssetId,
@@ -350,6 +366,26 @@ export const useRoomActivity = (roomId: string) => {
       void queryClient.invalidateQueries({ queryKey: rosterKey });
     },
   });
+  const translate = useCallback(
+    async (
+      texts: string[],
+      sourceLanguage: string,
+      targetLanguage: "en" | "zh-CN",
+    ): Promise<string[]> => {
+      if (localActor === undefined) {
+        throw new Error("Join the room before translating messages.");
+      }
+
+      const result = await translateTexts(
+        localActor.id,
+        texts,
+        sourceLanguage,
+        targetLanguage,
+      );
+      return result.translations;
+    },
+    [localActor],
+  );
   // The explicit step through the room door: presence joins only when the
   // person chooses to enter from the start screen.
   const enterRoom = async (): Promise<void> => {
@@ -606,5 +642,6 @@ export const useRoomActivity = (roomId: string) => {
     uploadProfilePicture,
     removeProfilePicture,
     updateProfile,
+    translate,
   };
 };

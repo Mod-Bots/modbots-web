@@ -205,6 +205,7 @@ export const postRoomMessage = (
   content: string,
   replyTo?: { contentItemId: string },
   addressedTo?: ContentAddress[],
+  source?: { text: string; language: string },
 ): Promise<RoomEvent> =>
   requestJson(apiUrl(`/api/rooms/${encodeURIComponent(roomId)}/messages`), {
     method: "POST",
@@ -216,6 +217,9 @@ export const postRoomMessage = (
       ...(addressedTo === undefined || addressedTo.length === 0
         ? {}
         : { addressedTo }),
+      ...(source === undefined
+        ? {}
+        : { sourceText: source.text, sourceLanguage: source.language }),
     }),
   });
 
@@ -338,3 +342,20 @@ export const getRoomEvents = async (roomId: string): Promise<RoomEvent[]> => {
 
   return page.data;
 };
+
+export const translateTexts = (
+  actorId: string,
+  texts: string[],
+  sourceLanguage: string,
+  targetLanguage: "en" | "zh-CN",
+): Promise<{ translations: string[] }> =>
+  requestJson(apiUrl("/api/translations"), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      actorId,
+      texts,
+      sourceLanguage,
+      targetLanguage,
+    }),
+  });

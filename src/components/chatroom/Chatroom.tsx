@@ -55,6 +55,7 @@ import {
 import type {
   Actor,
   ActorType,
+  ChatLanguage,
   ContentAddress,
   RoomEvent,
 } from "@/data/contracts";
@@ -122,7 +123,13 @@ interface EventAssetPart {
 }
 
 type EventContentPart =
-  | { partId: string; kind: "text"; text: string }
+  | {
+      partId: string;
+      kind: "text";
+      text: string;
+      sourceText: string | null;
+      sourceLanguage: string | null;
+    }
   | EventAssetPart;
 
 const contentParts = (event: RoomEvent): EventContentPart[] => {
@@ -146,7 +153,15 @@ const contentParts = (event: RoomEvent): EventContentPart[] => {
     }
 
     if (part.kind === "text" && typeof part.text === "string") {
-      parts.push({ partId: part.partId, kind: "text", text: part.text });
+      parts.push({
+        partId: part.partId,
+        kind: "text",
+        text: part.text,
+        sourceText:
+          typeof part.sourceText === "string" ? part.sourceText : null,
+        sourceLanguage:
+          typeof part.sourceLanguage === "string" ? part.sourceLanguage : null,
+      });
       continue;
     }
 
@@ -194,6 +209,63 @@ const eventContent = (event: RoomEvent): string => {
     .filter((part): part is EventAssetPart => part.kind !== "text")
     .map((part) => part.caption ?? `Shared ${part.kind}`)
     .join("\n");
+};
+
+const eventSource = (
+  event: RoomEvent,
+): { text: string; language: string } | null => {
+  const legacyText = payloadString(event, "sourceText");
+  const legacyLanguage = payloadString(event, "sourceLanguage");
+
+  if (legacyText !== null && legacyLanguage !== null) {
+    return { text: legacyText, language: legacyLanguage };
+  }
+
+  const textParts = contentParts(event).filter(
+    (part): part is Extract<EventContentPart, { kind: "text" }> =>
+      part.kind === "text",
+  );
+
+  if (
+    textParts.length === 0 ||
+    textParts.some(
+      (part) => part.sourceText === null || part.sourceLanguage === null,
+    )
+  ) {
+    return null;
+  }
+
+  const language = textParts[0].sourceLanguage;
+
+  if (
+    language === null ||
+    textParts.some((part) => part.sourceLanguage !== language)
+  ) {
+    return null;
+  }
+
+  return {
+    text: textParts.map((part) => part.sourceText).join("\n"),
+    language,
+  };
+};
+
+const displayedEventText = (
+  event: RoomEvent,
+  language: ChatLanguage,
+  translations: ReadonlyMap<string, string>,
+): string => {
+  if (language === "en") {
+    return eventText(event);
+  }
+
+  const source = eventSource(event);
+
+  if (source?.language === language) {
+    return source.text;
+  }
+
+  return translations.get(event.sequence) ?? eventText(event);
 };
 
 const payloadReply = (event: RoomEvent): { contentItemId: string } | null => {
@@ -466,6 +538,7 @@ const activityScopes: Array<{ id: ActivityScope; label: string }> = [
 
 const settingsStorageKeys = {
   sendWithEnter: "modbots.web.send-with-enter",
+  chatLanguage: "modbots.web.chat-language",
 };
 
 const readStoredBoolean = (key: string, fallback: boolean): boolean => {
@@ -484,6 +557,11 @@ const readStoredBoolean = (key: string, fallback: boolean): boolean => {
 
 const writeStoredBoolean = (key: string, value: boolean): void => {
   window.localStorage.setItem(key, String(value));
+};
+
+const readStoredChatLanguage = (): ChatLanguage => {
+  const stored = window.localStorage.getItem(settingsStorageKeys.chatLanguage);
+  return stored === "zh-CN" ? "zh-CN" : "en";
 };
 
 const moderationActionLabels: Record<string, string> = {
@@ -956,6 +1034,8 @@ function ChatMessage({
   localActorId,
   mentionLabels,
   repliedEvent,
+  displayText,
+  repliedDisplayText,
   onReply,
 }: {
   actors: Map<string, Actor>;
@@ -964,12 +1044,14 @@ function ChatMessage({
   localActorId: string | undefined;
   mentionLabels: MentionLabel[];
   repliedEvent: RoomEvent | null;
+  displayText: string;
+  repliedDisplayText: string | null;
   onReply?: () => void;
 }) {
   const actor = event.actorId === null ? undefined : actors.get(event.actorId);
   const ownMessage = event.actorId === localActorId;
   const name = actorLabel(event.actorId, actors);
-  const content = eventText(event);
+  const content = displayText;
   const isReply = payloadReply(event) !== null;
   const body = renderMessageBody(content, mentionLabels, localActorId);
 
@@ -1040,7 +1122,7 @@ function ChatMessage({
                     {actorLabel(repliedEvent.actorId, actors)}
                   </p>
                   <p className="mt-0.5 truncate text-[11px] leading-5 text-zinc-500">
-                    {eventContent(repliedEvent)}
+                    {repliedDisplayText ?? eventContent(repliedEvent)}
                   </p>
                 </>
               )}
@@ -1104,6 +1186,8 @@ const ConversationTimeline = memo(function ConversationTimeline({
   localActorId,
   mentionLabels,
   messagesByContentItem,
+  chatLanguage,
+  translatedEventText,
   onReply,
   ruleTitles,
 }: {
@@ -1112,6 +1196,8 @@ const ConversationTimeline = memo(function ConversationTimeline({
   localActorId: string | undefined;
   mentionLabels: MentionLabel[];
   messagesByContentItem: Map<string, RoomEvent>;
+  chatLanguage: ChatLanguage;
+  translatedEventText: ReadonlyMap<string, string>;
   onReply: (event: RoomEvent) => void;
   ruleTitles: Map<string, string>;
 }) {
@@ -1139,6 +1225,15 @@ const ConversationTimeline = memo(function ConversationTimeline({
     const canReply =
       localActorId !== undefined &&
       payloadString(item.event, "contentItemId") !== null;
+    const displayText = displayedEventText(
+      item.event,
+      chatLanguage,
+      translatedEventText,
+    );
+    const repliedDisplayText =
+      repliedEvent === null
+        ? null
+        : displayedEventText(repliedEvent, chatLanguage, translatedEventText);
 
     return (
       <ChatMessage
@@ -1149,6 +1244,8 @@ const ConversationTimeline = memo(function ConversationTimeline({
         localActorId={localActorId}
         mentionLabels={mentionLabels}
         repliedEvent={repliedEvent}
+        displayText={displayText}
+        repliedDisplayText={repliedDisplayText}
         onReply={canReply ? () => onReply(item.event) : undefined}
       />
     );
@@ -1347,6 +1444,7 @@ export function Chatroom() {
     signOut,
     uploadProfilePicture,
     removeProfilePicture,
+    translate,
     updateProfile,
   } = useRoomActivity(roomId);
   const [draft, setDraft] = useState("");
@@ -1397,6 +1495,12 @@ export function Chatroom() {
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection>("account");
   const [sendWithEnter, setSendWithEnter] = useState(true);
+  const [chatLanguage, setChatLanguage] = useState<ChatLanguage>("en");
+  const [translatedEventText, setTranslatedEventText] = useState<
+    Map<string, string>
+  >(() => new Map());
+  const [translationError, setTranslationError] = useState<string | null>(null);
+  const [translatingSubmission, setTranslatingSubmission] = useState(false);
   const [settingsReady, setSettingsReady] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [localWindowActive, setLocalWindowActive] = useState(false);
@@ -1413,6 +1517,8 @@ export function Chatroom() {
   const attachmentInput = useRef<HTMLInputElement>(null);
   const profilePictureInput = useRef<HTMLInputElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
+  const pendingTranslations = useRef(new Set<string>());
+  const failedTranslations = useRef(new Set<string>());
   const apiConnected = apiHealth.data?.status === "ok";
   const chatBotCount = onlineActorIds.filter(
     (actorId) => actors.get(actorId)?.type === "chat_bot",
@@ -1441,6 +1547,7 @@ export function Chatroom() {
     setSendWithEnter(
       readStoredBoolean(settingsStorageKeys.sendWithEnter, true),
     );
+    setChatLanguage(readStoredChatLanguage());
     setSettingsReady(true);
   }, []);
 
@@ -1473,6 +1580,20 @@ export function Chatroom() {
 
     writeStoredBoolean(settingsStorageKeys.sendWithEnter, sendWithEnter);
   }, [sendWithEnter, settingsReady]);
+
+  useEffect(() => {
+    if (!settingsReady) {
+      return;
+    }
+
+    window.localStorage.setItem(settingsStorageKeys.chatLanguage, chatLanguage);
+  }, [chatLanguage, settingsReady]);
+
+  const changeChatLanguage = useCallback((language: ChatLanguage) => {
+    failedTranslations.current.clear();
+    setTranslationError(null);
+    setChatLanguage(language);
+  }, []);
 
   const openSettings = useCallback((section: SettingsSection = "account") => {
     setSettingsSection(section);
@@ -1639,9 +1760,16 @@ export function Chatroom() {
           return true;
         }
 
-        return eventContent(event).toLocaleLowerCase().includes(query);
+        const displayed = displayedEventText(
+          event,
+          chatLanguage,
+          translatedEventText,
+        );
+        const searchable =
+          displayed.length > 0 ? displayed : eventContent(event);
+        return searchable.toLocaleLowerCase().includes(query);
       });
-  }, [events.data, searchQuery]);
+  }, [chatLanguage, events.data, searchQuery, translatedEventText]);
   const hiddenEventCount = Math.max(0, roomEvents.length - visibleEventCount);
   const visibleRoomEvents = useMemo(
     () => roomEvents.slice(-visibleEventCount),
@@ -1651,6 +1779,90 @@ export function Chatroom() {
     () => buildTimeline(visibleRoomEvents),
     [visibleRoomEvents],
   );
+  useEffect(() => {
+    if (chatLanguage !== "zh-CN" || localActor === undefined) {
+      return;
+    }
+
+    const candidates: Array<{ sequence: string; text: string }> = [];
+    let totalCharacters = 0;
+
+    for (const event of (events.data ?? []).slice(-visibleEventCount)) {
+      if (
+        (event.type !== "message_posted" && event.type !== "content_posted") ||
+        translatedEventText.has(event.sequence) ||
+        pendingTranslations.current.has(event.sequence) ||
+        failedTranslations.current.has(event.sequence) ||
+        eventSource(event)?.language === "zh-CN"
+      ) {
+        continue;
+      }
+
+      const text = eventText(event);
+
+      if (
+        text.trim().length === 0 ||
+        text.length > 4_000 ||
+        candidates.length >= 50 ||
+        totalCharacters + text.length > 40_000
+      ) {
+        continue;
+      }
+
+      candidates.push({ sequence: event.sequence, text });
+      totalCharacters += text.length;
+    }
+
+    if (candidates.length === 0) {
+      return;
+    }
+
+    for (const candidate of candidates) {
+      pendingTranslations.current.add(candidate.sequence);
+    }
+
+    void translate(
+      candidates.map((candidate) => candidate.text),
+      "en",
+      "zh-CN",
+    )
+      .then((translations) => {
+        setTranslatedEventText((current) => {
+          const next = new Map(current);
+
+          candidates.forEach((candidate, index) => {
+            const translated = translations[index];
+
+            if (translated !== undefined) {
+              next.set(candidate.sequence, translated);
+            }
+          });
+
+          return next;
+        });
+        setTranslationError(null);
+      })
+      .catch(() => {
+        for (const candidate of candidates) {
+          failedTranslations.current.add(candidate.sequence);
+        }
+        setTranslationError(
+          "Some messages could not be translated. English remains visible until translation is available.",
+        );
+      })
+      .finally(() => {
+        for (const candidate of candidates) {
+          pendingTranslations.current.delete(candidate.sequence);
+        }
+      });
+  }, [
+    chatLanguage,
+    localActor,
+    events.data,
+    translate,
+    translatedEventText,
+    visibleEventCount,
+  ]);
   const latestRoomEventSequence =
     roomEvents[roomEvents.length - 1]?.sequence ?? null;
   // Replies reference the content item behind a message; this resolves the
@@ -2257,7 +2469,8 @@ export function Chatroom() {
     apiConnected &&
     (draft.trim().length > 0 || attachment !== null) &&
     !sendMessage.isPending &&
-    !sendContent.isPending;
+    !sendContent.isPending &&
+    !translatingSubmission;
   const mutationError = sendMessage.error ?? sendContent.error;
   const sendError = isMutedError(mutationError) ? null : mutationError;
   const error =
@@ -2428,11 +2641,29 @@ export function Chatroom() {
     setDraft("");
     setMention(null);
     setMutedNotice(null);
+    setTranslationError(null);
     const replyContentItemId =
       replyTarget === null ? null : payloadString(replyTarget, "contentItemId");
     const addressedTo = deriveAddressedTo(content, addressableParticipants);
+    let translationCompleted = chatLanguage !== "zh-CN" || content.length === 0;
 
     try {
+      let chatroomContent = content;
+      let source: { text: string; language: string } | undefined;
+
+      if (chatLanguage === "zh-CN" && content.length > 0) {
+        setTranslatingSubmission(true);
+        const [translated] = await translate([content], "zh-CN", "en");
+
+        if (translated === undefined) {
+          throw new Error("Translation returned no message.");
+        }
+
+        chatroomContent = translated;
+        source = { text: content, language: "zh-CN" };
+        translationCompleted = true;
+      }
+
       const addressing = {
         ...(replyContentItemId === null
           ? {}
@@ -2441,10 +2672,15 @@ export function Chatroom() {
       };
 
       if (attachment === null) {
-        await sendMessage.mutateAsync({ content, ...addressing });
+        await sendMessage.mutateAsync({
+          content: chatroomContent,
+          source,
+          ...addressing,
+        });
       } else {
         await sendContent.mutateAsync({
-          content,
+          content: chatroomContent,
+          source,
           file: attachment,
           ...addressing,
         });
@@ -2458,7 +2694,13 @@ export function Chatroom() {
         setMutedNotice(
           "You are muted by moderation. Your message was not sent.",
         );
+      } else if (!translationCompleted) {
+        setTranslationError(
+          "Your message could not be translated, so it was not sent.",
+        );
       }
+    } finally {
+      setTranslatingSubmission(false);
     }
   };
 
@@ -2900,6 +3142,8 @@ export function Chatroom() {
                           localActorId={localActor?.id}
                           mentionLabels={mentionLabels}
                           messagesByContentItem={messagesByContentItem}
+                          chatLanguage={chatLanguage}
+                          translatedEventText={translatedEventText}
                           onReply={selectReplyTarget}
                           ruleTitles={ruleTitles}
                         />
@@ -2908,6 +3152,20 @@ export function Chatroom() {
                   </div>
 
                   <div className="shrink-0 px-3 pb-3 pt-2 sm:px-7 sm:pb-5">
+                    {translationError !== null ? (
+                      <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                        <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+                        <span className="flex-1">{translationError}</span>
+                        <button
+                          type="button"
+                          onClick={() => setTranslationError(null)}
+                          className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                          aria-label="Dismiss translation error"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ) : null}
                     {attachmentError !== null ? (
                       <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
                         <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
@@ -3018,7 +3276,11 @@ export function Chatroom() {
                             </span>
                           </span>
                           <span className="min-w-0 flex-1 truncate text-zinc-600">
-                            {eventContent(replyTarget)}
+                            {displayedEventText(
+                              replyTarget,
+                              chatLanguage,
+                              translatedEventText,
+                            ) || eventContent(replyTarget)}
                           </span>
                           <button
                             type="button"
@@ -3153,7 +3415,9 @@ export function Chatroom() {
                             disabled={!canSend}
                             className="flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#171717] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
                           >
-                            <span>Send</span>
+                            <span>
+                              {translatingSubmission ? "Translating..." : "Send"}
+                            </span>
                             <Send className="h-4 w-4" />
                           </button>
                         </div>
@@ -3475,7 +3739,11 @@ export function Chatroom() {
         {entered ? (
           <StatusBar
             connectionLabel={connectionLabel}
-            sending={sendMessage.isPending || sendContent.isPending}
+            sending={
+              sendMessage.isPending ||
+              sendContent.isPending ||
+              translatingSubmission
+            }
             muted={isMuted}
             searchMatches={
               searchQuery.trim().length > 0 ? roomEvents.length : null
@@ -3500,6 +3768,9 @@ export function Chatroom() {
             }
             sendWithEnter={sendWithEnter}
             onSendWithEnterChange={setSendWithEnter}
+            chatLanguage={chatLanguage}
+            onChatLanguageChange={changeChatLanguage}
+            translationError={translationError}
             onOpenAccountPage={openAccountPage}
             onManageProfilePicture={chooseProfilePicture}
             onRemoveProfilePicture={() => {

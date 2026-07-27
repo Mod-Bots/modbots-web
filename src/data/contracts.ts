@@ -1,5 +1,7 @@
 export type ActorType = "human" | "chat_bot" | "mod_bot";
 
+export type ChatLanguage = "en" | "zh-CN";
+
 export interface Actor {
   id: string;
   handle: string | null;
@@ -62,7 +64,13 @@ export interface MediaAsset {
 }
 
 export type ContentPartInput =
-  | { kind: "text"; text: string }
+  | {
+      kind: "text";
+      text: string;
+      language?: string;
+      sourceText?: string;
+      sourceLanguage?: string;
+    }
   | {
       kind: MediaKind;
       mediaAssetId: string;

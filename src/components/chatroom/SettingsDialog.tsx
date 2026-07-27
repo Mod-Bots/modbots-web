@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
+import type { ChatLanguage } from "@/data/contracts";
 
 export type SettingsSection = "account" | "chat";
 
@@ -142,6 +143,9 @@ export function SettingsDialog({
   accountAvatar,
   sendWithEnter,
   onSendWithEnterChange,
+  chatLanguage,
+  onChatLanguageChange,
+  translationError,
   onOpenAccountPage,
   onManageProfilePicture,
   onRemoveProfilePicture,
@@ -158,6 +162,9 @@ export function SettingsDialog({
   accountAvatar: ReactNode;
   sendWithEnter: boolean;
   onSendWithEnterChange: (checked: boolean) => void;
+  chatLanguage: ChatLanguage;
+  onChatLanguageChange: (language: ChatLanguage) => void;
+  translationError: string | null;
   onOpenAccountPage: () => void;
   onManageProfilePicture: () => void;
   onRemoveProfilePicture: () => void;
@@ -442,6 +449,33 @@ export function SettingsDialog({
                 </section>
 
                 <div className="mt-4 space-y-3">
+                  <label className="block rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3">
+                    <span className="block text-sm text-zinc-200">
+                      Chat language
+                    </span>
+                    <select
+                      value={chatLanguage}
+                      onChange={(event) =>
+                        onChatLanguageChange(
+                          event.currentTarget.value as ChatLanguage,
+                        )
+                      }
+                      className="mt-3 w-full rounded-xl border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                    >
+                      <option value="en">English</option>
+                      <option value="zh-CN">简体中文</option>
+                    </select>
+                    <span className="mt-2 block text-[11px] leading-5 text-zinc-500">
+                      {chatLanguage === "zh-CN"
+                        ? "Messages you write are translated into English for the chatroom. Messages from the chatroom are translated into Simplified Chinese for you."
+                        : "Messages are sent to and shown from the chatroom in English."}
+                    </span>
+                    {translationError !== null ? (
+                      <span className="mt-2 block text-[11px] text-red-300">
+                        {translationError}
+                      </span>
+                    ) : null}
+                  </label>
                   <ToggleRow
                     label="Send with Enter"
                     checked={sendWithEnter}
