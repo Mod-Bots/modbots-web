@@ -268,6 +268,9 @@ const displayedEventText = (
   return translations.get(event.sequence) ?? eventText(event);
 };
 
+const originalEventText = (event: RoomEvent): string =>
+  eventSource(event)?.text ?? eventText(event);
+
 const payloadReply = (event: RoomEvent): { contentItemId: string } | null => {
   const value = event.payload.replyTo;
 
@@ -1035,6 +1038,7 @@ function ChatMessage({
   mentionLabels,
   repliedEvent,
   displayText,
+  originalText,
   repliedDisplayText,
   onReply,
 }: {
@@ -1045,13 +1049,16 @@ function ChatMessage({
   mentionLabels: MentionLabel[];
   repliedEvent: RoomEvent | null;
   displayText: string;
+  originalText: string;
   repliedDisplayText: string | null;
   onReply?: () => void;
 }) {
   const actor = event.actorId === null ? undefined : actors.get(event.actorId);
   const ownMessage = event.actorId === localActorId;
   const name = actorLabel(event.actorId, actors);
-  const content = displayText;
+  const [showOriginal, setShowOriginal] = useState(false);
+  const hasTranslation = displayText !== originalText;
+  const content = showOriginal && hasTranslation ? originalText : displayText;
   const isReply = payloadReply(event) !== null;
   const body = renderMessageBody(content, mentionLabels, localActorId);
 
@@ -1068,6 +1075,15 @@ function ChatMessage({
             <p className="max-w-[76ch] whitespace-pre-wrap break-words text-[13px] leading-[22px] text-zinc-200">
               {body}
             </p>
+          ) : null}
+          {hasTranslation ? (
+            <button
+              type="button"
+              onClick={() => setShowOriginal((current) => !current)}
+              className="mt-1 text-[11px] text-zinc-500 hover:text-zinc-300"
+            >
+              {showOriginal ? "View translation" : "View original"}
+            </button>
           ) : null}
           <MessageMedia event={event} />
         </div>
@@ -1133,6 +1149,15 @@ function ChatMessage({
           <p className="mt-1.5 max-w-[76ch] whitespace-pre-wrap break-words text-[13px] leading-[22px] text-zinc-200">
             {body}
           </p>
+        ) : null}
+        {hasTranslation ? (
+          <button
+            type="button"
+            onClick={() => setShowOriginal((current) => !current)}
+            className="mt-1 text-[11px] text-zinc-500 hover:text-zinc-300"
+          >
+            {showOriginal ? "View translation" : "View original"}
+          </button>
         ) : null}
         <MessageMedia event={event} />
       </div>
@@ -1230,6 +1255,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
       chatLanguage,
       translatedEventText,
     );
+    const originalText = originalEventText(item.event);
     const repliedDisplayText =
       repliedEvent === null
         ? null
@@ -1245,6 +1271,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
         mentionLabels={mentionLabels}
         repliedEvent={repliedEvent}
         displayText={displayText}
+        originalText={originalText}
         repliedDisplayText={repliedDisplayText}
         onReply={canReply ? () => onReply(item.event) : undefined}
       />

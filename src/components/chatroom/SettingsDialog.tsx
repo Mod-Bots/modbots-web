@@ -467,8 +467,8 @@ export function SettingsDialog({
                     </select>
                     <span className="mt-2 block text-[11px] leading-5 text-zinc-500">
                       {chatLanguage === "zh-CN"
-                        ? "Messages you write are translated into English for the chatroom. Messages from the chatroom are translated into Simplified Chinese for you."
-                        : "Messages are sent to and shown from the chatroom in English."}
+                        ? "The chatroom functions in English. This setting translates what you write and read through your Simplified Chinese layer."
+                        : "The chatroom functions in English with no translation layer applied."}
                     </span>
                     {translationError !== null ? (
                       <span className="mt-2 block text-[11px] text-red-300">
