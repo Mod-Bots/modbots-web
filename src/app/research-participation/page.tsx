@@ -171,7 +171,7 @@ export default function ResearchPage() {
       <P>
         The Research Ethics Committee at {policyMeta.institutionShort} takes
         complaints about the conduct of the study. It sits outside the research
-        and can be approached without going through the researcher first.
+        and can be approached directly, without going through the study first.
       </P>
       <P>
         Anything about your personal data can go straight to the{" "}

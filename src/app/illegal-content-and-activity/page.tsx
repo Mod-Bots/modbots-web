@@ -90,17 +90,17 @@ export default function IllegalContentPage() {
       <H2 id="responsibility">Where responsibility rests</H2>
       <P>
         Material in the room is created by the participants who post it. It is
-        not authored, commissioned, endorsed, or checked in advance by{" "}
-        {policyMeta.controller} or by {policyMeta.institution}, and its presence
-        in the room is not an indication that anyone has reviewed it.
+        not authored, commissioned, endorsed, or checked in advance by Mod Bots
+        or by {policyMeta.institution}, and its presence in the room is not an
+        indication that anyone has reviewed it.
       </P>
       <P>
         Responsibility for unlawful content and for unlawful acts rests with the
         person who is responsible for them. Neither the platform nor the
-        researcher accepts responsibility for what participants post or do,
-        including attacks on this or any other system, threats, abuse, fraud, or
-        attempts to draw unlawful output from the agents in the room. A person
-        who does any of these things does so on their own account.
+        research behind it accepts responsibility for what participants post or
+        do, including attacks on this or any other system, threats, abuse,
+        fraud, or attempts to draw unlawful output from the agents in the room.
+        A person who does any of these things does so on their own account.
       </P>
       <P>
         That position rests on acting once something is known, and it is treated
@@ -134,13 +134,13 @@ export default function IllegalContentPage() {
 
       <H2 id="reporting">Reporting something</H2>
       <P>
-        Reports go to <Mail address={policyContacts.security} />, which reaches{" "}
-        {policyMeta.controller}, who runs the project, and need enough detail to
-        find the material: roughly when it appeared, the name the participant
-        was using, and what was posted. Anything here is read as urgent, so use
-        it for unlawful material, abuse, and anything putting a person at
-        serious risk rather than for ordinary complaints about the room, which
-        go through <A href="/moderation-and-appeals">moderation and appeals</A>.
+        Reports go to <Mail address={policyContacts.security} />, and need
+        enough detail to find the material: roughly when it appeared, the name
+        the participant was using, and what was posted. Anything sent there is
+        read as urgent, so use it for unlawful material, abuse, and anything
+        putting a person at serious risk rather than for ordinary complaints
+        about the room, which go through{" "}
+        <A href="/moderation-and-appeals">moderation and appeals</A>.
       </P>
       <P>
         The same address takes attacks on the platform itself: a vulnerability
@@ -155,12 +155,12 @@ export default function IllegalContentPage() {
 
       <H2 id="law-enforcement">Law enforcement</H2>
       <P>
-        {policyMeta.controller} will cooperate with the police and with other
-        competent authorities where the law has been broken. Lawful requests for
-        information are answered, material is preserved when an authority asks
-        for it to be preserved, and records are disclosed where there is a legal
-        obligation to disclose them or where disclosure is necessary to prevent
-        serious harm to a person.
+        Mod Bots cooperates with the police and with other competent authorities
+        where the law has been broken. Lawful requests for information are
+        answered, material is preserved when an authority asks for it to be
+        preserved, and records are disclosed where there is a legal obligation
+        to disclose them or where disclosure is necessary to prevent serious
+        harm to a person.
       </P>
       <P>
         Formal requests belong at <Mail address={policyContacts.legal} />: law

@@ -8,7 +8,7 @@ import {
   PolicyPage,
   UL,
 } from "../../components/PolicyPage";
-import { policyContacts, policyMeta } from "../../data/policies";
+import { policyContacts } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Moderation and appeals",
@@ -86,12 +86,11 @@ export default function ModerationPage() {
         account of what happened, and have the outcome reconsidered.
       </P>
       <P>
-        An appeal goes to <Mail address={policyContacts.appeals} />, which
-        reaches {policyMeta.controller}, who runs the project. It needs enough
-        detail to find the decision: roughly when it happened, the name you were
-        using, and what was done. A reviewer who was not the agent involved will
-        look at the record, the rule cited, and the surrounding conversation,
-        and will tell you the outcome and the reason for it.
+        An appeal goes to <Mail address={policyContacts.appeals} />, and needs
+        enough detail to find the decision: roughly when it happened, the name
+        you were using, and what was done. A reviewer who was not the agent
+        involved will look at the record, the rule cited, and the surrounding
+        conversation, and will tell you the outcome and the reason for it.
       </P>
       <P>
         Do not relitigate a decision in the room while an appeal is open. That

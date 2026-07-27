@@ -257,8 +257,8 @@ export default function PrivacyPage() {
         against the research exemptions.
       </P>
       <P>
-        These rights are exercised against {policyMeta.controller} directly, as
-        the controller, and not against {policyMeta.institution}. Requests go to{" "}
+        These rights are exercised against the controller named above, not
+        against {policyMeta.institution}. Requests go to{" "}
         <Mail address={policyContacts.privacy} />, and need enough detail to
         find what you are asking about: the name you were using in the room and
         roughly when you were there.
