@@ -7,5 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/chatroom",
     },
+    sitemap: "https://modbots.ai/sitemap.xml",
   };
 }
