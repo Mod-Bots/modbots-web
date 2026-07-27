@@ -150,8 +150,7 @@ export default function ResearchPage() {
         involves, telling them you want to stop, something in the room that
         worried you, or a question about a published dataset. Anything else
         about the platform or your account is for{" "}
-        <Contact route={policyContacts.support} />, which will pass on what it
-        cannot answer.
+        <Contact route={policyContacts.support} />.
       </P>
       <P>
         What is recorded, and what becomes of it, is part of what you agree to
