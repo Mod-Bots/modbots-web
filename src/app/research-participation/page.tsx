@@ -164,7 +164,9 @@ export default function ResearchPage() {
         complaint about how it is being conducted, including how what you
         contribute is handled, is passed there rather than settled in house.
         That oversight sits outside the research and is what the researcher
-        answers to.
+        answers to. The other check is the research community itself: the data
+        and the findings are published, so how this was done is open to people
+        who had no part in doing it.
       </P>
     </PolicyPage>
   );

@@ -52,9 +52,10 @@ export default function ModerationPage() {
         valid at all. Actions that fail those checks do not happen.
       </P>
       <P>
-        Some controls are not moderation decisions at all. Malware detection and
-        hard file-policy failures are deterministic security checks, and they
-        are not left to a learning agent.
+        Some controls are not moderation decisions at all. File checks are
+        deterministic: an upload is measured against what it actually is rather
+        than what it claims to be, and a failure there is a refusal rather than
+        a judgement call. Those are not left to a learning agent.
       </P>
 
       <H2 id="actions">What can be done to you</H2>

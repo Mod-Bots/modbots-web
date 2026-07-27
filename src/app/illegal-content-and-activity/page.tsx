@@ -81,9 +81,10 @@ export default function IllegalContentPage() {
         page does not pretend otherwise.
       </P>
       <P>
-        Some controls are not left to a learning system. Malware detection and
-        hard file-policy failures are deterministic checks applied to every
-        upload before it can reach the room, as described in{" "}
+        Some controls are not left to a learning system. Every upload is
+        measured against what it actually is rather than what it claims to be,
+        and it reaches nobody in the room until the pipeline has finished with
+        it, as described in{" "}
         <A href="/moderation-and-appeals">moderation and appeals</A>.
       </P>
 

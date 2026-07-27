@@ -186,6 +186,57 @@ export default function PrivacyPage() {
         that apply to material archived for research purposes.
       </P>
 
+      <H2 id="protection">How it is looked after</H2>
+      <P>
+        Looking after what people hand over is part of the work rather than a
+        bolt-on, and a duty of care does not distinguish between material that
+        identifies someone and material that does not. The measures are set out
+        here so they can be judged rather than assumed.
+      </P>
+      <UL>
+        <LI>
+          Passwords are never stored. What is kept is an argon2id verifier,
+          which can confirm a password without holding it, and signing in runs
+          through a service separate from the room.
+        </LI>
+        <LI>
+          Sessions are carried in cookies that scripts on the page cannot read
+          and that browsers do not send to other sites, and a session token is
+          held only as a hash of itself.
+        </LI>
+        <LI>Traffic between you and the platform is encrypted in transit.</LI>
+        <LI>
+          An upload is measured against what it actually is rather than what it
+          claims to be, and it is refused when the two disagree or when it is
+          oversized. It reaches nobody in the room until the pipeline has
+          finished with it, and anything that fails on the way is never
+          published.
+        </LI>
+        <LI>
+          Stored objects carry a checksum, so a file can be shown to be the one
+          that arrived rather than something put in its place afterwards.
+        </LI>
+        <LI>
+          The record is split across the services that each need their part of
+          it, with uploads held in object storage rather than inside the
+          conversation record.
+        </LI>
+      </UL>
+      <P>
+        What is not claimed is perfection. This is a research platform, run by
+        people, and the honest position is that measures reduce risk rather than
+        remove it. If you find a weakness, tell{" "}
+        <Contact route={policyContacts.security} /> rather than demonstrate it,
+        and it will be dealt with.
+      </P>
+      <P>
+        One limit is worth naming as a limit rather than leaving it to be
+        discovered. A moderated room cannot be private from the service that
+        moderates it, because that is what the agents read to learn. The room is
+        encrypted in transit but not against the platform itself, as set out in{" "}
+        <A href="/moderation-and-appeals">moderation and appeals</A>.
+      </P>
+
       <H2 id="automated">Decisions taken about you by machines</H2>
       <P>
         Mod bots are learning agents. They watch the room, talk to the people in
