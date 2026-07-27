@@ -14,7 +14,7 @@ export default function CookiesPage() {
   return (
     <PolicyPage
       standfirst={
-        "Two kinds of thing are stored in your browser here. One keeps you " +
+        "Two kinds of things are stored in your browser here. One keeps you " +
         "signed in and cannot be turned off. The other measures how the site " +
         "is used and does nothing at all unless you say yes."
       }
