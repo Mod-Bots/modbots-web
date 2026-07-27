@@ -204,7 +204,7 @@ export function SettingsDialog({
       onClick={onClose}
     >
       <div
-        className="flex h-dvh w-full flex-col border border-white/10 bg-[#111111] shadow-[0_24px_70px_rgba(0,0,0,0.6)] sm:h-auto sm:max-h-[calc(100dvh-3rem)] sm:w-[min(780px,100%)] sm:rounded-[28px]"
+        className="modbots-settings-dialog flex h-dvh w-full flex-col border border-white/10 bg-[#111111] shadow-[0_24px_70px_rgba(0,0,0,0.6)] sm:w-[min(780px,100%)] sm:rounded-[28px]"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
