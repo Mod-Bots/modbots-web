@@ -226,7 +226,7 @@ export function SettingsDialog({
               Settings
             </h2>
             <p className="mt-1 text-xs text-zinc-500">
-              Manage your account and chat preferences.
+              Manage your account and chat settings.
             </p>
           </div>
           <button

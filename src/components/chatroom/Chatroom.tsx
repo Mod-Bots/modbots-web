@@ -2750,7 +2750,7 @@ export function Chatroom() {
       {entered ? (
         <MenuBar
           onFindInChat={openSearch}
-          onOpenPreferences={() => openSettings("account")}
+          onOpenSettings={() => openSettings("account")}
           onRefreshChatroom={() => void refresh()}
           onTakeScreenshot={() =>
             void takeScreenshot().catch(() => undefined)

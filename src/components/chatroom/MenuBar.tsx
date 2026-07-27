@@ -272,13 +272,13 @@ function MobileMenu({
 
 export function MenuBar({
   onFindInChat,
-  onOpenPreferences,
+  onOpenSettings,
   onRefreshChatroom,
   onTakeScreenshot,
   onExportChatLog,
 }: {
   onFindInChat: () => void;
-  onOpenPreferences: () => void;
+  onOpenSettings: () => void;
   onRefreshChatroom: () => void;
   onTakeScreenshot: () => void;
   onExportChatLog: () => void;
@@ -321,11 +321,11 @@ export function MenuBar({
           onSelect: () => window.print(),
         },
         {
-          id: "preferences",
-          label: "Preferences",
+          id: "settings",
+          label: "Settings",
           icon: Settings2,
           shortcut: "Ctrl+,",
-          onSelect: onOpenPreferences,
+          onSelect: onOpenSettings,
         },
         { kind: "separator", id: "file-close" },
         {
