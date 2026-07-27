@@ -8,7 +8,7 @@ import {
   PolicyPage,
   UL,
 } from "../../components/PolicyPage";
-import { policyContacts, policyMeta } from "../../data/policies";
+import { policyContacts } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Research participation",
@@ -154,16 +154,17 @@ export default function ResearchPage() {
         cannot answer.
       </P>
       <P>
-        The research is run under academic research ethics oversight, and a
-        complaint about how it is being conducted is passed there rather than
-        settled in house.
+        What is recorded, and what becomes of it, is part of what you agree to
+        by taking part. It is set out in the{" "}
+        <A href="/privacy-notice">privacy notice</A>, and reading it before you
+        decide is the point of it being there.
       </P>
       <P>
-        Anything about your personal data can go straight to the{" "}
-        {policyMeta.supervisoryAuthority} at{" "}
-        <A href={policyMeta.supervisoryAuthorityUrl}>ico.org.uk</A>, at any time
-        and without coming here first. What is held about you, and what you can
-        ask for, is in the <A href="/privacy-notice">privacy notice</A>.
+        The research is run under academic research ethics oversight. A
+        complaint about how it is being conducted, including how what you
+        contribute is handled, is passed there rather than settled in house.
+        That oversight sits outside the research and is what the researcher
+        answers to.
       </P>
     </PolicyPage>
   );
