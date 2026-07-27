@@ -9,8 +9,8 @@ import {
   Row,
   Rows,
   UL,
-} from "../../components/PolicyPage";
-import { policyContacts } from "../../data/policies";
+} from "@/components/PolicyPage";
+import { policyContacts } from "@/data/policies";
 
 export const metadata: Metadata = {
   title: "Dataset releases",

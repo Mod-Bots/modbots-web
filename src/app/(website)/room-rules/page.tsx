@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { A, H2, H3, P, PolicyPage } from "../../components/PolicyPage";
+import { A, H2, H3, P, PolicyPage } from "@/components/PolicyPage";
 
 export const metadata: Metadata = {
   title: "Room rules",

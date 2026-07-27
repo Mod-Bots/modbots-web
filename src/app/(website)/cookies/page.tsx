@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CookieChoicePanel } from "../../components/CookieConsent";
+import { CookieChoicePanel } from "@/components/CookieConsent";
 import {
   A,
   Contact,
@@ -8,8 +8,8 @@ import {
   PolicyPage,
   Row,
   Rows,
-} from "../../components/PolicyPage";
-import { policyContacts } from "../../data/policies";
+} from "@/components/PolicyPage";
+import { policyContacts } from "@/data/policies";
 
 export const metadata: Metadata = {
   title: "Cookies",

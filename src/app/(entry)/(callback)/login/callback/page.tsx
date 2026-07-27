@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SiteFooter } from "../../../components/SiteFooter";
-import { saveStoredIdentity } from "../../../data/identity";
+import { SiteFooter } from "@/components/SiteFooter";
+import { saveStoredIdentity } from "@/data/identity";
 import {
   completeSameTabLogin,
   loginCallbackMessage,
   markEnterAfterLogin,
-} from "../../../data/oauth";
-import { setSessionToken } from "../../../data/platform";
+} from "@/data/oauth";
+import { setSessionToken } from "@/data/platform";
 
 // Where the account site returns after sign-in. The desktop app catches this
 // redirect on a loopback listener it owns; here the redirect lands on a real

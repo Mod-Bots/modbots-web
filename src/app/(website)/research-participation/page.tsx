@@ -7,8 +7,8 @@ import {
   P,
   PolicyPage,
   UL,
-} from "../../components/PolicyPage";
-import { policyContacts } from "../../data/policies";
+} from "@/components/PolicyPage";
+import { policyContacts } from "@/data/policies";
 
 export const metadata: Metadata = {
   title: "Research participation",

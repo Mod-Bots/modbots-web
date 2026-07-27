@@ -1,10 +1,6 @@
-import { ArrowLeft } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import appLogo from "../assets/logo.svg";
 import { type PolicyContact, policyMeta } from "../data/policies";
-import { BackPageFooter } from "./BackPageFooter";
 
 // Typographic primitives for the published documents. They exist so seven
 // policy pages cannot drift apart in type, rhythm, or link treatment.
@@ -153,50 +149,16 @@ export const PolicyPage = ({
   standfirst: string;
   children: ReactNode;
 }): React.ReactElement => (
-  <div className="modbots-scroll h-screen h-dvh overflow-y-auto bg-[#0a0a0a] text-zinc-100">
-    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#0a0a0a]/85 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 w-full max-w-[1100px] items-center justify-between px-6 sm:px-10">
-        <Link
-          className="flex items-center gap-3 text-[15px] font-semibold tracking-tight text-white"
-          href="/"
-        >
-          <Image
-            alt=""
-            className="rounded-lg"
-            height={30}
-            src={appLogo}
-            width={30}
-          />
-          Mod Bots
-        </Link>
-
-        <Link
-          className="group inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-zinc-200"
-          href="/why-mod-bots-exists"
-        >
-          <ArrowLeft
-            aria-hidden="true"
-            className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
-            strokeWidth={2}
-          />
-          Why Mod Bots exists
-        </Link>
-      </div>
-    </header>
-
-    <main className="mx-auto w-full max-w-[1100px] px-6 sm:px-10">
-      <article className="mx-auto max-w-[720px] pb-24 pt-20 sm:pt-28">
-        <h1 className="text-4xl font-semibold leading-[1.08] tracking-[-0.035em] text-white sm:text-[52px]">
-          {title}
-        </h1>
-        <Lead>{standfirst}</Lead>
-        <p className="mt-8 text-sm text-zinc-600">
-          Version {policyMeta.version}. Last updated {policyMeta.updated}.
-        </p>
-        {children}
-      </article>
-    </main>
-
-    <BackPageFooter />
+  <div className="mx-auto w-full max-w-[1100px] px-6 sm:px-10">
+    <article className="mx-auto max-w-[720px] pb-24 pt-20 sm:pt-28">
+      <h1 className="text-4xl font-semibold leading-[1.08] tracking-[-0.035em] text-white sm:text-[52px]">
+        {title}
+      </h1>
+      <Lead>{standfirst}</Lead>
+      <p className="mt-8 text-sm text-zinc-600">
+        Version {policyMeta.version}. Last updated {policyMeta.updated}.
+      </p>
+      {children}
+    </article>
   </div>
 );
