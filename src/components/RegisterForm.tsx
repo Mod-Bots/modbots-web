@@ -295,11 +295,11 @@ export function RegisterForm() {
             I accept the{" "}
             <a
               className="font-medium text-zinc-200 underline decoration-zinc-600 underline-offset-2 hover:text-white"
-              href={`${accountBaseUrl}/policy`}
+              href="/terms-of-use"
               target="_blank"
               rel="noreferrer"
             >
-              Participation Policy
+              Terms of use
             </a>
           </span>
         </label>

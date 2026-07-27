@@ -21,7 +21,6 @@ import type { StoredIdentity } from "../data/identity";
 import {
   getActor,
   getApiHealth,
-  getParticipationPolicy,
   getRoomRules,
   getRealtimeConfig,
   getRealtimeHealth,
@@ -138,13 +137,6 @@ export const useRoomActivity = (roomId: string) => {
     // interface show a clear unavailable state with an explicit Retry action.
     retry: maximumRoomHistoryRetries,
     retryDelay: roomHistoryRetryDelay,
-  });
-  const policy = useQuery({
-    queryKey: ["participation-policy"],
-    queryFn: getParticipationPolicy,
-    enabled: identity === null,
-    staleTime: 5 * 60_000,
-    retry: 1,
   });
   const rules = useQuery({
     queryKey: ["room-rules"],
@@ -604,7 +596,6 @@ export const useRoomActivity = (roomId: string) => {
     localActor,
     onlineActorIds: currentOnlineActorIds,
     overview,
-    policy,
     realtimeHealth,
     rules,
     realtimeStatus,

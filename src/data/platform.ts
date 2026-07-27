@@ -5,7 +5,6 @@ import type {
   ContentPartInput,
   MediaAsset,
   MediaKind,
-  ParticipationPolicy,
   RealtimeConfig,
   RoomEvent,
   RoomOverview,
@@ -145,9 +144,6 @@ export const updateActorProfile = (
       body: JSON.stringify(profile),
     },
   );
-
-export const getParticipationPolicy = (): Promise<ParticipationPolicy> =>
-  requestJson(apiUrl("/api/policy"));
 
 export const getRoomRules = (): Promise<RoomRules> =>
   requestJson(apiUrl("/api/rules"));

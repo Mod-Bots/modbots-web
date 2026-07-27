@@ -20,13 +20,6 @@ export interface Actor {
   createdAt: string;
 }
 
-export interface ParticipationPolicy {
-  version: string;
-  moderationAccess: string;
-  trainingUse: string;
-  retention: string;
-}
-
 export interface RoomRule {
   id: string;
   title: string;

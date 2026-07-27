@@ -83,11 +83,11 @@ export function LoginForm() {
             I accept the{" "}
             <a
               className="font-medium text-zinc-200 underline decoration-zinc-600 underline-offset-2 transition-colors hover:text-white hover:decoration-zinc-400"
-              href={`${accountBaseUrl}/policy`}
+              href="/terms-of-use"
               target="_blank"
               rel="noreferrer"
             >
-              Participation Policy
+              Terms of use
             </a>
           </span>
         </label>
