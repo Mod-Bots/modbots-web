@@ -10,10 +10,14 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
   return (
     <main className="flex h-screen h-dvh flex-col overflow-hidden bg-[#0b0b0b] text-zinc-100">
       <section className="modbots-scroll relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-8 sm:px-6">
-        <div
-          className="pointer-events-none absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${startScreenBg.src})` }}
+        <Image
+          className="pointer-events-none object-cover object-center"
+          src={startScreenBg}
+          alt=""
           aria-hidden="true"
+          fill
+          preload
+          sizes="100vw"
         />
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/35 to-black/60"
@@ -34,7 +38,7 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
               alt=""
               width={48}
               height={48}
-              priority
+              loading="eager"
               className="mx-auto h-12 w-12 rounded-lg shadow-[0_8px_24px_rgba(0,143,255,0.2)]"
             />
             <h1 className="mt-5 text-[26px] font-semibold tracking-tight text-white">
