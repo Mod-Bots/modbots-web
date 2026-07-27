@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { accountBaseUrl, getBrowserLoginSession } from "../data/oauth";
-import { uidQuery, useLaunchUid } from "../hooks/useAuthRoute";
+import { accountBaseUrl, getBrowserLoginSession } from "@/data/oauth";
+import { uidQuery, useLaunchUid } from "@/hooks/useAuthRoute";
 
 export function LoginForm() {
   const uid = useLaunchUid();

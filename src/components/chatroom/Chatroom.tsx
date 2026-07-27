@@ -44,30 +44,30 @@ import {
   useRef,
   useState,
 } from "react";
-import appLogo from "../assets/logo.svg";
-import startScreenBg from "../assets/start-screen-bg.png";
-import { MenuBar } from "../components/MenuBar";
+import appLogo from "@/assets/logo.svg";
+import startScreenBg from "@/assets/start-screen-bg.png";
+import { MenuBar } from "./MenuBar";
 import {
   type AccountSettingsSummary,
   SettingsDialog,
   type SettingsSection,
-} from "../components/SettingsDialog";
+} from "./SettingsDialog";
 import type {
   Actor,
   ActorType,
   ContentAddress,
   RoomEvent,
-} from "../data/contracts";
+} from "@/data/contracts";
 import {
   accountBaseUrl,
   consumeEnterAfterLogin,
-} from "../data/oauth";
+} from "@/data/oauth";
 import {
   isMutedError,
   mediaAssetDataUrl,
-} from "../data/platform";
-import { actorLabel, actorRole } from "../data/room-state";
-import { useRoomActivity } from "../hooks/useRoomActivity";
+} from "@/data/platform";
+import { actorLabel, actorRole } from "@/data/room-state";
+import { useRoomActivity } from "@/hooks/useRoomActivity";
 
 const roomId = "global-lobby";
 const roomName = "Room";

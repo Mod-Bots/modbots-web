@@ -10,7 +10,7 @@ import {
   Row,
   Rows,
   UL,
-} from "@/components/PolicyPage";
+} from "@/components/website/PolicyPage";
 import { policyContacts } from "@/data/policies";
 
 export const metadata: Metadata = {

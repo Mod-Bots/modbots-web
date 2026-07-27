@@ -4,9 +4,9 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import appLogo from "../assets/logo.svg";
+import appLogo from "@/assets/logo.svg";
 
-export const WebsiteHeader = (): React.ReactElement => {
+export const Header = (): React.ReactElement => {
   const pathname = usePathname();
   const onWhyPage = pathname === "/why-mod-bots-exists";
 

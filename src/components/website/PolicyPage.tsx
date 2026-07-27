@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { type PolicyContact, policyMeta } from "../data/policies";
+import { type PolicyContact, policyMeta } from "@/data/policies";
 
 // Typographic primitives for the published documents. They exist so seven
 // policy pages cannot drift apart in type, rhythm, or link treatment.

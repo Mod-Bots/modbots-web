@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { policyPages } from "../data/policies";
+import { policyPages } from "@/data/policies";
 
 // The shared website footer carries the published policy set, which is how a
 // reader reaches the cookie notice from anywhere.
-export const WebsiteFooter = (): React.ReactElement => {
+export const Footer = (): React.ReactElement => {
   const [year, setYear] = useState(() => new Date().getFullYear());
 
   useEffect(() => {

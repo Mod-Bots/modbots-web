@@ -7,7 +7,7 @@ import {
   P,
   PolicyPage,
   UL,
-} from "@/components/PolicyPage";
+} from "@/components/website/PolicyPage";
 import { policyContacts, policyMeta } from "@/data/policies";
 
 export const metadata: Metadata = {

@@ -3,17 +3,17 @@
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
-import { saveStoredIdentity } from "../data/identity";
-import type { BrowserLoginOutcome, BrowserLoginSession } from "../data/oauth";
+import { saveStoredIdentity } from "@/data/identity";
+import type { BrowserLoginOutcome, BrowserLoginSession } from "@/data/oauth";
 import {
   accountBaseUrl,
   getBrowserLoginSession,
   markEnterAfterLogin,
   openInBrowser,
   resetBrowserLoginSession,
-} from "../data/oauth";
-import { setSessionToken } from "../data/platform";
-import { uidQuery, useLaunchUid } from "../hooks/useAuthRoute";
+} from "@/data/oauth";
+import { setSessionToken } from "@/data/platform";
+import { uidQuery, useLaunchUid } from "@/hooks/useAuthRoute";
 
 const browserLoginWaitMs = 90_000;
 

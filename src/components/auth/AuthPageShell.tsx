@@ -2,9 +2,9 @@ import { MoveRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import appLogo from "../assets/logo.svg";
-import startScreenBg from "../assets/start-screen-bg.png";
-import { SiteFooter } from "./SiteFooter";
+import appLogo from "@/assets/logo.svg";
+import startScreenBg from "@/assets/start-screen-bg.png";
+import { SiteFooter } from "@/components/shared/SiteFooter";
 
 export function AuthPageShell({ children }: { children: ReactNode }) {
   return (

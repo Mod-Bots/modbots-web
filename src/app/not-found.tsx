@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import notFoundImage from "../assets/404-page.png";
-import { SiteFooter } from "../components/SiteFooter";
+import { SiteFooter } from "@/components/shared/SiteFooter";
 
 const NotFoundPage = (): React.ReactElement => (
   <div className="modbots-scroll flex h-screen h-dvh flex-col overflow-y-auto bg-[#0b0b0b] text-zinc-100">

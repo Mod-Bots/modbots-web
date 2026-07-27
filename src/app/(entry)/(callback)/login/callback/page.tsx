@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SiteFooter } from "@/components/SiteFooter";
+import { SiteFooter } from "@/components/shared/SiteFooter";
 import { saveStoredIdentity } from "@/data/identity";
 import {
   completeSameTabLogin,
