@@ -13,7 +13,7 @@ import { policyContacts, policyMeta } from "../../data/policies";
 export const metadata: Metadata = {
   title: "Research participation",
   description:
-    "What the Mod Bots study is, what taking part involves, what is " +
+    "What the Mod Bots research is, what taking part involves, what is " +
     "published, and what agreeing to take part commits you to.",
   alternates: { canonical: "/research-participation" },
 };
@@ -22,7 +22,7 @@ export default function ResearchPage() {
   return (
     <PolicyPage
       standfirst={
-        "Taking part in the room is taking part in a study. This page is the " +
+        "Being in the room is taking part in research. This page is the " +
         "information you are owed before you decide to, written to be read " +
         "rather than clicked past."
       }
@@ -39,10 +39,10 @@ export default function ResearchPage() {
         participants were working together.
       </P>
       <P>
-        This study runs a public chatroom as the environment in which that can
-        actually be watched, and uses what happens there to develop and evaluate
-        agents that learn to moderate. The reasoning behind the choice of a
-        chatroom is set out in{" "}
+        This research runs a public chatroom as the environment in which that
+        can actually be watched, and uses what happens there to develop and
+        evaluate agents that learn to moderate. The reasoning behind the choice
+        of a chatroom is set out in{" "}
         <A href="/why-mod-bots-exists">why Mod Bots exists</A>.
       </P>
 
@@ -108,8 +108,8 @@ export default function ResearchPage() {
         to separate individuals. One participant's contributions cannot be
         lifted out of it without leaving the surrounding exchanges responding to
         things that are no longer there, which destroys the record rather than
-        correcting it. This is a condition of the study, which is why it is set
-        out before you decide rather than after.
+        correcting it. This is a condition of taking part, which is why it is
+        set out before you decide rather than after.
       </P>
 
       <H2 id="risks">What could go wrong</H2>
@@ -130,14 +130,14 @@ export default function ResearchPage() {
         </LI>
         <LI>
           Moderation acts on you, sometimes wrongly, because the agents doing it
-          are learning. That is the point of the study, and the reason there is
-          a route to a human.
+          are learning. That is the point of the research, and the reason there
+          is a route to a human.
         </LI>
       </UL>
 
       <H2 id="benefits">What you get out of it</H2>
       <P>
-        Nothing is paid and nothing is promised. What the study produces goes
+        Nothing is paid and nothing is promised. What the research produces goes
         into the open, which is the closest thing to a direct benefit on offer:
         the data and the findings become available to anyone working on the same
         problem.
@@ -145,16 +145,18 @@ export default function ResearchPage() {
 
       <H2 id="help">If you need help</H2>
       <P>
-        Anything to do with the study is looked after by{" "}
-        <Contact route={policyContacts.research} />, and that is the first place
-        to raise it: a question about what taking part involves, telling us you
-        want to stop, something that worried you in the room, or a query about a
-        published dataset.
+        Questions about taking part are for the research team,{" "}
+        <Contact route={policyContacts.research} />: what participation
+        involves, telling them you want to stop, something in the room that
+        worried you, or a question about a published dataset. Anything else
+        about the platform or your account is for{" "}
+        <Contact route={policyContacts.support} />, which will pass on what it
+        cannot answer.
       </P>
       <P>
-        The study is run under academic research ethics oversight, and a
-        complaint about how it is being conducted is passed to that oversight
-        rather than settled in house.
+        The research is run under academic research ethics oversight, and a
+        complaint about how it is being conducted is passed there rather than
+        settled in house.
       </P>
       <P>
         Anything about your personal data can go straight to the{" "}

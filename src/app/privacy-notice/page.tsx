@@ -189,9 +189,9 @@ export default function PrivacyPage() {
         are useful for security and no longer.
       </P>
       <P>
-        Research ends. Collection stops when the study does, after which the
-        record is kept as the evidence behind the published findings, under the
-        provisions that apply to material archived for research purposes.
+        Research ends. Collection stops when it does, after which the record is
+        kept as the evidence behind the published findings, under the provisions
+        that apply to material archived for research purposes.
       </P>
 
       <H2 id="automated">Decisions taken about you by machines</H2>
@@ -241,8 +241,8 @@ export default function PrivacyPage() {
         further collection. It does not remove what has already been recorded.
         The room is captured as one continuous record of how conversations
         developed, and contributions cannot be extracted from it without
-        destroying the evidence the study rests on. A release that has already
-        been published cannot be recalled from those who hold it.
+        destroying the evidence the research rests on. A release that has
+        already been published cannot be recalled from those who hold it.
       </P>
       <P>
         Unlawful material, and material whose continued availability would put a
