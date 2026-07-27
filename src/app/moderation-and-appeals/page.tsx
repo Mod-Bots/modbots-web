@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
-import { A, H2, LI, P, PolicyPage, UL } from "../../components/PolicyPage";
-import { policyMeta } from "../../data/policies";
+import {
+  A,
+  H2,
+  LI,
+  Mail,
+  P,
+  PolicyPage,
+  UL,
+} from "../../components/PolicyPage";
+import { policyContacts, policyMeta } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Moderation and appeals",
@@ -78,11 +86,12 @@ export default function ModerationPage() {
         account of what happened, and have the outcome reconsidered.
       </P>
       <P>
-        An appeal goes to {policyMeta.controller}, who runs the project, and
-        needs enough detail to find the decision: roughly when it happened, the
-        name you were using, and what was done. A reviewer who was not the agent
-        involved will look at the record, the rule cited, and the surrounding
-        conversation, and will tell you the outcome and the reason for it.
+        An appeal goes to <Mail address={policyContacts.appeals} />, which
+        reaches {policyMeta.controller}, who runs the project. It needs enough
+        detail to find the decision: roughly when it happened, the name you were
+        using, and what was done. A reviewer who was not the agent involved will
+        look at the record, the rule cited, and the surrounding conversation,
+        and will tell you the outcome and the reason for it.
       </P>
       <P>
         Do not relitigate a decision in the room while an appeal is open. That
@@ -93,11 +102,17 @@ export default function ModerationPage() {
       <H2 id="reporting">Reporting something</H2>
       <P>
         If something in the room needs attention and the agents have not noticed
-        it, it goes the same way as an appeal. Anything unlawful is handled
+        it, it goes the same way as an appeal, to{" "}
+        <Mail address={policyContacts.appeals} />. That is also the address for
+        asking to have a stretch of room activity looked at rather than a single
+        decision.
+      </P>
+      <P>
+        Anything unlawful, and anything where someone is at serious risk, goes
+        to <Mail address={policyContacts.security} /> instead and is handled
         under{" "}
         <A href="/illegal-content-and-activity">illegal content and activity</A>
-        , and reports about immediate danger to a person should go to the police
-        first.
+        . Where a person is in immediate danger, go to the police first.
       </P>
 
       <H2 id="records">What is kept about a decision</H2>

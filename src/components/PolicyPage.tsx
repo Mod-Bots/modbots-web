@@ -85,6 +85,14 @@ export const A = ({
     "text-zinc-200 underline decoration-zinc-600 underline-offset-[5px] " +
     "transition-colors hover:text-white hover:decoration-zinc-400";
 
+  if (href.startsWith("mailto:")) {
+    return (
+      <a className={className} href={href}>
+        {children}
+      </a>
+    );
+  }
+
   return href.startsWith("http") ? (
     <a className={className} href={href} rel="noreferrer" target="_blank">
       {children}
@@ -95,6 +103,13 @@ export const A = ({
     </Link>
   );
 };
+
+// A published address, written out in full so it can be read as well as
+// clicked. The address is the link text because a document that hides it
+// behind "contact us" cannot be acted on from a printed copy.
+export const Mail = ({ address }: { address: string }): React.ReactElement => (
+  <A href={`mailto:${address}`}>{address}</A>
+);
 
 // A definition row, used where a document has to answer the same question for
 // several categories at once without turning into an unreadable table.

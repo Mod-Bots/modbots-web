@@ -4,13 +4,14 @@ import {
   H2,
   H3,
   LI,
+  Mail,
   P,
   PolicyPage,
   Row,
   Rows,
   UL,
 } from "../../components/PolicyPage";
-import { policyMeta } from "../../data/policies";
+import { policyContacts, policyMeta } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Privacy notice",
@@ -30,6 +31,18 @@ export default function PrivacyPage() {
       }
       title="Privacy notice"
     >
+      <H2 id="controller">Who holds it</H2>
+      <Rows>
+        <Row term="Controller">{policyMeta.controller}</Row>
+        <Row term="Affiliation">
+          {policyMeta.institution} ({policyMeta.institutionShort}), where the
+          research is carried out. The university is not the controller.
+        </Row>
+        <Row term="Contact">
+          <Mail address={policyContacts.privacy} />
+        </Row>
+      </Rows>
+
       <H2 id="collected">What is collected</H2>
       <P>
         The room is the research instrument, so what happens in it is recorded
@@ -238,11 +251,17 @@ export default function PrivacyPage() {
       <P>
         Unlawful material, and material whose continued availability would put a
         person at serious risk, is treated separately from this and is dealt
-        with on its own terms.
+        with on its own terms. Send it to{" "}
+        <Mail address={policyContacts.security} /> rather than as a rights
+        request, because it is acted on to stop the harm rather than weighed
+        against the research exemptions.
       </P>
       <P>
         These rights are exercised against {policyMeta.controller} directly, as
-        the controller, and not against {policyMeta.institution}.
+        the controller, and not against {policyMeta.institution}. Requests go to{" "}
+        <Mail address={policyContacts.privacy} />, and need enough detail to
+        find what you are asking about: the name you were using in the room and
+        roughly when you were there.
       </P>
 
       <H2 id="changes">Changes</H2>

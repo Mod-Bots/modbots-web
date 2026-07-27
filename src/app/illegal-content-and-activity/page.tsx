@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
-import { A, H2, LI, P, PolicyPage, UL } from "../../components/PolicyPage";
-import { policyMeta } from "../../data/policies";
+import {
+  A,
+  H2,
+  LI,
+  Mail,
+  P,
+  PolicyPage,
+  UL,
+} from "../../components/PolicyPage";
+import { policyContacts, policyMeta } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Illegal content and activity",
@@ -126,9 +134,18 @@ export default function IllegalContentPage() {
 
       <H2 id="reporting">Reporting something</H2>
       <P>
-        Reports go to {policyMeta.controller}, who runs the project, and need
-        enough detail to find the material: roughly when it appeared, the name
-        the participant was using, and what was posted.
+        Reports go to <Mail address={policyContacts.security} />, which reaches{" "}
+        {policyMeta.controller}, who runs the project, and need enough detail to
+        find the material: roughly when it appeared, the name the participant
+        was using, and what was posted. Anything here is read as urgent, so use
+        it for unlawful material, abuse, and anything putting a person at
+        serious risk rather than for ordinary complaints about the room, which
+        go through <A href="/moderation-and-appeals">moderation and appeals</A>.
+      </P>
+      <P>
+        The same address takes attacks on the platform itself: a vulnerability
+        you have found, an account you believe has been taken over, malware, and
+        unauthorised access. Report it rather than demonstrate it further.
       </P>
       <P>
         Where a person is in immediate danger, contact the police first. In the
@@ -144,6 +161,14 @@ export default function IllegalContentPage() {
         for it to be preserved, and records are disclosed where there is a legal
         obligation to disclose them or where disclosure is necessary to prevent
         serious harm to a person.
+      </P>
+      <P>
+        Formal requests belong at <Mail address={policyContacts.legal} />: law
+        enforcement enquiries, requests to preserve material as evidence, court
+        orders, and anything else with legal process behind it. Urgent reports
+        of ongoing harm should still go to{" "}
+        <Mail address={policyContacts.security} />, which is watched more
+        closely.
       </P>
       <P>
         Research does not put anything here beyond the reach of the law. The

@@ -3,12 +3,14 @@ import {
   A,
   H2,
   LI,
+  Mail,
   P,
   PolicyPage,
   Row,
   Rows,
   UL,
 } from "../../components/PolicyPage";
+import { policyContacts } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Dataset releases",
@@ -36,6 +38,11 @@ export default function DataPage() {
         collected. This page exists now so that anyone taking part can read the
         terms before contributing to something released under them, rather than
         after.
+      </P>
+      <P>
+        Questions about a release, about the material behind a published
+        finding, or about using the data in your own work go to{" "}
+        <Mail address={policyContacts.research} />.
       </P>
 
       <H2 id="contains">What a release contains</H2>
@@ -140,7 +147,11 @@ export default function DataPage() {
       <P>
         Unlawful material, and material whose continued availability would put a
         person at serious risk, is treated separately from this and is dealt
-        with on its own terms.
+        with on its own terms. Report it to{" "}
+        <Mail address={policyContacts.security} />, whether it is in the room or
+        in a release that has already gone out. That is the one case where a
+        release is corrected because of what it contains rather than because the
+        research required it.
       </P>
       <P>
         What agreeing to take part commits you to is set out in{" "}

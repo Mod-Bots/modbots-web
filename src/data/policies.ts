@@ -6,16 +6,27 @@ export const policyMeta = {
   controller: "William Sawyerr",
   institution: "University for the Creative Arts",
   institutionShort: "UCA",
-  // No contact route is published yet. The institution is an affiliation, not
-  // a mailbox: a letter addressed to a university does not reach one person's
-  // project, so the documents name the researcher and stop there until there
-  // is a direct route to give.
   jurisdiction: "United Kingdom",
   supervisoryAuthority: "Information Commissioner's Office",
   supervisoryAuthorityUrl: "https://ico.org.uk",
   version: "1",
   updated: "26 July 2026",
   minimumAge: 18,
+} as const;
+
+// The routes a reader can actually use. One definition so no document can send
+// someone to a mailbox another document has stopped naming. Safety and
+// security are one address deliberately: an abuse report and an intrusion
+// report both need the same person reading them quickly, and splitting them
+// only makes a person in trouble guess which one they are in.
+export const policyContacts = {
+  support: "support@modbots.ai",
+  research: "research@modbots.ai",
+  privacy: "privacy@modbots.ai",
+  appeals: "appeals@modbots.ai",
+  security: "security@modbots.ai",
+  copyright: "copyright@modbots.ai",
+  legal: "legal@modbots.ai",
 } as const;
 
 export interface PolicyPageLink {

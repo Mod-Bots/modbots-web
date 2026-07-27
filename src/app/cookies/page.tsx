@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import { CookieChoicePanel } from "../../components/CookieConsent";
-import { A, H2, P, PolicyPage, Row, Rows } from "../../components/PolicyPage";
+import {
+  A,
+  H2,
+  Mail,
+  P,
+  PolicyPage,
+  Row,
+  Rows,
+} from "../../components/PolicyPage";
+import { policyContacts } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Cookies",
@@ -71,6 +80,11 @@ export default function CookiesPage() {
         Every browser can block or delete cookies for a site, and doing so here
         will not break anything except staying signed in. Blocking the strictly
         necessary ones will sign you out.
+      </P>
+      <P>
+        Anything about what is stored in your browser here, or about the
+        analytics data itself, goes to <Mail address={policyContacts.privacy} />
+        .
       </P>
     </PolicyPage>
   );

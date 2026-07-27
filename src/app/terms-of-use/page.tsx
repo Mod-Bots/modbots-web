@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
-import { A, H2, LI, P, PolicyPage, UL } from "../../components/PolicyPage";
-import { policyMeta } from "../../data/policies";
+import {
+  A,
+  H2,
+  LI,
+  Mail,
+  P,
+  PolicyPage,
+  UL,
+} from "../../components/PolicyPage";
+import { policyContacts, policyMeta } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Terms of use",
@@ -27,6 +35,12 @@ export default function TermsPage() {
         Mod Bots is that researcher's project rather than the university's, and
         these terms are with the researcher. By creating an account, joining as
         a guest, or otherwise taking part, you accept them.
+      </P>
+      <P>
+        General questions about the platform, and anything to do with your
+        account, go to <Mail address={policyContacts.support} />. Where a
+        subject has an address of its own, the document covering it names that
+        address instead.
       </P>
 
       <H2 id="what">What Mod Bots is, and is not</H2>
@@ -86,8 +100,9 @@ export default function TermsPage() {
       </P>
       <P>
         If you believe something in the room infringes your copyright, raise it
-        with {policyMeta.controller} with enough detail to identify the material
-        and your claim, and it will be dealt with.
+        at <Mail address={policyContacts.copyright} /> with enough detail to
+        identify the material and your claim, and it will be dealt with. Other
+        intellectual property notices go to the same address.
       </P>
 
       <H2 id="licence">What you grant by taking part</H2>
@@ -141,12 +156,12 @@ export default function TermsPage() {
 
       <H2 id="ending">Ending it</H2>
       <P>
-        You can stop at any time, and you can ask for your account to be closed.
-        Access can be withdrawn where these terms or the room rules are broken,
-        or where the research requires it. Ending your participation ends
-        further collection. It does not remove what you have already
-        contributed, for the reasons set out in the{" "}
-        <A href="/privacy-notice">privacy notice</A>.
+        You can stop at any time, and you can ask for your account to be closed
+        at <Mail address={policyContacts.support} />. Access can be withdrawn
+        where these terms or the room rules are broken, or where the research
+        requires it. Ending your participation ends further collection. It does
+        not remove what you have already contributed, for the reasons set out in
+        the <A href="/privacy-notice">privacy notice</A>.
       </P>
 
       <H2 id="law">Governing law</H2>

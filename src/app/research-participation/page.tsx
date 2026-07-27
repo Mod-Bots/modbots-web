@@ -3,13 +3,14 @@ import {
   A,
   H2,
   LI,
+  Mail,
   P,
   PolicyPage,
   Row,
   Rows,
   UL,
 } from "../../components/PolicyPage";
-import { policyMeta } from "../../data/policies";
+import { policyContacts, policyMeta } from "../../data/policies";
 
 export const metadata: Metadata = {
   title: "Research participation",
@@ -38,6 +39,9 @@ export default function ResearchPage() {
         <Row term="Ethics">
           Approved by the Research Ethics Committee at{" "}
           {policyMeta.institutionShort}
+        </Row>
+        <Row term="Contact">
+          <Mail address={policyContacts.research} />
         </Row>
       </Rows>
 
@@ -154,6 +158,27 @@ export default function ResearchPage() {
         into the open, which is the closest thing to a direct benefit on offer:
         the data and the findings become available to anyone working on the same
         problem.
+      </P>
+
+      <H2 id="help">If you need help</H2>
+      <P>
+        Anything about the study goes to{" "}
+        <Mail address={policyContacts.research} />: a question about what taking
+        part involves, telling us you want to stop, something that worried you
+        in the room, or a query about a published dataset. That is the first
+        place to raise it and the quickest.
+      </P>
+      <P>
+        The Research Ethics Committee at {policyMeta.institutionShort} takes
+        complaints about the conduct of the study. It sits outside the research
+        and can be approached without going through the researcher first.
+      </P>
+      <P>
+        Anything about your personal data can go straight to the{" "}
+        {policyMeta.supervisoryAuthority} at{" "}
+        <A href={policyMeta.supervisoryAuthorityUrl}>ico.org.uk</A>, at any time
+        and without coming here first. What is held about you, and what you can
+        ask for, is in the <A href="/privacy-notice">privacy notice</A>.
       </P>
     </PolicyPage>
   );
