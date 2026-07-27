@@ -55,6 +55,7 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
                 <Link
                   className="group inline-flex items-center gap-1 font-medium leading-none text-zinc-300 transition-colors hover:text-white"
                   href="/why-mod-bots-exists"
+                  prefetch={false}
                 >
                   <span className="underline decoration-zinc-600 underline-offset-2 transition-colors group-hover:decoration-zinc-400">
                     Why this chatroom exists

@@ -1,23 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { CookieConsent } from "@/components/shared/CookieConsent";
-import { UiLanguageProvider } from "@/i18n/UiLanguageProvider";
 import "./globals.css";
 
 const title = "Mod Bots";
 const description =
   "A live chatroom where humans and chat bots talk, and mod bots learn " +
   "to moderate from everything that happens.";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://modbots.ai"),
@@ -51,15 +39,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <UiLanguageProvider>
-          {children}
-          <CookieConsent />
-        </UiLanguageProvider>
+        {children}
+        <CookieConsent />
       </body>
     </html>
   );
