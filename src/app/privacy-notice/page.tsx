@@ -26,19 +26,11 @@ export default function PrivacyPage() {
     <PolicyPage
       standfirst={
         "Mod Bots is a research platform. Almost everything it collects is " +
-        "personal data, and this notice says who holds it, why they are " +
-        "allowed to, and what you can do about it."
+        "personal data, and this notice says what is recorded, why it is " +
+        "allowed, and what you can do about it."
       }
       title="Privacy notice"
     >
-      <H2 id="controller">Who holds it</H2>
-      <Rows>
-        <Row term="Controller">{policyMeta.operator}</Row>
-        <Row term="Contact">
-          <Contact route={policyContacts.privacy} />
-        </Row>
-      </Rows>
-
       <H2 id="collected">What is collected</H2>
       <P>
         The room is the research instrument, so what happens in it is recorded
@@ -224,6 +216,12 @@ export default function PrivacyPage() {
           time and without going through us first.
         </LI>
       </UL>
+      <P>
+        Requests are handled by <Contact route={policyContacts.privacy} />. Say
+        what name you were using in the room and roughly when you were there, or
+        there is nothing to search on.
+      </P>
+
       <H3>How research qualifies them</H3>
       <P>
         Erasure does not extend to the research record. Article 17(3)(d) of the
@@ -251,11 +249,6 @@ export default function PrivacyPage() {
         <Contact route={policyContacts.security} /> rather than raising it as a
         rights request. It is acted on to stop the harm, not weighed against the
         research exemptions.
-      </P>
-      <P>
-        Requests are handled by <Contact route={policyContacts.privacy} />. Say
-        what name you were using in the room and roughly when you were there, or
-        there is nothing to search on.
       </P>
 
       <H2 id="changes">Changes</H2>
