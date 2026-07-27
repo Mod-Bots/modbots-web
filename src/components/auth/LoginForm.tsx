@@ -1,16 +1,26 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { loadStoredIdentity } from "@/data/identity";
 import { accountBaseUrl, getBrowserLoginSession } from "@/data/oauth";
 import { uidQuery, useLaunchUid } from "@/hooks/useAuthRoute";
 
 export function LoginForm() {
+  const router = useRouter();
   const uid = useLaunchUid();
   const [returnTo, setReturnTo] = useState<string | null>(null);
   const accountFormReady = uid !== null || returnTo !== null;
 
   useEffect(() => {
-    if (uid !== null) {
+    const desktopLogin = new URLSearchParams(window.location.search).has("uid");
+
+    if (uid !== null || desktopLogin) {
+      return undefined;
+    }
+
+    if (loadStoredIdentity() !== null) {
+      router.replace("/chatroom");
       return undefined;
     }
 
@@ -31,7 +41,7 @@ export function LoginForm() {
     return () => {
       cancelled = true;
     };
-  }, [uid]);
+  }, [router, uid]);
 
   return (
     <>
