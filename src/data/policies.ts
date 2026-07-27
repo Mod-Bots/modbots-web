@@ -2,10 +2,11 @@
 // a change of controller, address, or document date cannot go stale on one
 // page and stay current on another.
 
+// The documents speak for the platform rather than for the people behind it.
+// Nobody is named: a reader wants the thing dealt with, and the individuals and
+// institutions involved answer to their own governance, not to the public.
 export const policyMeta = {
-  controller: "William Sawyerr",
-  institution: "University for the Creative Arts",
-  institutionShort: "UCA",
+  operator: "Mod Bots",
   jurisdiction: "United Kingdom",
   supervisoryAuthority: "Information Commissioner's Office",
   supervisoryAuthorityUrl: "https://ico.org.uk",

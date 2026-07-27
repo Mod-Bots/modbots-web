@@ -33,11 +33,7 @@ export default function PrivacyPage() {
     >
       <H2 id="controller">Who holds it</H2>
       <Rows>
-        <Row term="Controller">{policyMeta.controller}</Row>
-        <Row term="Affiliation">
-          {policyMeta.institution} ({policyMeta.institutionShort}), where the
-          research is carried out. The university is not the controller.
-        </Row>
+        <Row term="Controller">{policyMeta.operator}</Row>
         <Row term="Contact">
           <Contact route={policyContacts.privacy} />
         </Row>
@@ -102,7 +98,7 @@ export default function PrivacyPage() {
         <Row term="Public task">
           Article 6(1)(e). The research itself: collecting room activity and
           using it to develop and evaluate moderation agents, as academic
-          research carried out at {policyMeta.institution}.
+          research.
         </Row>
         <Row term="Contract">
           Article 6(1)(b). Creating your account, signing you in, and giving you
@@ -122,7 +118,7 @@ export default function PrivacyPage() {
         data protection law has to be freely given and freely withdrawn, and
         resting a research record on it would mean the lawfulness of years of
         collected material could evaporate participant by participant. Public
-        task is the appropriate basis and is the standard one for university
+        task is the appropriate basis and is the standard one for academic
         research. That is a separate question from research ethics, where your
         informed agreement is still required and still yours to withdraw. How
         that works is set out in{" "}
@@ -257,11 +253,9 @@ export default function PrivacyPage() {
         research exemptions.
       </P>
       <P>
-        These rights are exercised against the controller named above, not
-        against {policyMeta.institution}. Requests are handled by{" "}
-        <Contact route={policyContacts.privacy} />. Say what name you were using
-        in the room and roughly when you were there, or there is nothing to
-        search on.
+        Requests are handled by <Contact route={policyContacts.privacy} />. Say
+        what name you were using in the room and roughly when you were there, or
+        there is nothing to search on.
       </P>
 
       <H2 id="changes">Changes</H2>

@@ -6,8 +6,6 @@ import {
   LI,
   P,
   PolicyPage,
-  Row,
-  Rows,
   UL,
 } from "../../components/PolicyPage";
 import { policyContacts, policyMeta } from "../../data/policies";
@@ -30,21 +28,6 @@ export default function ResearchPage() {
       }
       title="Research participation"
     >
-      <H2 id="study">The study</H2>
-      <Rows>
-        <Row term="Researcher">{policyMeta.controller}</Row>
-        <Row term="Institution">
-          {policyMeta.institution} ({policyMeta.institutionShort})
-        </Row>
-        <Row term="Ethics">
-          Approved by the Research Ethics Committee at{" "}
-          {policyMeta.institutionShort}
-        </Row>
-        <Row term="Contact">
-          <Contact route={policyContacts.research} />
-        </Row>
-      </Rows>
-
       <H2 id="about">What it is about</H2>
       <P>
         Moderation research has largely been done inside closed platforms, on
@@ -169,9 +152,9 @@ export default function ResearchPage() {
         published dataset.
       </P>
       <P>
-        The Research Ethics Committee at {policyMeta.institutionShort} takes
-        complaints about the conduct of the study. It sits outside the research
-        and can be approached directly, without going through the study first.
+        The study is run under academic research ethics oversight, and a
+        complaint about how it is being conducted is passed to that oversight
+        rather than settled in house.
       </P>
       <P>
         Anything about your personal data can go straight to the{" "}

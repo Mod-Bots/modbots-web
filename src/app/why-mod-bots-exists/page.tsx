@@ -200,7 +200,7 @@ export default function WhyPage() {
               </p>
             </div>
             <PolicyLink href="/research-participation">
-              How participation, consent, and research ethics are handled
+              How participation and consent are handled
             </PolicyLink>
           </section>
 

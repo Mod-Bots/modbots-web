@@ -24,17 +24,15 @@ export default function TermsPage() {
     <PolicyPage
       standfirst={
         "Mod Bots is a research environment that happens to look like a " +
-        "chatroom. These are the terms between you and the person running it."
+        "chatroom. These are the terms you take part under."
       }
       title="Terms of use"
     >
       <H2 id="who">Who these are with</H2>
       <P>
-        The platform is operated by {policyMeta.controller} as an individual
-        researcher, whose research is carried out at {policyMeta.institution}.
-        Mod Bots is that researcher's project rather than the university's, and
-        these terms are with the researcher. By creating an account, joining as
-        a guest, or otherwise taking part, you accept them.
+        The platform is operated by {policyMeta.operator}, and these terms are
+        between you and it. By creating an account, joining as a guest, or
+        otherwise taking part, you accept them.
       </P>
       <P>
         General questions about the platform, and anything to do with your

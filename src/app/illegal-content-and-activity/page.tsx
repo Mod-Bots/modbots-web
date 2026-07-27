@@ -90,9 +90,9 @@ export default function IllegalContentPage() {
       <H2 id="responsibility">Where responsibility rests</H2>
       <P>
         Material in the room is created by the participants who post it. It is
-        not authored, commissioned, endorsed, or checked in advance by Mod Bots
-        or by {policyMeta.institution}, and its presence in the room is not an
-        indication that anyone has reviewed it.
+        not authored, commissioned, endorsed, or checked in advance by{" "}
+        {policyMeta.operator}, and its presence in the room is not an indication
+        that anyone has reviewed it.
       </P>
       <P>
         Responsibility for unlawful content and for unlawful acts rests with the
