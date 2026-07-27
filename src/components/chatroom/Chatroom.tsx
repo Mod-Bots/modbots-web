@@ -3,8 +3,8 @@
 import {
   AtSign,
   Bot,
-  Camera,
   CalendarDays,
+  Camera,
   ChevronDown,
   CircleAlert,
   CornerUpLeft,
@@ -36,22 +36,9 @@ import type {
   ReactNode,
   PointerEvent as ReactPointerEvent,
 } from "react";
-import {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import appLogo from "@/assets/logo.svg";
 import startScreenBg from "@/assets/start-screen-bg.png";
-import { MenuBar } from "./MenuBar";
-import {
-  type AccountSettingsSummary,
-  SettingsDialog,
-  type SettingsSection,
-} from "./SettingsDialog";
 import type {
   Actor,
   ActorType,
@@ -59,25 +46,22 @@ import type {
   ContentAddress,
   RoomEvent,
 } from "@/data/contracts";
-import {
-  accountBaseUrl,
-  consumeEnterAfterLogin,
-} from "@/data/oauth";
-import {
-  isMutedError,
-  mediaAssetDataUrl,
-} from "@/data/platform";
+import { accountBaseUrl, consumeEnterAfterLogin } from "@/data/oauth";
+import { isMutedError, mediaAssetDataUrl } from "@/data/platform";
 import { actorLabel, actorRole } from "@/data/room-state";
 import { useRoomActivity } from "@/hooks/useRoomActivity";
+import { useUiLanguage } from "@/i18n/UiLanguageProvider";
+import { MenuBar } from "./MenuBar";
+import {
+  type AccountSettingsSummary,
+  SettingsDialog,
+  type SettingsSection,
+} from "./SettingsDialog";
 
 const roomId = "global-lobby";
 const roomName = "Room";
-const roomAbout = (
-  <>
-    A live chatroom where humans and chat bots talk, and mod bots learn to
-    moderate from everything that happens.
-  </>
-);
+const roomAbout =
+  "A live chatroom where humans and chat bots talk, and mod bots learn to moderate from everything that happens.";
 const appVersion = "0.0.1-alpha";
 
 const groupWindowMs = 45 * 1000;
@@ -542,6 +526,8 @@ const activityScopes: Array<{ id: ActivityScope; label: string }> = [
 const settingsStorageKeys = {
   sendWithEnter: "modbots.web.send-with-enter",
   chatLanguage: "modbots.web.chat-language",
+  translationEnabled: "modbots.web.translation-enabled",
+  translationLanguage: "modbots.web.translation-language",
 };
 
 const readStoredBoolean = (key: string, fallback: boolean): boolean => {
@@ -877,6 +863,8 @@ function StatusBar({
   muted: boolean;
   searchMatches: number | null;
 }) {
+  const { t } = useUiLanguage();
+
   return (
     <footer className="flex h-7 shrink-0 items-center justify-between gap-4 border-t border-white/[0.08] bg-[#0a0a0a] px-3 text-[11px] text-zinc-500">
       <div className="flex items-center gap-3">
@@ -890,16 +878,16 @@ function StatusBar({
                   : "animate-pulse bg-zinc-500"
             }`}
           />
-          <span className="text-zinc-400">{connectionLabel}</span>
+          <span className="text-zinc-400">{t(connectionLabel)}</span>
         </span>
-        {sending ? <span>Sending...</span> : null}
+        {sending ? <span>{t("Sending...")}</span> : null}
         {muted ? (
           <span
             className="flex items-center gap-1.5 text-zinc-300"
-            title="Moderation has muted you in this room"
+            title={t("Moderation has muted you in this room")}
           >
             <MicOff className="h-3 w-3" />
-            Muted
+            {t("Muted")}
           </span>
         ) : null}
       </div>
@@ -914,6 +902,8 @@ function StatusBar({
 }
 
 function MessageActions({ onReply }: { onReply?: () => void }) {
+  const { t } = useUiLanguage();
+
   return (
     <div className="absolute right-4 top-0 flex items-center rounded-xl border border-white/10 bg-[#181818] p-0.5 opacity-80 shadow-xl lg:right-6 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100">
       <button
@@ -921,24 +911,24 @@ function MessageActions({ onReply }: { onReply?: () => void }) {
         onClick={onReply}
         disabled={onReply === undefined}
         className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-zinc-500"
-        aria-label="Reply to message"
-        title="Reply"
+        aria-label={t("Reply to message")}
+        title={t("Reply")}
       >
         <Reply className="h-3.5 w-3.5" />
       </button>
       <button
         type="button"
         className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white"
-        aria-label="Add reaction"
-        title="Add reaction"
+        aria-label={t("Add reaction")}
+        title={t("Add reaction")}
       >
         <SmilePlus className="h-3.5 w-3.5" />
       </button>
       <button
         type="button"
         className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white"
-        aria-label="More message actions"
-        title="More actions"
+        aria-label={t("More message actions")}
+        title={t("More actions")}
       >
         <MoreHorizontal className="h-3.5 w-3.5" />
       </button>
@@ -1053,6 +1043,7 @@ function ChatMessage({
   repliedDisplayText: string | null;
   onReply?: () => void;
 }) {
+  const { t } = useUiLanguage();
   const actor = event.actorId === null ? undefined : actors.get(event.actorId);
   const ownMessage = event.actorId === localActorId;
   const name = actorLabel(event.actorId, actors);
@@ -1082,7 +1073,7 @@ function ChatMessage({
               onClick={() => setShowOriginal((current) => !current)}
               className="mt-1 text-[11px] text-zinc-500 hover:text-zinc-300"
             >
-              {showOriginal ? "View translation" : "View original"}
+              {showOriginal ? t("View translation") : t("View original")}
             </button>
           ) : null}
           <MessageMedia event={event} />
@@ -1110,11 +1101,11 @@ function ChatMessage({
           </span>
           {actor?.type !== "human" && actor !== undefined ? (
             <span className="rounded-md border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-400">
-              {formatRole(actor)}
+              {t(formatRole(actor))}
             </span>
           ) : null}
           {ownMessage ? (
-            <span className="text-[11px] text-zinc-500">You</span>
+            <span className="text-[11px] text-zinc-500">{t("You")}</span>
           ) : null}
           <time className="text-[10px] tabular-nums text-zinc-500">
             {formatTime(event.occurredAt)}
@@ -1156,7 +1147,7 @@ function ChatMessage({
             onClick={() => setShowOriginal((current) => !current)}
             className="mt-1 text-[11px] text-zinc-500 hover:text-zinc-300"
           >
-            {showOriginal ? "View translation" : "View original"}
+            {showOriginal ? t("View translation") : t("View original")}
           </button>
         ) : null}
         <MessageMedia event={event} />
@@ -1339,6 +1330,7 @@ function ParticipantRow({
   actor: Actor;
   status: ParticipantStatus;
 }) {
+  const { t } = useUiLanguage();
   const currentStatus = participantStatusStyles[status];
 
   return (
@@ -1352,7 +1344,7 @@ function ParticipantRow({
         />
         <span
           className={`absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0d0d0d] ${currentStatus.dot}`}
-          title={currentStatus.label}
+          title={t(currentStatus.label)}
         />
       </div>
       <div className="min-w-0 flex-1">
@@ -1362,7 +1354,7 @@ function ParticipantRow({
         <p
           className={`mt-0.5 text-[10px] font-medium uppercase tracking-[0.08em] ${currentStatus.text}`}
         >
-          {currentStatus.label}
+          {t(currentStatus.label)}
         </p>
       </div>
     </div>
@@ -1387,7 +1379,9 @@ function ProfileDetailRow({
         <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-600">
           {label}
         </p>
-        <div className="mt-0.5 text-[12px] leading-5 text-zinc-200">{value}</div>
+        <div className="mt-0.5 text-[12px] leading-5 text-zinc-200">
+          {value}
+        </div>
       </div>
     </div>
   );
@@ -1419,6 +1413,8 @@ function RegisteredMark({ className = "h-3.5 w-3.5" }: { className?: string }) {
 }
 
 function SessionRestoreScreen({ restoring }: { restoring: boolean }) {
+  const { t } = useUiLanguage();
+
   return (
     <section className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden bg-[#0b0b0b] px-6 py-12 text-zinc-100">
       <img
@@ -1434,7 +1430,9 @@ function SessionRestoreScreen({ restoring }: { restoring: boolean }) {
         />
         <h1 className="mt-7 text-4xl font-bold text-white">Mod Bots</h1>
         <p className="mt-4 max-w-md text-lg leading-8 text-zinc-400">
-          {restoring ? "Restoring your session..." : "Starting Mod Bots..."}
+          {restoring
+            ? t("Restoring your session...")
+            : t("Starting Mod Bots...")}
         </p>
       </div>
     </section>
@@ -1452,6 +1450,7 @@ const downloadBlob = (blob: Blob, fileName: string) => {
 
 export function Chatroom() {
   const router = useRouter();
+  const { language: uiLanguage, t } = useUiLanguage();
   const {
     actors,
     apiHealth,
@@ -1522,7 +1521,12 @@ export function Chatroom() {
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection>("account");
   const [sendWithEnter, setSendWithEnter] = useState(true);
-  const [chatLanguage, setChatLanguage] = useState<ChatLanguage>("en");
+  const [translationEnabled, setTranslationEnabled] = useState(false);
+  const [translationLanguage, setTranslationLanguage] =
+    useState<ChatLanguage>("zh-CN");
+  const chatLanguage: ChatLanguage = translationEnabled
+    ? translationLanguage
+    : "en";
   const [translatedEventText, setTranslatedEventText] = useState<
     Map<string, string>
   >(() => new Map());
@@ -1574,7 +1578,14 @@ export function Chatroom() {
     setSendWithEnter(
       readStoredBoolean(settingsStorageKeys.sendWithEnter, true),
     );
-    setChatLanguage(readStoredChatLanguage());
+    const storedChatLanguage = readStoredChatLanguage();
+    setTranslationEnabled(
+      readStoredBoolean(
+        settingsStorageKeys.translationEnabled,
+        storedChatLanguage !== "en",
+      ),
+    );
+    setTranslationLanguage("zh-CN");
     setSettingsReady(true);
   }, []);
 
@@ -1613,13 +1624,27 @@ export function Chatroom() {
       return;
     }
 
+    writeStoredBoolean(
+      settingsStorageKeys.translationEnabled,
+      translationEnabled,
+    );
+    window.localStorage.setItem(
+      settingsStorageKeys.translationLanguage,
+      translationLanguage,
+    );
     window.localStorage.setItem(settingsStorageKeys.chatLanguage, chatLanguage);
-  }, [chatLanguage, settingsReady]);
+  }, [chatLanguage, settingsReady, translationEnabled, translationLanguage]);
 
-  const changeChatLanguage = useCallback((language: ChatLanguage) => {
+  const changeTranslationLanguage = useCallback((language: ChatLanguage) => {
     failedTranslations.current.clear();
     setTranslationError(null);
-    setChatLanguage(language);
+    setTranslationLanguage(language);
+  }, []);
+
+  const changeTranslationEnabled = useCallback((enabled: boolean) => {
+    failedTranslations.current.clear();
+    setTranslationError(null);
+    setTranslationEnabled(enabled);
   }, []);
 
   const openSettings = useCallback((section: SettingsSection = "account") => {
@@ -1634,11 +1659,7 @@ export function Chatroom() {
     ) {
       openSettings("account");
     }
-  }, [
-    openSettings,
-    removeProfilePicture.error,
-    uploadProfilePicture.error,
-  ]);
+  }, [openSettings, removeProfilePicture.error, uploadProfilePicture.error]);
 
   useEffect(() => {
     if (entered && !wasEntered.current) {
@@ -2259,14 +2280,13 @@ export function Chatroom() {
           ? "You are using the monogram fallback right now."
           : "This profile picture is assigned through the Unified Profile-Picture System.",
       hasProfilePicture: localActor.profilePictureId !== null,
-      healthSummary:
-        isMuted
-          ? "Muted right now."
-          : localProfile.moderationOnMe === 0
-            ? "Good standing. No mod bot has had to act on your messages."
-            : `${localProfile.moderationOnMe.toLocaleString()} mod bot ${
-                localProfile.moderationOnMe === 1 ? "action" : "actions"
-              } on your messages.`,
+      healthSummary: isMuted
+        ? "Muted right now."
+        : localProfile.moderationOnMe === 0
+          ? "Good standing. No mod bot has had to act on your messages."
+          : `${localProfile.moderationOnMe.toLocaleString()} mod bot ${
+              localProfile.moderationOnMe === 1 ? "action" : "actions"
+            } on your messages.`,
       latestModerationLabel: localProfile.lastModerationLabel,
       bio: localActor.bio,
       pronouns: localActor.pronouns,
@@ -2752,15 +2772,11 @@ export function Chatroom() {
           onFindInChat={openSearch}
           onOpenSettings={() => openSettings("account")}
           onRefreshChatroom={() => void refresh()}
-          onTakeScreenshot={() =>
-            void takeScreenshot().catch(() => undefined)
-          }
+          onTakeScreenshot={() => void takeScreenshot().catch(() => undefined)}
           onExportChatLog={exportChatLog}
         />
       ) : null}
-      <main
-        className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
-      >
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         {userMenuOpen ? (
           <div
             className="fixed inset-0 z-20"
@@ -2771,7 +2787,7 @@ export function Chatroom() {
         {mobilePanel !== null ? (
           <button
             type="button"
-            aria-label="Close side panel"
+            aria-label={t("Close side panel")}
             onClick={() => {
               setMobilePanel(null);
               setUserMenuOpen(false);
@@ -2780,987 +2796,1022 @@ export function Chatroom() {
           />
         ) : null}
         <div className="relative flex min-h-0 flex-1">
-        {!entered ? (
-          <SessionRestoreScreen restoring={identityRestored && hasIdentity} />
-        ) : (
-          <>
-            {membersOpen ? (
-              <aside
-                className={`fixed bottom-7 left-0 top-11 z-40 w-[min(88vw,340px)] shrink-0 flex-col border-r border-white/[0.08] bg-[#0d0d0d] shadow-[20px_0_60px_rgba(0,0,0,0.5)] lg:static lg:z-auto lg:flex lg:w-[var(--participants-width)] lg:shadow-none ${
-                  mobilePanel === "participants" ? "flex" : "hidden"
-                }`}
-                style={
-                  {
-                    "--participants-width": `${participantsWidth}px`,
-                  } as CSSProperties
-                }
-              >
-                <div className="flex h-[68px] shrink-0 items-center border-b border-white/[0.08] px-5">
-                  <h1 className="truncate text-[15px] font-semibold text-white">
-                    {roomName}
-                  </h1>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobilePanel(null);
-                      setUserMenuOpen(false);
-                    }}
-                    className="ml-auto rounded-lg p-2 text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:hidden"
-                    aria-label="Close participants"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="flex shrink-0 items-center gap-2 border-b border-white/[0.06] px-5 py-2 text-zinc-400">
-                  <Users className="h-3.5 w-3.5 shrink-0" />
-                  <span className="text-xs font-semibold uppercase tracking-[0.08em]">
-                    Participants
-                  </span>
-                  <span className="ml-auto text-xs tabular-nums text-zinc-500">
-                    {visibleOnlineActors.length}
-                  </span>
-                </div>
-                <div className="modbots-scroll min-h-0 flex-1 overflow-y-auto p-3">
-                  <div className="space-y-4">
-                    {roster.map((group) => (
-                      <div key={group.type}>
-                        <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
-                          {roleLabels[group.type]} · {group.members.length}
-                        </p>
-                        <div className="space-y-0.5">
-                          {group.members.map((member) => (
-                            <ParticipantRow
-                              key={member.actor.id}
-                              actor={member.actor}
-                              status={member.status}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="relative shrink-0 border-t border-white/[0.08] p-3">
-                  {userMenuOpen &&
-                  localActor !== undefined &&
-                  localProfile !== null ? (
-                    <div
-                      className="absolute bottom-full left-3 z-30 mb-2 max-h-[calc(100vh-120px)] w-[320px] max-w-[calc(100vw-24px)] overflow-y-auto rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(28,28,28,0.98),rgba(17,17,17,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.58)] backdrop-blur-xl"
-                      role="dialog"
-                      aria-label="Your profile"
-                    >
-                      <div className="border-b border-white/[0.08] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_45%)] px-4 py-4">
-                        <div className="flex items-start gap-3">
-                          <div className="relative shrink-0">
-                            <ActorProfilePicture
-                              actor={localActor}
-                              actorId={localActor.id}
-                              name={localActor.display}
-                              size="lg"
-                            />
-                            <button
-                              type="button"
-                              onClick={chooseProfilePicture}
-                              className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.1] bg-[#181818] text-zinc-300 shadow-[0_10px_22px_rgba(0,0,0,0.35)] transition-colors hover:border-white/20 hover:bg-[#202020] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                              aria-label="Change profile picture"
-                              title="Change profile picture"
-                            >
-                              <Camera className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                          <div className="min-w-0 flex-1 pt-1">
-                            <p className="truncate text-[15px] font-semibold leading-5 text-zinc-50">
-                              {localActor.display}
-                            </p>
-                            <p className="mt-0.5 truncate text-[14px] text-zinc-400">
-                              {localProfile.handleLabel}
-                            </p>
-                            <div className="mt-0.5 flex items-center gap-1.5">
-                              {localActor.registered ? (
-                                <RegisteredMark className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                              ) : null}
-                              <button
-                                type="button"
-                                onClick={openAccountSettings}
-                                className="inline-flex h-4 cursor-pointer items-center text-[13px] font-medium leading-none text-zinc-400 underline decoration-zinc-600 underline-offset-2 transition-colors hover:text-white hover:decoration-zinc-300 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                              >
-                                {localProfile.accountLabel}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1 px-4 py-3">
-                        <ProfileDetailRow
-                          icon={<CalendarDays className="h-4 w-4" />}
-                          label={
-                            localActor.registered
-                              ? "Member since"
-                              : "Identity created"
-                          }
-                          value={memberSince(localActor.createdAt)}
-                        />
-                        <ProfileDetailRow
-                          icon={<FileText className="h-4 w-4" />}
-                          label="About"
-                          value={localActor.bio ?? "Not set"}
-                        />
-                        <ProfileDetailRow
-                          icon={<AtSign className="h-4 w-4" />}
-                          label="Pronouns"
-                          value={localActor.pronouns ?? "Not set"}
-                        />
-                        <ProfileDetailRow
-                          icon={<MapPin className="h-4 w-4" />}
-                          label="Location"
-                          value={localActor.location ?? "Not set"}
-                        />
-                        <ProfileDetailRow
-                          icon={<LinkIcon className="h-4 w-4" />}
-                          label="Links"
-                          value={
-                            (localActor.links ?? []).length === 0 ? (
-                              "Not set"
-                            ) : (
-                              <div className="flex flex-wrap gap-x-3 gap-y-1">
-                                {(localActor.links ?? []).map((link) => (
-                                  <a
-                                    key={link}
-                                    href={link}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="truncate underline decoration-zinc-600 underline-offset-2 hover:text-white"
-                                  >
-                                    {new URL(link).hostname}
-                                  </a>
-                                ))}
-                              </div>
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="border-t border-white/[0.08] p-2">
-                        <button
-                          type="button"
-                          onClick={logOut}
-                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                        >
-                          <LogOut className="h-4 w-4 shrink-0 text-zinc-500" />
-                          Log out
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-                  <div className="flex items-center gap-1 rounded-[20px] border border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.22)]">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        localActor === undefined
-                          ? undefined
-                          : setUserMenuOpen((open) => !open)
-                      }
-                      disabled={localActor === undefined}
-                      aria-haspopup="dialog"
-                      aria-expanded={userMenuOpen}
-                      title="Your profile"
-                      className="flex min-w-0 flex-1 items-center gap-2.5 px-2 py-1.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-default"
-                    >
-                      <div className="relative shrink-0">
-                        <ActorProfilePicture
-                          actor={localActor}
-                          actorId={localActor?.id ?? null}
-                          name={localActor?.display ?? "You"}
-                          size="md"
-                        />
-                        {localActor !== undefined ? (
-                          <span
-                            className={`absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-[#0d0d0d] ${localParticipantStatusStyle.dot}`}
-                            aria-label={localParticipantStatusStyle.label}
-                            title={localParticipantStatusStyle.label}
-                          />
-                        ) : null}
-                      </div>
-                      <span className="min-w-0 truncate text-[13px] font-semibold leading-5 text-zinc-100">
-                        {localActor?.display ??
-                          (hasIdentity ? "Preparing session..." : "Not joined")}
-                      </span>
-                      {localActor !== undefined ? (
-                        <ChevronDown
-                          className={`h-3.5 w-3.5 shrink-0 text-zinc-500 transition-transform duration-200 ${
-                            userMenuOpen ? "" : "rotate-180"
-                          }`}
-                        />
-                      ) : null}
-                    </button>
-                  </div>
-                </div>
-              </aside>
-            ) : null}
-            {membersOpen ? (
-              <PanelResizeHandle
-                label="Resize the participants panel"
-                width={participantsWidth}
-                limits={participantsPanel}
-                onWidthChange={setParticipantsWidth}
-                grow={1}
-              />
-            ) : null}
-
-            <div className="flex min-w-0 flex-1 flex-col">
-              <header className="z-10 flex h-14 shrink-0 items-center gap-2 border-b border-white/[0.08] bg-[#0d0d0d] px-3 lg:h-[68px] lg:gap-4 lg:px-5">
-                {mobileSearchOpen ? (
-                  <div className="flex min-w-0 flex-1 items-center gap-2 lg:hidden">
-                    <div className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/10 bg-[#181818] px-3">
-                      <Search className="h-4 w-4 shrink-0 text-zinc-500" />
-                      <input
-                        ref={searchInput}
-                        value={searchQuery}
-                        onChange={(event) =>
-                          setSearchQuery(event.currentTarget.value)
-                        }
-                        placeholder="Search the chat"
-                        className="min-w-0 flex-1 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
-                      />
-                    </div>
+          {!entered ? (
+            <SessionRestoreScreen restoring={identityRestored && hasIdentity} />
+          ) : (
+            <>
+              {membersOpen ? (
+                <aside
+                  className={`fixed bottom-7 left-0 top-11 z-40 w-[min(88vw,340px)] shrink-0 flex-col border-r border-white/[0.08] bg-[#0d0d0d] shadow-[20px_0_60px_rgba(0,0,0,0.5)] lg:static lg:z-auto lg:flex lg:w-[var(--participants-width)] lg:shadow-none ${
+                    mobilePanel === "participants" ? "flex" : "hidden"
+                  }`}
+                  style={
+                    {
+                      "--participants-width": `${participantsWidth}px`,
+                    } as CSSProperties
+                  }
+                >
+                  <div className="flex h-[68px] shrink-0 items-center border-b border-white/[0.08] px-5">
+                    <h1 className="truncate text-[15px] font-semibold text-white">
+                      {t(roomName)}
+                    </h1>
                     <button
                       type="button"
                       onClick={() => {
-                        setSearchQuery("");
-                        setMobileSearchOpen(false);
+                        setMobilePanel(null);
+                        setUserMenuOpen(false);
                       }}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                      aria-label="Close search"
+                      className="ml-auto rounded-lg p-2 text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:hidden"
+                      aria-label={t("Close participants")}
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </div>
-                ) : (
-                  <>
-                    <h2 className="min-w-0 flex-1 truncate text-[14px] font-semibold text-white lg:flex-none">
-                      Chat
-                    </h2>
-                    <div className="hidden flex-1 lg:block" />
-                    <div className="hidden h-9 w-[min(32vw,380px)] items-center gap-2 rounded-lg border border-white/10 bg-[#181818] px-3 lg:flex">
-                      <Search className="h-4 w-4 shrink-0 text-zinc-500" />
-                      <input
-                        ref={searchInput}
-                        value={searchQuery}
-                        onChange={(event) =>
-                          setSearchQuery(event.currentTarget.value)
-                        }
-                        placeholder="Search the chat"
-                        className="min-w-0 flex-1 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
-                      />
-                      {searchQuery.length > 0 ? (
-                        <button
-                          type="button"
-                          onClick={() => setSearchQuery("")}
-                          className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                          aria-label="Clear search"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      ) : null}
+                  <div className="flex shrink-0 items-center gap-2 border-b border-white/[0.06] px-5 py-2 text-zinc-400">
+                    <Users className="h-3.5 w-3.5 shrink-0" />
+                    <span className="text-xs font-semibold uppercase tracking-[0.08em]">
+                      {t("Participants")}
+                    </span>
+                    <span className="ml-auto text-xs tabular-nums text-zinc-500">
+                      {visibleOnlineActors.length}
+                    </span>
+                  </div>
+                  <div className="modbots-scroll min-h-0 flex-1 overflow-y-auto p-3">
+                    <div className="space-y-4">
+                      {roster.map((group) => (
+                        <div key={group.type}>
+                          <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
+                            {t(roleLabels[group.type])} · {group.members.length}
+                          </p>
+                          <div className="space-y-0.5">
+                            {group.members.map((member) => (
+                              <ParticipantRow
+                                key={member.actor.id}
+                                actor={member.actor}
+                                status={member.status}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="hidden flex-1 lg:block" />
-                    <div className="ml-auto flex items-center gap-1 lg:hidden">
-                      <button
-                        type="button"
-                        onClick={openSearch}
-                        className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
-                        aria-label="Search the chat"
+                  </div>
+                  <div className="relative shrink-0 border-t border-white/[0.08] p-3">
+                    {userMenuOpen &&
+                    localActor !== undefined &&
+                    localProfile !== null ? (
+                      <div
+                        className="absolute bottom-full left-3 z-30 mb-2 max-h-[calc(100vh-120px)] w-[320px] max-w-[calc(100vw-24px)] overflow-y-auto rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(28,28,28,0.98),rgba(17,17,17,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.58)] backdrop-blur-xl"
+                        role="dialog"
+                        aria-label={t("Your profile")}
                       >
-                        <Search className="h-[18px] w-[18px]" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          setMembersOpen(true);
-                          setMobilePanel("participants");
-                        }}
-                        className="relative flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
-                        aria-label="Show participants"
-                        aria-expanded={mobilePanel === "participants"}
-                      >
-                        <Users className="h-[18px] w-[18px]" />
-                        <span className="absolute right-0 top-0 flex min-w-4 -translate-y-1/4 translate-x-1/4 items-center justify-center rounded-full bg-zinc-200 px-1 text-[9px] font-bold leading-4 text-zinc-900">
-                          {visibleOnlineActors.length}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          setAboutPanelOpen(true);
-                          setMobilePanel("about");
-                        }}
-                        className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
-                        aria-label="Show room information"
-                        aria-expanded={mobilePanel === "about"}
-                      >
-                        <Info className="h-[18px] w-[18px]" />
-                      </button>
-                    </div>
-                  </>
-                )}
-              </header>
+                        <div className="border-b border-white/[0.08] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_45%)] px-4 py-4">
+                          <div className="flex items-start gap-3">
+                            <div className="relative shrink-0">
+                              <ActorProfilePicture
+                                actor={localActor}
+                                actorId={localActor.id}
+                                name={localActor.display}
+                                size="lg"
+                              />
+                              <button
+                                type="button"
+                                onClick={chooseProfilePicture}
+                                className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.1] bg-[#181818] text-zinc-300 shadow-[0_10px_22px_rgba(0,0,0,0.35)] transition-colors hover:border-white/20 hover:bg-[#202020] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                                aria-label={t("Change profile picture")}
+                                title={t("Change profile picture")}
+                              >
+                                <Camera className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                            <div className="min-w-0 flex-1 pt-1">
+                              <p className="truncate text-[15px] font-semibold leading-5 text-zinc-50">
+                                {localActor.display}
+                              </p>
+                              <p className="mt-0.5 truncate text-[14px] text-zinc-400">
+                                {localProfile.handleLabel}
+                              </p>
+                              <div className="mt-0.5 flex items-center gap-1.5">
+                                {localActor.registered ? (
+                                  <RegisteredMark className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                                ) : null}
+                                <button
+                                  type="button"
+                                  onClick={openAccountSettings}
+                                  className="inline-flex h-4 cursor-pointer items-center text-[13px] font-medium leading-none text-zinc-400 underline decoration-zinc-600 underline-offset-2 transition-colors hover:text-white hover:decoration-zinc-300 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                                >
+                                  {localProfile.accountLabel}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
 
-              {connectionProblem || error instanceof Error ? (
-                <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] bg-[#151515] px-4 py-2 text-xs text-zinc-300 lg:px-7">
-                  <span>
-                    {historyUnavailable
-                      ? "We couldn't load the conversation right now. Try again in a moment."
-                      : error instanceof Error
-                        ? error.message
-                        : "The conversation is reconnecting. New messages may be delayed."}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => void refresh()}
-                    className="rounded-lg px-3 py-1.5 font-medium text-white hover:bg-white/[0.07]"
-                  >
-                    Retry
-                  </button>
-                </div>
+                        <div className="space-y-1 px-4 py-3">
+                          <ProfileDetailRow
+                            icon={<CalendarDays className="h-4 w-4" />}
+                            label={
+                              localActor.registered
+                                ? t("Member since")
+                                : t("Identity created")
+                            }
+                            value={memberSince(localActor.createdAt)}
+                          />
+                          <ProfileDetailRow
+                            icon={<FileText className="h-4 w-4" />}
+                            label={t("About")}
+                            value={localActor.bio ?? t("Not set")}
+                          />
+                          <ProfileDetailRow
+                            icon={<AtSign className="h-4 w-4" />}
+                            label={t("Pronouns")}
+                            value={localActor.pronouns ?? t("Not set")}
+                          />
+                          <ProfileDetailRow
+                            icon={<MapPin className="h-4 w-4" />}
+                            label={t("Location")}
+                            value={localActor.location ?? t("Not set")}
+                          />
+                          <ProfileDetailRow
+                            icon={<LinkIcon className="h-4 w-4" />}
+                            label={t("Links")}
+                            value={
+                              (localActor.links ?? []).length === 0 ? (
+                                t("Not set")
+                              ) : (
+                                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                                  {(localActor.links ?? []).map((link) => (
+                                    <a
+                                      key={link}
+                                      href={link}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="truncate underline decoration-zinc-600 underline-offset-2 hover:text-white"
+                                    >
+                                      {new URL(link).hostname}
+                                    </a>
+                                  ))}
+                                </div>
+                              )
+                            }
+                          />
+                        </div>
+                        <div className="border-t border-white/[0.08] p-2">
+                          <button
+                            type="button"
+                            onClick={logOut}
+                            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                          >
+                            <LogOut className="h-4 w-4 shrink-0 text-zinc-500" />
+                            {t("Log out")}
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+                    <div className="flex items-center gap-1 rounded-[20px] border border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.22)]">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          localActor === undefined
+                            ? undefined
+                            : setUserMenuOpen((open) => !open)
+                        }
+                        disabled={localActor === undefined}
+                        aria-haspopup="dialog"
+                        aria-expanded={userMenuOpen}
+                        title={t("Your profile")}
+                        className="flex min-w-0 flex-1 items-center gap-2.5 px-2 py-1.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-default"
+                      >
+                        <div className="relative shrink-0">
+                          <ActorProfilePicture
+                            actor={localActor}
+                            actorId={localActor?.id ?? null}
+                            name={localActor?.display ?? t("You")}
+                            size="md"
+                          />
+                          {localActor !== undefined ? (
+                            <span
+                              className={`absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-[#0d0d0d] ${localParticipantStatusStyle.dot}`}
+                              aria-label={t(localParticipantStatusStyle.label)}
+                              title={t(localParticipantStatusStyle.label)}
+                            />
+                          ) : null}
+                        </div>
+                        <span className="min-w-0 truncate text-[13px] font-semibold leading-5 text-zinc-100">
+                          {localActor?.display ??
+                            (hasIdentity
+                              ? t("Preparing session...")
+                              : t("Not joined"))}
+                        </span>
+                        {localActor !== undefined ? (
+                          <ChevronDown
+                            className={`h-3.5 w-3.5 shrink-0 text-zinc-500 transition-transform duration-200 ${
+                              userMenuOpen ? "" : "rotate-180"
+                            }`}
+                          />
+                        ) : null}
+                      </button>
+                    </div>
+                  </div>
+                </aside>
+              ) : null}
+              {membersOpen ? (
+                <PanelResizeHandle
+                  label="Resize the participants panel"
+                  width={participantsWidth}
+                  limits={participantsPanel}
+                  onWidthChange={setParticipantsWidth}
+                  grow={1}
+                />
               ) : null}
 
-              <div className="relative flex min-h-0 flex-1">
-                <section className="flex min-w-0 flex-1 flex-col">
-                  <div
-                    ref={conversationViewport}
-                    onScroll={handleConversationScroll}
-                    className="modbots-scroll min-h-0 flex-1 overflow-y-auto"
-                  >
-                    <div className="flex min-h-full flex-col justify-end py-3">
-                      {events.isLoading ? (
-                        <div className="flex flex-1 items-center justify-center text-sm text-zinc-500">
-                          Loading conversation...
-                        </div>
-                      ) : timeline.length === 0 ? (
-                        <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-[#171717] text-zinc-400">
-                            {searchQuery.length > 0 ? (
-                              <Search className="h-5 w-5" />
-                            ) : (
-                              <MessageSquare className="h-5 w-5" />
-                            )}
-                          </div>
-                          <h2 className="mt-4 text-base font-semibold text-zinc-200">
-                            {searchQuery.length > 0
-                              ? "No matching messages"
-                              : historyUnavailable
-                                ? "We couldn't load the conversation"
-                                : "Start the conversation"}
-                          </h2>
-                          <p className="mt-1 text-sm text-zinc-500">
-                            {searchQuery.length > 0
-                              ? "Try another word or phrase."
-                              : historyUnavailable
-                                ? "Try again in a moment."
-                                : "Messages from people and bots appear here together."}
-                          </p>
-                        </div>
-                      ) : (
-                        <ConversationTimeline
-                          actors={actors}
-                          items={timeline}
-                          localActorId={localActor?.id}
-                          mentionLabels={mentionLabels}
-                          messagesByContentItem={messagesByContentItem}
-                          chatLanguage={chatLanguage}
-                          translatedEventText={translatedEventText}
-                          onReply={selectReplyTarget}
-                          ruleTitles={ruleTitles}
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="shrink-0 px-3 pb-3 pt-2 sm:px-7 sm:pb-5">
-                    {translationError !== null ? (
-                      <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
-                        <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-                        <span className="flex-1">{translationError}</span>
-                        <button
-                          type="button"
-                          onClick={() => setTranslationError(null)}
-                          className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                          aria-label="Dismiss translation error"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ) : null}
-                    {attachmentError !== null ? (
-                      <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
-                        <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-                        <span className="flex-1">{attachmentError}</span>
-                        <button
-                          type="button"
-                          onClick={() => setAttachmentError(null)}
-                          className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                          aria-label="Dismiss attachment error"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ) : null}
-                    {mutedNotice !== null ? (
-                      <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
-                        <MicOff className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-                        <span className="flex-1">{mutedNotice}</span>
-                        <button
-                          type="button"
-                          onClick={() => setMutedNotice(null)}
-                          className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                          aria-label="Dismiss muted notice"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ) : null}
-                    <form
-                      onSubmit={(event) => void submitMessage(event)}
-                      className="relative rounded-2xl border border-white/10 bg-[#171717] shadow-[0_16px_50px_rgba(0,0,0,0.35)] focus-within:border-white/20"
-                    >
-                      {mention !== null && mentionOptions.length > 0 ? (
-                        <div className="absolute bottom-full left-0 mb-2 w-72 overflow-hidden rounded-xl border border-white/10 bg-[#181818] p-1 shadow-2xl">
-                          <p className="px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-600">
-                            Address someone
-                          </p>
-                          {mentionOptions.map((option, index) => {
-                            const active =
-                              index ===
-                              Math.min(
-                                mention.index,
-                                mentionOptions.length - 1,
-                              );
-
-                            return (
-                              <button
-                                key={
-                                  option.kind === "room"
-                                    ? "room"
-                                    : option.actor.id
-                                }
-                                type="button"
-                                onMouseDown={(pointerEvent) => {
-                                  pointerEvent.preventDefault();
-                                  applyMention(option);
-                                }}
-                                className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left ${
-                                  active
-                                    ? "bg-white/[0.08] text-white"
-                                    : "text-zinc-300 hover:bg-white/[0.05]"
-                                }`}
-                              >
-                                {option.kind === "room" ? (
-                                  <>
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-300">
-                                      <Users className="h-4 w-4" />
-                                    </span>
-                                    <span className="min-w-0 flex-1">
-                                      <span className="block text-[13px] font-medium">
-                                        Room
-                                      </span>
-                                      <span className="block truncate text-[11px] text-zinc-500">
-                                        Everyone here
-                                      </span>
-                                    </span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <ActorProfilePicture
-                                      actor={option.actor}
-                                      actorId={option.actor.id}
-                                      name={option.actor.display}
-                                      size="sm"
-                                    />
-                                    <span className="min-w-0 flex-1">
-                                      <span className="block truncate text-[13px] font-medium">
-                                        {option.actor.displayName}
-                                      </span>
-                                      <span className="block truncate text-[11px] text-zinc-500">
-                                        {actorRole(option.actor.id, actors)}
-                                      </span>
-                                    </span>
-                                  </>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : null}
-                      {replyTarget !== null ? (
-                        <div className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2 text-xs">
-                          <CornerUpLeft className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-                          <span className="shrink-0 text-zinc-400">
-                            Replying to{" "}
-                            <span className="font-medium text-zinc-200">
-                              {actorLabel(replyTarget.actorId, actors)}
-                            </span>
-                          </span>
-                          <span className="min-w-0 flex-1 truncate text-zinc-600">
-                            {displayedEventText(
-                              replyTarget,
-                              chatLanguage,
-                              translatedEventText,
-                            ) || eventContent(replyTarget)}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setReplyTarget(null)}
-                            className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                            aria-label="Cancel reply"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      ) : null}
-                      {attachment !== null ? (
-                        <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-zinc-300">
-                          <Paperclip className="h-3.5 w-3.5 shrink-0" />
-                          <span className="min-w-0 flex-1 truncate">
-                            {attachment.name}
-                          </span>
-                          <span className="text-zinc-500">
-                            {(attachment.size / 1_048_576).toFixed(1)} MB
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setAttachment(null)}
-                            className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                            aria-label="Remove attachment"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      ) : null}
-                      <input
-                        ref={attachmentInput}
-                        type="file"
-                        className="hidden"
-                        onChange={(event) => {
-                          const file = event.currentTarget.files?.[0] ?? null;
-
-                          if (file !== null && file.size > 100 * 1024 * 1024) {
-                            setAttachment(null);
-                            setAttachmentError(
-                              "Attachments cannot exceed 100 MB.",
-                            );
-                          } else {
-                            setAttachment(file);
-                            setAttachmentError(null);
+              <div className="flex min-w-0 flex-1 flex-col">
+                <header className="z-10 flex h-14 shrink-0 items-center gap-2 border-b border-white/[0.08] bg-[#0d0d0d] px-3 lg:h-[68px] lg:gap-4 lg:px-5">
+                  {mobileSearchOpen ? (
+                    <div className="flex min-w-0 flex-1 items-center gap-2 lg:hidden">
+                      <div className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/10 bg-[#181818] px-3">
+                        <Search className="h-4 w-4 shrink-0 text-zinc-500" />
+                        <input
+                          ref={searchInput}
+                          value={searchQuery}
+                          onChange={(event) =>
+                            setSearchQuery(event.currentTarget.value)
                           }
-
-                          event.currentTarget.value = "";
-                        }}
-                      />
-                      <textarea
-                        ref={composerRef}
-                        value={draft}
-                        onChange={(event) => {
-                          const value = event.currentTarget.value;
-                          setDraft(value);
-                          updateMentionState(
-                            value,
-                            event.currentTarget.selectionStart ?? value.length,
-                          );
-                        }}
-                        onSelect={(event) =>
-                          updateMentionState(
-                            event.currentTarget.value,
-                            event.currentTarget.selectionStart ?? 0,
-                          )
-                        }
-                        onBlur={() => setMention(null)}
-                        onKeyDown={handleComposerKeyDown}
-                        rows={1}
-                        maxLength={4_000}
-                        disabled={localActor === undefined || !apiConnected}
-                        placeholder={
-                          localActor === undefined
-                            ? "Preparing your session..."
-                            : "Message the room"
-                        }
-                        className="max-h-40 min-h-[58px] w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[14px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed"
-                      />
-                      <div className="flex items-center justify-between px-2 pb-2">
-                        <div className="flex items-center gap-0.5">
-                          <button
-                            type="button"
-                            disabled={!apiConnected || localActor === undefined}
-                            onClick={() => openAttachmentPicker("")}
-                            className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
-                            aria-label="Add files or media"
-                            title="Add a file, image, audio, or video"
-                          >
-                            <Paperclip className="h-[18px] w-[18px]" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={!apiConnected || localActor === undefined}
-                            onClick={() => openAttachmentPicker("image/*")}
-                            className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
-                            aria-label="Add image"
-                            title="Add an image"
-                          >
-                            <Image className="h-[18px] w-[18px]" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={!apiConnected || localActor === undefined}
-                            onClick={() => openAttachmentPicker("audio/*")}
-                            className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
-                            aria-label="Record voice message"
-                            title="Add an audio recording"
-                          >
-                            <Mic className="h-[18px] w-[18px]" />
-                          </button>
-                          <span className="mx-1 h-5 w-px bg-white/10" />
-                          <button
-                            type="button"
-                            disabled
-                            className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
-                            aria-label="Add reaction"
-                            title="Reactions are not connected yet"
-                          >
-                            <SmilePlus className="h-[18px] w-[18px]" />
-                          </button>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <span className="hidden text-[11px] text-zinc-600 sm:block">
-                            {draft.length > 0
-                              ? `${draft.length}/4000`
-                              : "Shift + Enter for a new line"}
-                          </span>
-                          <button
-                            type="submit"
-                            disabled={!canSend}
-                            className="flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#171717] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
-                          >
-                            <span>
-                              {translatingSubmission ? "Translating..." : "Send"}
-                            </span>
-                            <Send className="h-4 w-4" />
-                          </button>
-                        </div>
+                          placeholder={t("Search the chat")}
+                          className="min-w-0 flex-1 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+                        />
                       </div>
-                    </form>
-                  </div>
-                </section>
-              </div>
-            </div>
-
-            {aboutPanelOpen ? (
-              <PanelResizeHandle
-                label="Resize the about panel"
-                width={aboutWidth}
-                limits={aboutPanel}
-                onWidthChange={setAboutWidth}
-                grow={-1}
-              />
-            ) : null}
-            {aboutPanelOpen ? (
-              <aside
-                className={`fixed bottom-7 right-0 top-11 z-40 w-[min(88vw,360px)] shrink-0 flex-col border-l border-white/[0.08] bg-[#0d0d0d] shadow-[-20px_0_60px_rgba(0,0,0,0.5)] lg:static lg:z-auto lg:flex lg:w-[var(--about-width)] lg:shadow-none ${
-                  mobilePanel === "about" ? "flex" : "hidden"
-                }`}
-                style={
-                  {
-                    "--about-width": `${aboutWidth}px`,
-                  } as CSSProperties
-                }
-              >
-                <div className="flex h-[68px] shrink-0 items-center border-b border-white/[0.08] px-5">
-                  <h2 className="text-[15px] font-semibold text-white lg:hidden">
-                    Room information
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={() => setMobilePanel(null)}
-                    className="ml-auto rounded-lg p-2 text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:hidden"
-                    aria-label="Close room information"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="modbots-scroll min-h-0 flex-1 overflow-y-auto p-5">
-                  <p className="text-[13px] font-semibold text-zinc-100">
-                    Mod Bots
-                  </p>
-                  <p className="mt-1 text-[13px] leading-5 text-zinc-400">
-                    {roomAbout}
-                  </p>
-
-                  <div className="mt-4 space-y-2.5 text-[13px] text-zinc-400">
-                    <p className="flex items-start gap-2.5">
-                      <Bot className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-                      <span>
-                        Home to{" "}
-                        <span className="text-zinc-200">
-                          {chatBotCount} chat{" "}
-                          {chatBotCount === 1 ? "bot" : "bots"}
-                        </span>
-                        , watched by{" "}
-                        <span className="text-zinc-200">
-                          {modBotCount} mod {modBotCount === 1 ? "bot" : "bots"}
-                        </span>
-                      </span>
-                    </p>
-                    <p className="flex items-start gap-2.5">
-                      <DoorOpen className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-                      <span>Open to guests, anonymous or registered</span>
-                    </p>
-                    <p className="flex items-start gap-2.5">
-                      <Image className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-                      <span>Text, images, audio, video, and files</span>
-                    </p>
-                  </div>
-
-                  <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
-                        Activity
-                      </p>
-                      <div
-                        className="flex rounded-md border border-white/[0.08] bg-[#0f0f0f] p-0.5"
-                        role="tablist"
-                        aria-label="Activity period"
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setMobileSearchOpen(false);
+                        }}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                        aria-label={t("Close search")}
                       >
-                        {activityScopes.map((option) => (
-                          <button
-                            key={option.id}
-                            type="button"
-                            role="tab"
-                            aria-selected={activityScope === option.id}
-                            onClick={() => setActivityScope(option.id)}
-                            className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
-                              activityScope === option.id
-                                ? "bg-white/[0.1] text-white"
-                                : "text-zinc-500 hover:text-zinc-200"
-                            }`}
-                          >
-                            {option.label}
-                          </button>
-                        ))}
-                      </div>
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
-
-                    {activityScope === "7d" ? (
-                      <div className="mt-2.5 grid grid-cols-7 gap-1.5">
-                        {activity.buckets.map((bucket, index) => (
-                          <div
-                            key={bucket.key}
-                            title={`${bucket.label} · ${bucket.count} ${
-                              bucket.count === 1 ? "message" : "messages"
-                            }`}
+                  ) : (
+                    <>
+                      <h2 className="min-w-0 flex-1 truncate text-[14px] font-semibold text-white lg:flex-none">
+                        {t("Chat")}
+                      </h2>
+                      <div className="hidden flex-1 lg:block" />
+                      <div className="hidden h-9 w-[min(32vw,380px)] items-center gap-2 rounded-lg border border-white/10 bg-[#181818] px-3 lg:flex">
+                        <Search className="h-4 w-4 shrink-0 text-zinc-500" />
+                        <input
+                          ref={searchInput}
+                          value={searchQuery}
+                          onChange={(event) =>
+                            setSearchQuery(event.currentTarget.value)
+                          }
+                          placeholder={t("Search the chat")}
+                          className="min-w-0 flex-1 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+                        />
+                        {searchQuery.length > 0 ? (
+                          <button
+                            type="button"
+                            onClick={() => setSearchQuery("")}
+                            className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                            aria-label={t("Clear search")}
                           >
-                            <div
-                              className={`h-7 rounded-md ${
-                                index === activity.buckets.length - 1
-                                  ? "ring-1 ring-inset ring-white/40"
-                                  : ""
-                              }`}
-                              style={{
-                                backgroundColor: bucketShade(
-                                  bucket.count,
-                                  activity.max,
-                                ),
-                              }}
-                            />
-                            <p
-                              className={`mt-1 text-center text-[9px] font-medium ${
-                                index === activity.buckets.length - 1
-                                  ? "text-zinc-300"
-                                  : "text-zinc-600"
-                              }`}
-                            >
-                              {bucket.initial}
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        ) : null}
+                      </div>
+                      <div className="hidden flex-1 lg:block" />
+                      <div className="ml-auto flex items-center gap-1 lg:hidden">
+                        <button
+                          type="button"
+                          onClick={openSearch}
+                          className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+                          aria-label={t("Search the chat")}
+                        >
+                          <Search className="h-[18px] w-[18px]" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            setMembersOpen(true);
+                            setMobilePanel("participants");
+                          }}
+                          className="relative flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+                          aria-label={t("Show participants")}
+                          aria-expanded={mobilePanel === "participants"}
+                        >
+                          <Users className="h-[18px] w-[18px]" />
+                          <span className="absolute right-0 top-0 flex min-w-4 -translate-y-1/4 translate-x-1/4 items-center justify-center rounded-full bg-zinc-200 px-1 text-[9px] font-bold leading-4 text-zinc-900">
+                            {visibleOnlineActors.length}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            setAboutPanelOpen(true);
+                            setMobilePanel("about");
+                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+                          aria-label={t("Show room information")}
+                          aria-expanded={mobilePanel === "about"}
+                        >
+                          <Info className="h-[18px] w-[18px]" />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </header>
+
+                {connectionProblem || error instanceof Error ? (
+                  <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] bg-[#151515] px-4 py-2 text-xs text-zinc-300 lg:px-7">
+                    <span>
+                      {historyUnavailable
+                        ? "We couldn't load the conversation right now. Try again in a moment."
+                        : error instanceof Error
+                          ? error.message
+                          : "The conversation is reconnecting. New messages may be delayed."}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void refresh()}
+                      className="rounded-lg px-3 py-1.5 font-medium text-white hover:bg-white/[0.07]"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : null}
+
+                <div className="relative flex min-h-0 flex-1">
+                  <section className="flex min-w-0 flex-1 flex-col">
+                    <div
+                      ref={conversationViewport}
+                      onScroll={handleConversationScroll}
+                      className="modbots-scroll min-h-0 flex-1 overflow-y-auto"
+                    >
+                      <div className="flex min-h-full flex-col justify-end py-3">
+                        {events.isLoading ? (
+                          <div className="flex flex-1 items-center justify-center text-sm text-zinc-500">
+                            Loading conversation...
+                          </div>
+                        ) : timeline.length === 0 ? (
+                          <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-[#171717] text-zinc-400">
+                              {searchQuery.length > 0 ? (
+                                <Search className="h-5 w-5" />
+                              ) : (
+                                <MessageSquare className="h-5 w-5" />
+                              )}
+                            </div>
+                            <h2 className="mt-4 text-base font-semibold text-zinc-200">
+                              {searchQuery.length > 0
+                                ? "No matching messages"
+                                : historyUnavailable
+                                  ? "We couldn't load the conversation"
+                                  : "Start the conversation"}
+                            </h2>
+                            <p className="mt-1 text-sm text-zinc-500">
+                              {searchQuery.length > 0
+                                ? "Try another word or phrase."
+                                : historyUnavailable
+                                  ? "Try again in a moment."
+                                  : "Messages from people and bots appear here together."}
                             </p>
                           </div>
-                        ))}
+                        ) : (
+                          <ConversationTimeline
+                            actors={actors}
+                            items={timeline}
+                            localActorId={localActor?.id}
+                            mentionLabels={mentionLabels}
+                            messagesByContentItem={messagesByContentItem}
+                            chatLanguage={chatLanguage}
+                            translatedEventText={translatedEventText}
+                            onReply={selectReplyTarget}
+                            ruleTitles={ruleTitles}
+                          />
+                        )}
                       </div>
-                    ) : (
-                      <>
-                        <div className="mt-2.5 grid grid-cols-[repeat(auto-fill,minmax(12px,1fr))] gap-1">
+                    </div>
+
+                    <div className="shrink-0 px-3 pb-3 pt-2 sm:px-7 sm:pb-5">
+                      {translationError !== null ? (
+                        <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                          <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+                          <span className="flex-1">{translationError}</span>
+                          <button
+                            type="button"
+                            onClick={() => setTranslationError(null)}
+                            className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                            aria-label={t("Dismiss translation error")}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ) : null}
+                      {attachmentError !== null ? (
+                        <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                          <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+                          <span className="flex-1">{attachmentError}</span>
+                          <button
+                            type="button"
+                            onClick={() => setAttachmentError(null)}
+                            className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                            aria-label={t("Dismiss attachment error")}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ) : null}
+                      {mutedNotice !== null ? (
+                        <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                          <MicOff className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+                          <span className="flex-1">{mutedNotice}</span>
+                          <button
+                            type="button"
+                            onClick={() => setMutedNotice(null)}
+                            className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                            aria-label={t("Dismiss muted notice")}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ) : null}
+                      <form
+                        onSubmit={(event) => void submitMessage(event)}
+                        className="relative rounded-2xl border border-white/10 bg-[#171717] shadow-[0_16px_50px_rgba(0,0,0,0.35)] focus-within:border-white/20"
+                      >
+                        {mention !== null && mentionOptions.length > 0 ? (
+                          <div className="absolute bottom-full left-0 mb-2 w-72 overflow-hidden rounded-xl border border-white/10 bg-[#181818] p-1 shadow-2xl">
+                            <p className="px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-600">
+                              Address someone
+                            </p>
+                            {mentionOptions.map((option, index) => {
+                              const active =
+                                index ===
+                                Math.min(
+                                  mention.index,
+                                  mentionOptions.length - 1,
+                                );
+
+                              return (
+                                <button
+                                  key={
+                                    option.kind === "room"
+                                      ? "room"
+                                      : option.actor.id
+                                  }
+                                  type="button"
+                                  onMouseDown={(pointerEvent) => {
+                                    pointerEvent.preventDefault();
+                                    applyMention(option);
+                                  }}
+                                  className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left ${
+                                    active
+                                      ? "bg-white/[0.08] text-white"
+                                      : "text-zinc-300 hover:bg-white/[0.05]"
+                                  }`}
+                                >
+                                  {option.kind === "room" ? (
+                                    <>
+                                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-300">
+                                        <Users className="h-4 w-4" />
+                                      </span>
+                                      <span className="min-w-0 flex-1">
+                                        <span className="block text-[13px] font-medium">
+                                          {t("Room")}
+                                        </span>
+                                        <span className="block truncate text-[11px] text-zinc-500">
+                                          {t("Everyone here")}
+                                        </span>
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ActorProfilePicture
+                                        actor={option.actor}
+                                        actorId={option.actor.id}
+                                        name={option.actor.display}
+                                        size="sm"
+                                      />
+                                      <span className="min-w-0 flex-1">
+                                        <span className="block truncate text-[13px] font-medium">
+                                          {option.actor.displayName}
+                                        </span>
+                                        <span className="block truncate text-[11px] text-zinc-500">
+                                          {actorRole(option.actor.id, actors)}
+                                        </span>
+                                      </span>
+                                    </>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : null}
+                        {replyTarget !== null ? (
+                          <div className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2 text-xs">
+                            <CornerUpLeft className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+                            <span className="shrink-0 text-zinc-400">
+                              Replying to{" "}
+                              <span className="font-medium text-zinc-200">
+                                {actorLabel(replyTarget.actorId, actors)}
+                              </span>
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-zinc-600">
+                              {displayedEventText(
+                                replyTarget,
+                                chatLanguage,
+                                translatedEventText,
+                              ) || eventContent(replyTarget)}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setReplyTarget(null)}
+                              className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                              aria-label={t("Cancel reply")}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ) : null}
+                        {attachment !== null ? (
+                          <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-zinc-300">
+                            <Paperclip className="h-3.5 w-3.5 shrink-0" />
+                            <span className="min-w-0 flex-1 truncate">
+                              {attachment.name}
+                            </span>
+                            <span className="text-zinc-500">
+                              {(attachment.size / 1_048_576).toFixed(1)} MB
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setAttachment(null)}
+                              className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                              aria-label={t("Remove attachment")}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ) : null}
+                        <input
+                          ref={attachmentInput}
+                          type="file"
+                          className="hidden"
+                          onChange={(event) => {
+                            const file = event.currentTarget.files?.[0] ?? null;
+
+                            if (
+                              file !== null &&
+                              file.size > 100 * 1024 * 1024
+                            ) {
+                              setAttachment(null);
+                              setAttachmentError(
+                                "Attachments cannot exceed 100 MB.",
+                              );
+                            } else {
+                              setAttachment(file);
+                              setAttachmentError(null);
+                            }
+
+                            event.currentTarget.value = "";
+                          }}
+                        />
+                        <textarea
+                          ref={composerRef}
+                          value={draft}
+                          onChange={(event) => {
+                            const value = event.currentTarget.value;
+                            setDraft(value);
+                            updateMentionState(
+                              value,
+                              event.currentTarget.selectionStart ??
+                                value.length,
+                            );
+                          }}
+                          onSelect={(event) =>
+                            updateMentionState(
+                              event.currentTarget.value,
+                              event.currentTarget.selectionStart ?? 0,
+                            )
+                          }
+                          onBlur={() => setMention(null)}
+                          onKeyDown={handleComposerKeyDown}
+                          rows={1}
+                          maxLength={4_000}
+                          disabled={localActor === undefined || !apiConnected}
+                          placeholder={
+                            localActor === undefined
+                              ? "Preparing your session..."
+                              : t("Message the room")
+                          }
+                          className="max-h-40 min-h-[58px] w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[14px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed"
+                        />
+                        <div className="flex items-center justify-between px-2 pb-2">
+                          <div className="flex items-center gap-0.5">
+                            <button
+                              type="button"
+                              disabled={
+                                !apiConnected || localActor === undefined
+                              }
+                              onClick={() => openAttachmentPicker("")}
+                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
+                              aria-label={t("Add files or media")}
+                              title={t("Add a file, image, audio, or video")}
+                            >
+                              <Paperclip className="h-[18px] w-[18px]" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={
+                                !apiConnected || localActor === undefined
+                              }
+                              onClick={() => openAttachmentPicker("image/*")}
+                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
+                              aria-label={t("Add image")}
+                              title={t("Add an image")}
+                            >
+                              <Image className="h-[18px] w-[18px]" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={
+                                !apiConnected || localActor === undefined
+                              }
+                              onClick={() => openAttachmentPicker("audio/*")}
+                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
+                              aria-label={t("Record voice message")}
+                              title={t("Add an audio recording")}
+                            >
+                              <Mic className="h-[18px] w-[18px]" />
+                            </button>
+                            <span className="mx-1 h-5 w-px bg-white/10" />
+                            <button
+                              type="button"
+                              disabled
+                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
+                              aria-label={t("Add reaction")}
+                              title={t("Reactions are not connected yet")}
+                            >
+                              <SmilePlus className="h-[18px] w-[18px]" />
+                            </button>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <span className="hidden text-[11px] text-zinc-600 sm:block">
+                              {draft.length > 0
+                                ? `${draft.length}/4000`
+                                : t("Shift + Enter for a new line")}
+                            </span>
+                            <button
+                              type="submit"
+                              disabled={!canSend}
+                              className="flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#171717] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
+                            >
+                              <span>
+                                {translatingSubmission
+                                  ? t("Translating...")
+                                  : t("Send")}
+                              </span>
+                              <Send className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </section>
+                </div>
+              </div>
+
+              {aboutPanelOpen ? (
+                <PanelResizeHandle
+                  label="Resize the about panel"
+                  width={aboutWidth}
+                  limits={aboutPanel}
+                  onWidthChange={setAboutWidth}
+                  grow={-1}
+                />
+              ) : null}
+              {aboutPanelOpen ? (
+                <aside
+                  className={`fixed bottom-7 right-0 top-11 z-40 w-[min(88vw,360px)] shrink-0 flex-col border-l border-white/[0.08] bg-[#0d0d0d] shadow-[-20px_0_60px_rgba(0,0,0,0.5)] lg:static lg:z-auto lg:flex lg:w-[var(--about-width)] lg:shadow-none ${
+                    mobilePanel === "about" ? "flex" : "hidden"
+                  }`}
+                  style={
+                    {
+                      "--about-width": `${aboutWidth}px`,
+                    } as CSSProperties
+                  }
+                >
+                  <div className="flex h-[68px] shrink-0 items-center border-b border-white/[0.08] px-5">
+                    <h2 className="text-[15px] font-semibold text-white lg:hidden">
+                      {t("Room information")}
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={() => setMobilePanel(null)}
+                      className="ml-auto rounded-lg p-2 text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:hidden"
+                      aria-label={t("Close room information")}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="modbots-scroll min-h-0 flex-1 overflow-y-auto p-5">
+                    <p className="text-[13px] font-semibold text-zinc-100">
+                      Mod Bots
+                    </p>
+                    <p className="mt-1 text-[13px] leading-5 text-zinc-400">
+                      {t(roomAbout)}
+                    </p>
+
+                    <div className="mt-4 space-y-2.5 text-[13px] text-zinc-400">
+                      <p className="flex items-start gap-2.5">
+                        <Bot className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
+                        {uiLanguage === "zh-CN" ? (
+                          <span>
+                            这里有
+                            <span className="text-zinc-200">
+                              {chatBotCount} 个聊天机器人
+                            </span>
+                            ，由
+                            <span className="text-zinc-200">
+                              {modBotCount} 个管理机器人
+                            </span>
+                            观察
+                          </span>
+                        ) : (
+                          <span>
+                            Home to{" "}
+                            <span className="text-zinc-200">
+                              {chatBotCount} chat{" "}
+                              {chatBotCount === 1 ? "bot" : "bots"}
+                            </span>
+                            , watched by{" "}
+                            <span className="text-zinc-200">
+                              {modBotCount} mod{" "}
+                              {modBotCount === 1 ? "bot" : "bots"}
+                            </span>
+                          </span>
+                        )}
+                      </p>
+                      <p className="flex items-start gap-2.5">
+                        <DoorOpen className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
+                        <span>
+                          {t("Open to guests, anonymous or registered")}
+                        </span>
+                      </p>
+                      <p className="flex items-start gap-2.5">
+                        <Image className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
+                        <span>
+                          {t("Text, images, audio, video, and files")}
+                        </span>
+                      </p>
+                    </div>
+
+                    <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
+                          {t("Activity")}
+                        </p>
+                        <div
+                          className="flex rounded-md border border-white/[0.08] bg-[#0f0f0f] p-0.5"
+                          role="tablist"
+                          aria-label={t("Activity period")}
+                        >
+                          {activityScopes.map((option) => (
+                            <button
+                              key={option.id}
+                              type="button"
+                              role="tab"
+                              aria-selected={activityScope === option.id}
+                              onClick={() => setActivityScope(option.id)}
+                              className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                                activityScope === option.id
+                                  ? "bg-white/[0.1] text-white"
+                                  : "text-zinc-500 hover:text-zinc-200"
+                              }`}
+                            >
+                              {t(option.label)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {activityScope === "7d" ? (
+                        <div className="mt-2.5 grid grid-cols-7 gap-1.5">
                           {activity.buckets.map((bucket, index) => (
                             <div
                               key={bucket.key}
                               title={`${bucket.label} · ${bucket.count} ${
                                 bucket.count === 1 ? "message" : "messages"
                               }`}
-                              className={`h-3 rounded-[3px] ${
-                                index === activity.buckets.length - 1
-                                  ? "ring-1 ring-inset ring-white/40"
-                                  : ""
-                              }`}
-                              style={{
-                                backgroundColor: bucketShade(
-                                  bucket.count,
-                                  activity.max,
-                                ),
-                              }}
-                            />
+                            >
+                              <div
+                                className={`h-7 rounded-md ${
+                                  index === activity.buckets.length - 1
+                                    ? "ring-1 ring-inset ring-white/40"
+                                    : ""
+                                }`}
+                                style={{
+                                  backgroundColor: bucketShade(
+                                    bucket.count,
+                                    activity.max,
+                                  ),
+                                }}
+                              />
+                              <p
+                                className={`mt-1 text-center text-[9px] font-medium ${
+                                  index === activity.buckets.length - 1
+                                    ? "text-zinc-300"
+                                    : "text-zinc-600"
+                                }`}
+                              >
+                                {bucket.initial}
+                              </p>
+                            </div>
                           ))}
                         </div>
-                        <div className="mt-1 flex items-center justify-between text-[9px] font-medium text-zinc-600">
-                          <span>{activity.rangeStartLabel}</span>
-                          <span>Today</span>
-                        </div>
-                      </>
-                    )}
-
-                    <div className="mt-2.5">
-                      <ActivitySection
-                        label="Messages"
-                        value={activity.messages.toLocaleString()}
-                        open={openActivity.messages === true}
-                        onToggle={() => toggleActivitySection("messages")}
-                      >
-                        {activity.messageRows.length === 0 ? (
-                          <p className="text-[11px] text-zinc-600">
-                            None in this period.
-                          </p>
-                        ) : (
-                          activity.messageRows.map((row) => (
-                            <ActivityCountRow
-                              key={row.label}
-                              label={`From ${row.label.toLocaleLowerCase()}`}
-                              count={row.count}
-                            />
-                          ))
-                        )}
-                      </ActivitySection>
-                      <ActivitySection
-                        label="Moderation"
-                        value={activity.moderationTotal.toLocaleString()}
-                        open={openActivity.moderation === true}
-                        onToggle={() => toggleActivitySection("moderation")}
-                      >
-                        {activity.moderationRows.length === 0 ? (
-                          <p className="text-[11px] text-zinc-600">
-                            None in this period.
-                          </p>
-                        ) : (
-                          activity.moderationRows.map((row) => (
-                            <ActivityCountRow
-                              key={row.label}
-                              label={row.label}
-                              count={row.count}
-                            />
-                          ))
-                        )}
-                      </ActivitySection>
-                      <ActivitySection
-                        label="Participants"
-                        value={activity.talkedTotal.toLocaleString()}
-                        open={openActivity.talked === true}
-                        onToggle={() => toggleActivitySection("talked")}
-                      >
-                        {activity.topPosters.length === 0 ? (
-                          <p className="text-[11px] text-zinc-600">
-                            None in this period.
-                          </p>
-                        ) : (
-                          <>
-                            <p className="text-[11px] text-zinc-600">
-                              {activity.talkedRows
-                                .map(
-                                  (row) =>
-                                    `${row.count} ${row.label.toLocaleLowerCase()}`,
-                                )
-                                .join(" · ")}
-                            </p>
-                            {activity.topPosters.map((poster) => {
-                              const posterActor = actors.get(poster.actorId);
-                              const posterName = actorLabel(
-                                poster.actorId,
-                                actors,
-                              );
-
-                              return (
-                                <div
-                                  key={poster.actorId}
-                                  className="flex items-center gap-2"
-                                >
-                                  <span
-                                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-white/10 text-[8px] font-semibold text-zinc-200"
-                                    style={{
-                                      backgroundColor: shadeFor(poster.actorId),
-                                    }}
-                                  >
-                                    {monogram(posterName)}
-                                  </span>
-                                  <span className="min-w-0 flex-1 truncate text-[11px] text-zinc-300">
-                                    {posterName}
-                                  </span>
-                                  {posterActor !== undefined &&
-                                  posterActor.type !== "human" ? (
-                                    <span className="shrink-0 text-zinc-600">
-                                      {roleBadgeIcon(posterActor.type)}
-                                    </span>
-                                  ) : null}
-                                  <span className="shrink-0 text-[11px] tabular-nums text-zinc-400">
-                                    {poster.count.toLocaleString()}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </>
-                        )}
-                      </ActivitySection>
-                    </div>
-                  </div>
-
-                  {rules.data !== undefined ? (
-                    <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
-                        Rules
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-zinc-300">
-                        {rules.data.ethos}
-                      </p>
-                      <ol className="mt-2">
-                        {rules.data.rules.map((rule, index) => (
-                          <li key={rule.id}>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setOpenRuleId(
-                                  openRuleId === rule.id ? null : rule.id,
-                                )
-                              }
-                              className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-left text-sm text-zinc-300 hover:bg-white/[0.04]"
-                            >
-                              <span className="w-4 shrink-0 text-xs tabular-nums text-zinc-600">
-                                {index + 1}
-                              </span>
-                              <span className="flex-1">{rule.title}</span>
-                              <ChevronDown
-                                className={`h-3.5 w-3.5 shrink-0 text-zinc-600 transition-transform ${
-                                  openRuleId === rule.id ? "rotate-180" : ""
+                      ) : (
+                        <>
+                          <div className="mt-2.5 grid grid-cols-[repeat(auto-fill,minmax(12px,1fr))] gap-1">
+                            {activity.buckets.map((bucket, index) => (
+                              <div
+                                key={bucket.key}
+                                title={`${bucket.label} · ${bucket.count} ${
+                                  bucket.count === 1 ? "message" : "messages"
                                 }`}
+                                className={`h-3 rounded-[3px] ${
+                                  index === activity.buckets.length - 1
+                                    ? "ring-1 ring-inset ring-white/40"
+                                    : ""
+                                }`}
+                                style={{
+                                  backgroundColor: bucketShade(
+                                    bucket.count,
+                                    activity.max,
+                                  ),
+                                }}
                               />
-                            </button>
-                            {openRuleId === rule.id ? (
-                              <p className="pb-2 pl-7 pr-1.5 text-xs leading-5 text-zinc-500">
-                                {rule.text}
+                            ))}
+                          </div>
+                          <div className="mt-1 flex items-center justify-between text-[9px] font-medium text-zinc-600">
+                            <span>{activity.rangeStartLabel}</span>
+                            <span>{t("Today")}</span>
+                          </div>
+                        </>
+                      )}
+
+                      <div className="mt-2.5">
+                        <ActivitySection
+                          label={t("Messages")}
+                          value={activity.messages.toLocaleString()}
+                          open={openActivity.messages === true}
+                          onToggle={() => toggleActivitySection("messages")}
+                        >
+                          {activity.messageRows.length === 0 ? (
+                            <p className="text-[11px] text-zinc-600">
+                              {t("None in this period.")}
+                            </p>
+                          ) : (
+                            activity.messageRows.map((row) => (
+                              <ActivityCountRow
+                                key={row.label}
+                                label={`From ${row.label.toLocaleLowerCase()}`}
+                                count={row.count}
+                              />
+                            ))
+                          )}
+                        </ActivitySection>
+                        <ActivitySection
+                          label={t("Moderation")}
+                          value={activity.moderationTotal.toLocaleString()}
+                          open={openActivity.moderation === true}
+                          onToggle={() => toggleActivitySection("moderation")}
+                        >
+                          {activity.moderationRows.length === 0 ? (
+                            <p className="text-[11px] text-zinc-600">
+                              {t("None in this period.")}
+                            </p>
+                          ) : (
+                            activity.moderationRows.map((row) => (
+                              <ActivityCountRow
+                                key={row.label}
+                                label={row.label}
+                                count={row.count}
+                              />
+                            ))
+                          )}
+                        </ActivitySection>
+                        <ActivitySection
+                          label={t("Participants")}
+                          value={activity.talkedTotal.toLocaleString()}
+                          open={openActivity.talked === true}
+                          onToggle={() => toggleActivitySection("talked")}
+                        >
+                          {activity.topPosters.length === 0 ? (
+                            <p className="text-[11px] text-zinc-600">
+                              {t("None in this period.")}
+                            </p>
+                          ) : (
+                            <>
+                              <p className="text-[11px] text-zinc-600">
+                                {activity.talkedRows
+                                  .map(
+                                    (row) =>
+                                      `${row.count} ${row.label.toLocaleLowerCase()}`,
+                                  )
+                                  .join(" · ")}
                               </p>
-                            ) : null}
-                          </li>
-                        ))}
-                      </ol>
+                              {activity.topPosters.map((poster) => {
+                                const posterActor = actors.get(poster.actorId);
+                                const posterName = actorLabel(
+                                  poster.actorId,
+                                  actors,
+                                );
+
+                                return (
+                                  <div
+                                    key={poster.actorId}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <span
+                                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-white/10 text-[8px] font-semibold text-zinc-200"
+                                      style={{
+                                        backgroundColor: shadeFor(
+                                          poster.actorId,
+                                        ),
+                                      }}
+                                    >
+                                      {monogram(posterName)}
+                                    </span>
+                                    <span className="min-w-0 flex-1 truncate text-[11px] text-zinc-300">
+                                      {posterName}
+                                    </span>
+                                    {posterActor !== undefined &&
+                                    posterActor.type !== "human" ? (
+                                      <span className="shrink-0 text-zinc-600">
+                                        {roleBadgeIcon(posterActor.type)}
+                                      </span>
+                                    ) : null}
+                                    <span className="shrink-0 text-[11px] tabular-nums text-zinc-400">
+                                      {poster.count.toLocaleString()}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </>
+                          )}
+                        </ActivitySection>
+                      </div>
                     </div>
-                  ) : null}
-                </div>
-              </aside>
-            ) : null}
-          </>
-        )}
+
+                    {rules.data !== undefined ? (
+                      <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
+                          {t("Rules")}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-zinc-300">
+                          {rules.data.ethos}
+                        </p>
+                        <ol className="mt-2">
+                          {rules.data.rules.map((rule, index) => (
+                            <li key={rule.id}>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenRuleId(
+                                    openRuleId === rule.id ? null : rule.id,
+                                  )
+                                }
+                                className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-left text-sm text-zinc-300 hover:bg-white/[0.04]"
+                              >
+                                <span className="w-4 shrink-0 text-xs tabular-nums text-zinc-600">
+                                  {index + 1}
+                                </span>
+                                <span className="flex-1">{rule.title}</span>
+                                <ChevronDown
+                                  className={`h-3.5 w-3.5 shrink-0 text-zinc-600 transition-transform ${
+                                    openRuleId === rule.id ? "rotate-180" : ""
+                                  }`}
+                                />
+                              </button>
+                              {openRuleId === rule.id ? (
+                                <p className="pb-2 pl-7 pr-1.5 text-xs leading-5 text-zinc-500">
+                                  {rule.text}
+                                </p>
+                              ) : null}
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    ) : null}
+                  </div>
+                </aside>
+              ) : null}
+            </>
+          )}
         </div>
 
         {entered ? (
@@ -3795,8 +3846,10 @@ export function Chatroom() {
             }
             sendWithEnter={sendWithEnter}
             onSendWithEnterChange={setSendWithEnter}
-            chatLanguage={chatLanguage}
-            onChatLanguageChange={changeChatLanguage}
+            translationEnabled={translationEnabled}
+            onTranslationEnabledChange={changeTranslationEnabled}
+            translationLanguage={translationLanguage}
+            onTranslationLanguageChange={changeTranslationLanguage}
             translationError={translationError}
             onOpenAccountPage={openAccountPage}
             onManageProfilePicture={chooseProfilePicture}
@@ -3837,7 +3890,11 @@ export function Chatroom() {
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-center gap-3">
-                <img src={appLogo.src} alt="" className="h-11 w-11 rounded-xl" />
+                <img
+                  src={appLogo.src}
+                  alt=""
+                  className="h-11 w-11 rounded-xl"
+                />
                 <div>
                   <p className="text-sm font-semibold text-white">
                     Mod Bots Web

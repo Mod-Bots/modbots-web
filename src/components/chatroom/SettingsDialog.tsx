@@ -1,6 +1,7 @@
 import {
   ArrowUpRight,
   Camera,
+  Languages,
   MessageSquare,
   Shield,
   UserRound,
@@ -9,8 +10,9 @@ import {
 import type { FormEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { ChatLanguage } from "@/data/contracts";
+import { type UiLanguage, useUiLanguage } from "@/i18n/UiLanguageProvider";
 
-export type SettingsSection = "account" | "chat";
+export type SettingsSection = "account" | "chat" | "language";
 
 export interface AccountSettingsSummary {
   display: string;
@@ -143,8 +145,10 @@ export function SettingsDialog({
   accountAvatar,
   sendWithEnter,
   onSendWithEnterChange,
-  chatLanguage,
-  onChatLanguageChange,
+  translationEnabled,
+  onTranslationEnabledChange,
+  translationLanguage,
+  onTranslationLanguageChange,
   translationError,
   onOpenAccountPage,
   onManageProfilePicture,
@@ -162,8 +166,10 @@ export function SettingsDialog({
   accountAvatar: ReactNode;
   sendWithEnter: boolean;
   onSendWithEnterChange: (checked: boolean) => void;
-  chatLanguage: ChatLanguage;
-  onChatLanguageChange: (language: ChatLanguage) => void;
+  translationEnabled: boolean;
+  onTranslationEnabledChange: (enabled: boolean) => void;
+  translationLanguage: ChatLanguage;
+  onTranslationLanguageChange: (language: ChatLanguage) => void;
   translationError: string | null;
   onOpenAccountPage: () => void;
   onManageProfilePicture: () => void;
@@ -180,6 +186,11 @@ export function SettingsDialog({
   profileError: string | null;
   onClose: () => void;
 }) {
+  const {
+    language: uiLanguage,
+    setLanguage: setUiLanguage,
+    t,
+  } = useUiLanguage();
   const [bio, setBio] = useState("");
   const [pronouns, setPronouns] = useState("");
   const [location, setLocation] = useState("");
@@ -223,17 +234,17 @@ export function SettingsDialog({
               id="modbots-settings-title"
               className="text-sm font-semibold text-white"
             >
-              Settings
+              {t("Settings")}
             </h2>
             <p className="mt-1 text-xs text-zinc-500">
-              Manage your account and chat settings.
+              {t("Manage your account, chat, and language settings.")}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="rounded-xl p-2 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-            aria-label="Close settings"
+            aria-label={t("Close settings")}
           >
             <X className="h-4 w-4" />
           </button>
@@ -241,18 +252,24 @@ export function SettingsDialog({
 
         <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-0 md:grid-cols-[220px_minmax(0,1fr)] md:grid-rows-1">
           <aside className="border-b border-white/[0.08] p-4 md:border-b-0 md:border-r">
-            <nav className="grid grid-cols-2 gap-2 md:block md:space-y-2">
+            <nav className="grid grid-cols-3 gap-2 md:block md:space-y-2">
               <SectionButton
-                label="Account"
+                label={t("Account")}
                 icon={<UserRound className="h-4 w-4" />}
                 active={section === "account"}
                 onClick={() => onSectionChange("account")}
               />
               <SectionButton
-                label="Chat"
+                label={t("Chat")}
                 icon={<MessageSquare className="h-4 w-4" />}
                 active={section === "chat"}
                 onClick={() => onSectionChange("chat")}
+              />
+              <SectionButton
+                label={t("Language")}
+                icon={<Languages className="h-4 w-4" />}
+                active={section === "language"}
+                onClick={() => onSectionChange("language")}
               />
             </nav>
           </aside>
@@ -269,8 +286,8 @@ export function SettingsDialog({
                           type="button"
                           onClick={onManageProfilePicture}
                           className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.1] bg-[#181818] text-zinc-300 shadow-[0_10px_22px_rgba(0,0,0,0.35)] transition-colors hover:border-white/20 hover:bg-[#202020] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                          aria-label="Change profile picture"
-                          title="Change profile picture"
+                          aria-label={t("Change profile picture")}
+                          title={t("Change profile picture")}
                         >
                           <Camera className="h-3.5 w-3.5" />
                         </button>
@@ -302,12 +319,12 @@ export function SettingsDialog({
                     className="mt-4 rounded-[22px] border border-white/[0.08] bg-white/[0.02] p-4"
                   >
                     <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                      Profile
+                      {t("Profile")}
                     </p>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <label className="sm:col-span-2">
                         <span className="text-[11px] font-medium text-zinc-300">
-                          About
+                          {t("About")}
                         </span>
                         <textarea
                           value={bio}
@@ -319,7 +336,7 @@ export function SettingsDialog({
                       </label>
                       <label>
                         <span className="text-[11px] font-medium text-zinc-300">
-                          Pronouns
+                          {t("Pronouns")}
                         </span>
                         <input
                           value={pronouns}
@@ -330,7 +347,7 @@ export function SettingsDialog({
                       </label>
                       <label>
                         <span className="text-[11px] font-medium text-zinc-300">
-                          Location
+                          {t("Location")}
                         </span>
                         <input
                           value={location}
@@ -341,7 +358,7 @@ export function SettingsDialog({
                       </label>
                       <label className="sm:col-span-2">
                         <span className="text-[11px] font-medium text-zinc-300">
-                          Links
+                          {t("Links")}
                         </span>
                         <textarea
                           value={links}
@@ -361,13 +378,13 @@ export function SettingsDialog({
                       disabled={profileSaving}
                       className="mt-4 rounded-xl bg-white px-4 py-2 text-[12px] font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-wait disabled:opacity-50"
                     >
-                      {profileSaving ? "Saving..." : "Save profile"}
+                      {profileSaving ? t("Saving...") : t("Save profile")}
                     </button>
                   </form>
 
                   <div className="mt-4 grid gap-3 lg:grid-cols-2">
                     <DetailCard
-                      title="Profile picture"
+                      title={t("Profile picture")}
                       icon={<Camera className="h-4 w-4" />}
                       action={
                         <div className="flex flex-wrap items-center gap-2">
@@ -379,8 +396,8 @@ export function SettingsDialog({
                           >
                             <Camera className="h-3.5 w-3.5" />
                             {profilePictureSaving
-                              ? "Saving picture..."
-                              : "Change picture"}
+                              ? t("Saving picture...")
+                              : t("Change picture")}
                           </button>
                           {account.hasProfilePicture ? (
                             <button
@@ -389,7 +406,7 @@ export function SettingsDialog({
                               disabled={profilePictureSaving}
                               className="rounded-full px-3 py-1.5 text-[11px] font-semibold text-zinc-500 transition-colors hover:bg-white/[0.05] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-wait disabled:opacity-50"
                             >
-                              Remove picture
+                              {t("Remove picture")}
                             </button>
                           ) : null}
                         </div>
@@ -397,7 +414,7 @@ export function SettingsDialog({
                     >
                       <p>{account.profilePictureSummary}</p>
                       <p className="mt-1 text-[11px] text-zinc-500">
-                        Profile pictures are served through UPPS.
+                        {t("Profile pictures are served through UPPS.")}
                       </p>
                       {profilePictureError !== null ? (
                         <p className="mt-2 text-[11px] text-red-300">
@@ -407,20 +424,22 @@ export function SettingsDialog({
                     </DetailCard>
 
                     <DetailCard
-                      title="Account health"
+                      title={t("Account health")}
                       icon={<Shield className="h-4 w-4" />}
                     >
                       <p>{account.healthSummary}</p>
                       <p className="mt-1 text-[11px] text-zinc-500">
                         {account.latestModerationLabel ??
-                          "No recent mod bot action is attached to this account."}
+                          t(
+                            "No recent mod bot action is attached to this account.",
+                          )}
                       </p>
                     </DetailCard>
                   </div>
 
                   <div className="mt-4 rounded-[22px] border border-white/[0.08] bg-white/[0.02] p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                      Member since
+                      {t("Member since")}
                     </p>
                     <p className="mt-2 text-[13px] text-zinc-200">
                       {account.memberSinceLabel}
@@ -430,34 +449,53 @@ export function SettingsDialog({
                       onClick={onOpenAccountPage}
                       className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-zinc-200 transition-colors hover:border-white/15 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                     >
-                      Open full account page
+                      {t("Open full account page")}
                       <ArrowUpRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
               )
+            ) : section === "chat" ? (
+              <div>
+                <section className="rounded-[24px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                    {t("Chat settings")}
+                  </p>
+                  <p className="mt-2 text-sm text-zinc-400">
+                    {t("Choose how you send messages.")}
+                  </p>
+                </section>
+
+                <div className="mt-4 space-y-3">
+                  <ToggleRow
+                    label={t("Send with Enter")}
+                    checked={sendWithEnter}
+                    onChange={onSendWithEnterChange}
+                  />
+                </div>
+              </div>
             ) : (
               <div>
                 <section className="rounded-[24px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                    Chat settings
+                    {t("Language settings")}
                   </p>
                   <p className="mt-2 text-sm text-zinc-400">
-                    Choose how messages appear and how you send them.
+                    {t(
+                      "Choose the language used by the interface and message translation.",
+                    )}
                   </p>
                 </section>
 
                 <div className="mt-4 space-y-3">
                   <label className="block rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3">
                     <span className="block text-sm text-zinc-200">
-                      Chat language
+                      {t("Interface language")}
                     </span>
                     <select
-                      value={chatLanguage}
+                      value={uiLanguage}
                       onChange={(event) =>
-                        onChatLanguageChange(
-                          event.currentTarget.value as ChatLanguage,
-                        )
+                        setUiLanguage(event.currentTarget.value as UiLanguage)
                       }
                       className="mt-3 w-full rounded-xl border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10"
                     >
@@ -465,21 +503,40 @@ export function SettingsDialog({
                       <option value="zh-CN">简体中文</option>
                     </select>
                     <span className="mt-2 block text-[11px] leading-5 text-zinc-500">
-                      {chatLanguage === "zh-CN"
-                        ? "Write and read messages in Simplified Chinese. Translation happens automatically."
-                        : "Write and read messages in English."}
+                      {uiLanguage === "zh-CN"
+                        ? t(
+                            "Show menus, buttons, and settings in Simplified Chinese.",
+                          )
+                        : t("Show menus, buttons, and settings in English.")}
                     </span>
+                  </label>
+                  <ToggleRow
+                    label={t("Translate messages")}
+                    checked={translationEnabled}
+                    onChange={onTranslationEnabledChange}
+                  />
+                  <label className="block rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3">
+                    <span className="block text-sm text-zinc-200">
+                      {t("Translate messages into")}
+                    </span>
+                    <select
+                      value={translationLanguage}
+                      disabled={!translationEnabled}
+                      onChange={(event) =>
+                        onTranslationLanguageChange(
+                          event.currentTarget.value as ChatLanguage,
+                        )
+                      }
+                      className="mt-3 w-full rounded-xl border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="zh-CN">简体中文</option>
+                    </select>
                     {translationError !== null ? (
                       <span className="mt-2 block text-[11px] text-red-300">
                         {translationError}
                       </span>
                     ) : null}
                   </label>
-                  <ToggleRow
-                    label="Send with Enter"
-                    checked={sendWithEnter}
-                    onChange={onSendWithEnterChange}
-                  />
                 </div>
               </div>
             )}

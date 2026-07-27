@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { useUiLanguage } from "@/i18n/UiLanguageProvider";
 
 type MenuId = "file" | "edit" | "view" | "tools" | "help";
 
@@ -69,6 +70,26 @@ interface MenuSpec {
 }
 
 const menuOrder: MenuId[] = ["file", "edit", "view", "tools", "help"];
+
+const translateMenuItems = (
+  items: MenuItemSpec[],
+  t: (text: string) => string,
+): MenuItemSpec[] =>
+  items.map((item) => {
+    if (item.kind === "separator") {
+      return item;
+    }
+
+    if (item.kind === "submenu") {
+      return {
+        ...item,
+        label: t(item.label),
+        items: translateMenuItems(item.items, t),
+      };
+    }
+
+    return { ...item, label: t(item.label) };
+  });
 
 function MenuItems({
   items,
@@ -175,6 +196,7 @@ function MobileMenu({
   menus: MenuSpec[];
   onAction: (action?: () => void) => void;
 }) {
+  const { t } = useUiLanguage();
   const [path, setPath] = useState<
     Array<{ id: string; label: string; items: MenuItemSpec[] }>
   >([]);
@@ -192,15 +214,15 @@ function MobileMenu({
   return (
     <div
       role="menu"
-      aria-label={current?.label ?? "Application menu"}
+      aria-label={current?.label ?? t("Application menu")}
       className="w-full p-1"
     >
       {current !== undefined ? (
         <div className="mb-1 flex h-8 items-center border-b border-white/[0.08] px-1">
           <button
             type="button"
-            aria-label="Back"
-            title="Back"
+            aria-label={t("Back")}
+            title={t("Back")}
             onClick={() => setPath((currentPath) => currentPath.slice(0, -1))}
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-400 hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
           >
@@ -283,6 +305,7 @@ export function MenuBar({
   onTakeScreenshot: () => void;
   onExportChatLog: () => void;
 }) {
+  const { t } = useUiLanguage();
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuBarRef = useRef<HTMLDivElement>(null);
@@ -307,7 +330,7 @@ export function MenuBar({
     document.execCommand(command);
   };
 
-  const menus: MenuSpec[] = [
+  const englishMenus: MenuSpec[] = [
     {
       id: "file",
       label: "File",
@@ -522,6 +545,11 @@ export function MenuBar({
       ],
     },
   ];
+  const menus: MenuSpec[] = englishMenus.map((menu) => ({
+    ...menu,
+    label: t(menu.label),
+    items: translateMenuItems(menu.items, t),
+  }));
 
   const focusMenuItem = (menuId: MenuId, edge: "first" | "last" = "first") => {
     requestAnimationFrame(() => {
@@ -651,7 +679,7 @@ export function MenuBar({
         <button
           type="button"
           tabIndex={-1}
-          aria-label="Close menu"
+          aria-label={t("Close menu")}
           className="fixed inset-0 z-20"
           onMouseDown={() => {
             setOpenMenu(null);
@@ -666,8 +694,8 @@ export function MenuBar({
       >
         <button
           type="button"
-          aria-label="Open application menu"
-          title="Menu"
+          aria-label={t("Open application menu")}
+          title={t("Menu")}
           aria-haspopup="menu"
           aria-expanded={mobileOpen}
           onFocus={(event) => rememberEditTarget(event.relatedTarget)}
@@ -698,7 +726,7 @@ export function MenuBar({
 
         <div
           role="menubar"
-          aria-label="Application menu"
+          aria-label={t("Application menu")}
           className="hidden h-full items-center gap-0.5 lg:flex"
         >
           {menus.map((menu) => (
