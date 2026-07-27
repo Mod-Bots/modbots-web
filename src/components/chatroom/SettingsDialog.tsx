@@ -226,7 +226,7 @@ export function SettingsDialog({
               Settings
             </h2>
             <p className="mt-1 text-xs text-zinc-500">
-              Account first, chat controls second.
+              Manage your account and chat preferences.
             </p>
           </div>
           <button
@@ -443,8 +443,7 @@ export function SettingsDialog({
                     Chat settings
                   </p>
                   <p className="mt-2 text-sm text-zinc-400">
-                    Keep room-specific controls here and leave account state in
-                    the account section.
+                    Choose how messages appear and how you send them.
                   </p>
                 </section>
 
@@ -467,8 +466,8 @@ export function SettingsDialog({
                     </select>
                     <span className="mt-2 block text-[11px] leading-5 text-zinc-500">
                       {chatLanguage === "zh-CN"
-                        ? "The chatroom functions in English. This setting translates what you write and read through your Simplified Chinese layer."
-                        : "The chatroom functions in English with no translation layer applied."}
+                        ? "Write and read messages in Simplified Chinese. Translation happens automatically."
+                        : "Write and read messages in English."}
                     </span>
                     {translationError !== null ? (
                       <span className="mt-2 block text-[11px] text-red-300">
