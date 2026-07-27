@@ -18,6 +18,7 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
           fill
           preload
           sizes="100vw"
+          quality={60}
         />
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/35 to-black/60"
