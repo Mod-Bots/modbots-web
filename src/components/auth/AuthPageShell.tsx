@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import appLogo from "@/assets/logo.svg";
 import startScreenBg from "@/assets/start-screen-bg.png";
-import { SiteFooter } from "@/components/shared/SiteFooter";
+import { Footer } from "@/components/entry/Footer";
 
 export function AuthPageShell({ children }: { children: ReactNode }) {
   return (
@@ -71,7 +71,7 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
             after the room.
           </p>
         </div>
-        <SiteFooter />
+        <Footer />
       </section>
     </main>
   );

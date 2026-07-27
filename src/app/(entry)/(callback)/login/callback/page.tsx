@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SiteFooter } from "@/components/shared/SiteFooter";
+import { Footer } from "@/components/entry/Footer";
 import { saveStoredIdentity } from "@/data/identity";
 import {
   completeSameTabLogin,
@@ -78,7 +78,7 @@ const LoginCallback = (): React.ReactElement => {
           )}
         </div>
       </main>
-      <SiteFooter />
+      <Footer />
     </div>
   );
 };

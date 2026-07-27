@@ -12,7 +12,7 @@ const useCurrentYear = (): number => {
   return year;
 };
 
-export const SiteFooter = (): React.ReactElement => {
+export const Footer = (): React.ReactElement => {
   const currentYear = useCurrentYear();
 
   return (
