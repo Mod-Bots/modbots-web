@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import {
   A,
+  Contact,
   H2,
   LI,
-  Mail,
   P,
   PolicyPage,
   Row,
@@ -41,7 +41,7 @@ export default function ResearchPage() {
           {policyMeta.institutionShort}
         </Row>
         <Row term="Contact">
-          <Mail address={policyContacts.research} />
+          <Contact route={policyContacts.research} />
         </Row>
       </Rows>
 
@@ -162,11 +162,11 @@ export default function ResearchPage() {
 
       <H2 id="help">If you need help</H2>
       <P>
-        Anything about the study goes to{" "}
-        <Mail address={policyContacts.research} />: a question about what taking
-        part involves, telling us you want to stop, something that worried you
-        in the room, or a query about a published dataset. That is the first
-        place to raise it and the quickest.
+        Anything to do with the study is looked after by{" "}
+        <Contact route={policyContacts.research} />, and that is the first place
+        to raise it: a question about what taking part involves, telling us you
+        want to stop, something that worried you in the room, or a query about a
+        published dataset.
       </P>
       <P>
         The Research Ethics Committee at {policyMeta.institutionShort} takes

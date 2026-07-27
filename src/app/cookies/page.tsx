@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { CookieChoicePanel } from "../../components/CookieConsent";
 import {
   A,
+  Contact,
   H2,
-  Mail,
   P,
   PolicyPage,
   Row,
@@ -82,9 +82,9 @@ export default function CookiesPage() {
         necessary ones will sign you out.
       </P>
       <P>
-        Anything about what is stored in your browser here, or about the
-        analytics data itself, goes to <Mail address={policyContacts.privacy} />
-        .
+        Questions about what is stored in your browser here, or about the
+        analytics data itself, are for{" "}
+        <Contact route={policyContacts.privacy} />.
       </P>
     </PolicyPage>
   );

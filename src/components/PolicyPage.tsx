@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import appLogo from "../assets/logo.svg";
-import { policyMeta } from "../data/policies";
+import { type PolicyContact, policyMeta } from "../data/policies";
 import { BackPageFooter } from "./BackPageFooter";
 
 // Typographic primitives for the published documents. They exist so seven
@@ -104,11 +104,17 @@ export const A = ({
   );
 };
 
-// A published address, written out in full so it can be read as well as
-// clicked. The address is the link text because a document that hides it
-// behind "contact us" cannot be acted on from a printed copy.
-export const Mail = ({ address }: { address: string }): React.ReactElement => (
-  <A href={`mailto:${address}`}>{address}</A>
+// A route to whoever handles the thing being discussed. The team carries the
+// sentence and the address rides along in plain sight, so the document reads
+// as prose on screen and still works when it is printed.
+export const Contact = ({
+  route,
+}: {
+  route: PolicyContact;
+}): React.ReactElement => (
+  <A href={`mailto:${route.address}`}>
+    {route.team} ({route.address})
+  </A>
 );
 
 // A definition row, used where a document has to answer the same question for

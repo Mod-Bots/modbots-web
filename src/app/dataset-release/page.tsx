@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import {
   A,
+  Contact,
   H2,
   LI,
-  Mail,
   P,
   PolicyPage,
   Row,
@@ -41,8 +41,8 @@ export default function DataPage() {
       </P>
       <P>
         Questions about a release, about the material behind a published
-        finding, or about using the data in your own work go to{" "}
-        <Mail address={policyContacts.research} />.
+        finding, or about using the data in your own work are answered by{" "}
+        <Contact route={policyContacts.research} />.
       </P>
 
       <H2 id="contains">What a release contains</H2>
@@ -148,8 +148,8 @@ export default function DataPage() {
         Unlawful material, and material whose continued availability would put a
         person at serious risk, is treated separately from this and is dealt
         with on its own terms. Report it to{" "}
-        <Mail address={policyContacts.security} />, whether it is in the room or
-        in a release that has already gone out. That is the one case where a
+        <Contact route={policyContacts.security} />, whether it sits in the room
+        or in a release that has already gone out. That is the one case where a
         release is corrected because of what it contains rather than because the
         research required it.
       </P>

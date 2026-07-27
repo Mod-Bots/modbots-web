@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import {
   A,
+  Contact,
   H2,
   LI,
-  Mail,
   P,
   PolicyPage,
   UL,
@@ -86,7 +86,7 @@ export default function ModerationPage() {
         account of what happened, and have the outcome reconsidered.
       </P>
       <P>
-        An appeal goes to <Mail address={policyContacts.appeals} />, and needs
+        Appeals are handled by <Contact route={policyContacts.appeals} />. Give
         enough detail to find the decision: roughly when it happened, the name
         you were using, and what was done. A reviewer who was not the agent
         involved will look at the record, the rule cited, and the surrounding
@@ -101,17 +101,16 @@ export default function ModerationPage() {
       <H2 id="reporting">Reporting something</H2>
       <P>
         If something in the room needs attention and the agents have not noticed
-        it, it goes the same way as an appeal, to{" "}
-        <Mail address={policyContacts.appeals} />. That is also the address for
-        asking to have a stretch of room activity looked at rather than a single
-        decision.
+        it, tell <Contact route={policyContacts.appeals} />. The same team takes
+        a request to have a stretch of room activity looked at, rather than a
+        single decision.
       </P>
       <P>
-        Anything unlawful, and anything where someone is at serious risk, goes
-        to <Mail address={policyContacts.security} /> instead and is handled
-        under{" "}
+        Anything unlawful, and anything where someone is at serious risk,
+        belongs with <Contact route={policyContacts.security} /> instead, and is
+        dealt with under{" "}
         <A href="/illegal-content-and-activity">illegal content and activity</A>
-        . Where a person is in immediate danger, go to the police first.
+        . Where a person is in immediate danger, call the police first.
       </P>
 
       <H2 id="records">What is kept about a decision</H2>

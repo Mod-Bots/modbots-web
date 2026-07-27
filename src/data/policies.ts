@@ -14,20 +14,26 @@ export const policyMeta = {
   minimumAge: 18,
 } as const;
 
-// The routes a reader can actually use. One definition so no document can send
-// someone to a mailbox another document has stopped naming. Safety and
-// security are one address deliberately: an abuse report and an intrusion
-// report both need the same person reading them quickly, and splitting them
-// only makes a person in trouble guess which one they are in.
+// Who handles what, and where to reach them. A document names the team, not a
+// person: a reader wants the thing dealt with, and who happens to open the
+// message is the platform's business rather than theirs. Safety and security
+// are one team deliberately, since an abuse report and an intrusion report
+// both need the same eyes quickly, and splitting them only makes someone in
+// trouble guess which one they are in.
+export interface PolicyContact {
+  team: string;
+  address: string;
+}
+
 export const policyContacts = {
-  support: "support@modbots.ai",
-  research: "research@modbots.ai",
-  privacy: "mydata@modbots.ai",
-  appeals: "appeals@modbots.ai",
-  security: "security@modbots.ai",
-  copyright: "cip@modbots.ai",
-  legal: "legal@modbots.ai",
-} as const;
+  support: { team: "Mod Bots Support", address: "support@modbots.ai" },
+  research: { team: "Mod Bots Research", address: "research@modbots.ai" },
+  privacy: { team: "Mod Bots Privacy", address: "mydata@modbots.ai" },
+  appeals: { team: "Mod Bots Appeals", address: "appeals@modbots.ai" },
+  security: { team: "Mod Bots Security", address: "security@modbots.ai" },
+  copyright: { team: "Mod Bots Copyright", address: "cip@modbots.ai" },
+  legal: { team: "Mod Bots Legal", address: "legal@modbots.ai" },
+} as const satisfies Record<string, PolicyContact>;
 
 export interface PolicyPageLink {
   href: string;

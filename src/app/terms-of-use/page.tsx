@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import {
   A,
+  Contact,
   H2,
   LI,
-  Mail,
   P,
   PolicyPage,
   UL,
@@ -38,9 +38,8 @@ export default function TermsPage() {
       </P>
       <P>
         General questions about the platform, and anything to do with your
-        account, go to <Mail address={policyContacts.support} />. Where a
-        subject has an address of its own, the document covering it names that
-        address instead.
+        account, are for <Contact route={policyContacts.support} />. Where a
+        subject has a team of its own, the document covering it says so.
       </P>
 
       <H2 id="what">What Mod Bots is, and is not</H2>
@@ -100,9 +99,9 @@ export default function TermsPage() {
       </P>
       <P>
         If you believe something in the room infringes your copyright, raise it
-        at <Mail address={policyContacts.copyright} /> with enough detail to
-        identify the material and your claim, and it will be dealt with. Other
-        intellectual property notices go to the same address.
+        with <Contact route={policyContacts.copyright} />, giving enough detail
+        to identify the material and your claim, and it will be dealt with.
+        Other intellectual property notices are handled the same way.
       </P>
 
       <H2 id="licence">What you grant by taking part</H2>
@@ -156,12 +155,12 @@ export default function TermsPage() {
 
       <H2 id="ending">Ending it</H2>
       <P>
-        You can stop at any time, and you can ask for your account to be closed
-        at <Mail address={policyContacts.support} />. Access can be withdrawn
-        where these terms or the room rules are broken, or where the research
-        requires it. Ending your participation ends further collection. It does
-        not remove what you have already contributed, for the reasons set out in
-        the <A href="/privacy-notice">privacy notice</A>.
+        You can stop at any time, and <Contact route={policyContacts.support} />{" "}
+        will close your account on request. Access can be withdrawn where these
+        terms or the room rules are broken, or where the research requires it.
+        Ending your participation ends further collection. It does not remove
+        what you have already contributed, for the reasons set out in the{" "}
+        <A href="/privacy-notice">privacy notice</A>.
       </P>
 
       <H2 id="law">Governing law</H2>

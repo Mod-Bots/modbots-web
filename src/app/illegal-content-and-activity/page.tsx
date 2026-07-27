@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import {
   A,
+  Contact,
   H2,
   LI,
-  Mail,
   P,
   PolicyPage,
   UL,
@@ -134,16 +134,16 @@ export default function IllegalContentPage() {
 
       <H2 id="reporting">Reporting something</H2>
       <P>
-        Reports go to <Mail address={policyContacts.security} />, and need
+        Reports are handled by <Contact route={policyContacts.security} />. Give
         enough detail to find the material: roughly when it appeared, the name
-        the participant was using, and what was posted. Anything sent there is
-        read as urgent, so use it for unlawful material, abuse, and anything
-        putting a person at serious risk rather than for ordinary complaints
-        about the room, which go through{" "}
+        the participant was using, and what was posted. Everything reaching that
+        team is treated as urgent, so keep it to unlawful material, abuse, and
+        anything putting a person at serious risk. Ordinary complaints about the
+        room belong with{" "}
         <A href="/moderation-and-appeals">moderation and appeals</A>.
       </P>
       <P>
-        The same address takes attacks on the platform itself: a vulnerability
+        The same team handles attacks on the platform itself: a vulnerability
         you have found, an account you believe has been taken over, malware, and
         unauthorised access. Report it rather than demonstrate it further.
       </P>
@@ -163,11 +163,11 @@ export default function IllegalContentPage() {
         harm to a person.
       </P>
       <P>
-        Formal requests belong at <Mail address={policyContacts.legal} />: law
+        Formal process is for <Contact route={policyContacts.legal} />: law
         enforcement enquiries, requests to preserve material as evidence, court
-        orders, and anything else with legal process behind it. Urgent reports
-        of ongoing harm should still go to{" "}
-        <Mail address={policyContacts.security} />, which is watched more
+        orders, and anything else carrying legal process behind it. Urgent
+        reports of ongoing harm should still reach{" "}
+        <Contact route={policyContacts.security} />, which is watched more
         closely.
       </P>
       <P>

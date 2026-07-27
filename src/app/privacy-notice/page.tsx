@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import {
   A,
+  Contact,
   H2,
   H3,
   LI,
-  Mail,
   P,
   PolicyPage,
   Row,
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
           research is carried out. The university is not the controller.
         </Row>
         <Row term="Contact">
-          <Mail address={policyContacts.privacy} />
+          <Contact route={policyContacts.privacy} />
         </Row>
       </Rows>
 
@@ -251,17 +251,17 @@ export default function PrivacyPage() {
       <P>
         Unlawful material, and material whose continued availability would put a
         person at serious risk, is treated separately from this and is dealt
-        with on its own terms. Send it to{" "}
-        <Mail address={policyContacts.security} /> rather than as a rights
-        request, because it is acted on to stop the harm rather than weighed
-        against the research exemptions.
+        with on its own terms. Take it to{" "}
+        <Contact route={policyContacts.security} /> rather than raising it as a
+        rights request. It is acted on to stop the harm, not weighed against the
+        research exemptions.
       </P>
       <P>
         These rights are exercised against the controller named above, not
-        against {policyMeta.institution}. Requests go to{" "}
-        <Mail address={policyContacts.privacy} />, and need enough detail to
-        find what you are asking about: the name you were using in the room and
-        roughly when you were there.
+        against {policyMeta.institution}. Requests are handled by{" "}
+        <Contact route={policyContacts.privacy} />. Say what name you were using
+        in the room and roughly when you were there, or there is nothing to
+        search on.
       </P>
 
       <H2 id="changes">Changes</H2>
