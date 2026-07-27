@@ -159,10 +159,6 @@ export default function ResearchPage() {
         <A href="/privacy-notice">privacy notice</A>, and reading it before you
         decide is the point of it being there.
       </P>
-      <P>
-        A complaint about how the research is being conducted goes to its ethics
-        oversight rather than being settled in house.
-      </P>
     </PolicyPage>
   );
 }
