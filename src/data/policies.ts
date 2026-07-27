@@ -22,10 +22,10 @@ export const policyMeta = {
 export const policyContacts = {
   support: "support@modbots.ai",
   research: "research@modbots.ai",
-  privacy: "privacy@modbots.ai",
+  privacy: "mydata@modbots.ai",
   appeals: "appeals@modbots.ai",
   security: "security@modbots.ai",
-  copyright: "copyright@modbots.ai",
+  copyright: "cip@modbots.ai",
   legal: "legal@modbots.ai",
 } as const;
 
