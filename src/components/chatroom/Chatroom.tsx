@@ -61,7 +61,6 @@ import {
   useNotifications,
 } from "@/notifications/NotificationProvider";
 import { AutomaticUpdateChecker } from "./AutomaticUpdateChecker";
-import { CheckForUpdatesDialog } from "./CheckForUpdatesDialog";
 import { MenuBar } from "./MenuBar";
 import { ReportProblemDialog } from "./ReportProblemDialog";
 import { RequestFeatureDialog } from "./RequestFeatureDialog";
@@ -1723,7 +1722,6 @@ export function Chatroom() {
     index: number;
   } | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [checkForUpdatesOpen, setCheckForUpdatesOpen] = useState(false);
   const [reportProblemOpen, setReportProblemOpen] = useState(false);
   const [requestFeatureOpen, setRequestFeatureOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -3116,7 +3114,6 @@ export function Chatroom() {
             onOpenSettings={() => openSettings("account")}
             onReportProblem={() => setReportProblemOpen(true)}
             onRequestFeature={() => setRequestFeatureOpen(true)}
-            onCheckForUpdates={() => setCheckForUpdatesOpen(true)}
             onOpenAbout={() => setAboutOpen(true)}
             onTakeScreenshot={() => void takeScreenshot()}
           />
@@ -4233,13 +4230,6 @@ export function Chatroom() {
 
         {requestFeatureOpen ? (
           <RequestFeatureDialog onClose={() => setRequestFeatureOpen(false)} />
-        ) : null}
-
-        {checkForUpdatesOpen ? (
-          <CheckForUpdatesDialog
-            currentVersion={appVersion}
-            onClose={() => setCheckForUpdatesOpen(false)}
-          />
         ) : null}
 
         {aboutOpen ? (

@@ -318,7 +318,6 @@ export function MenuBar({
   onOpenSettings,
   onReportProblem,
   onRequestFeature,
-  onCheckForUpdates,
   onOpenAbout,
   onTakeScreenshot,
 }: {
@@ -329,7 +328,6 @@ export function MenuBar({
   onOpenSettings: () => void;
   onReportProblem: () => void;
   onRequestFeature: () => void;
-  onCheckForUpdates: () => void;
   onOpenAbout: () => void;
   onTakeScreenshot: () => void;
 }) {
@@ -661,12 +659,6 @@ export function MenuBar({
           label: "Request a Feature",
           icon: Lightbulb,
           onSelect: onRequestFeature,
-        },
-        {
-          id: "check-updates",
-          label: "Check for Updates",
-          icon: RefreshCw,
-          onSelect: onCheckForUpdates,
         },
         { kind: "separator", id: "help-about" },
         {

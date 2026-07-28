@@ -4,12 +4,14 @@ import { useEffect } from "react";
 import { useNotifications } from "@/notifications/NotificationProvider";
 import {
   checkForWebUpdate,
+  failedUpdateCheckRetryInterval,
   getTimeUntilAutomaticUpdateCheck,
-  isManualUpdateCheckActive,
   recordNotifiedUpdateVersion,
-  updateCheckStateEvent,
   wasUpdateVersionNotified,
 } from "@/updates/update-check";
+
+const updatePollInterval = 5_000;
+const updatePollLimit = 24;
 
 export function AutomaticUpdateChecker({
   currentVersion,
@@ -21,6 +23,7 @@ export function AutomaticUpdateChecker({
   useEffect(() => {
     let cancelled = false;
     let checkTimer: number | null = null;
+    let updatePollCount = 0;
 
     const clearCheckTimer = () => {
       if (checkTimer !== null) {
@@ -29,56 +32,78 @@ export function AutomaticUpdateChecker({
       }
     };
 
-    const runAutomaticCheck = async () => {
-      checkTimer = null;
+    const scheduleCheck = (delay: number) => {
+      clearCheckTimer();
 
-      if (cancelled || isManualUpdateCheckActive()) {
-        return;
-      }
-
-      try {
-        const result = await checkForWebUpdate(currentVersion);
-
-        if (
-          cancelled ||
-          isManualUpdateCheckActive() ||
-          !result.updateAvailable ||
-          result.latestVersion === null ||
-          wasUpdateVersionNotified(result.latestVersion)
-        ) {
-          return;
-        }
-
-        notify({
-          title: "Web update available",
-          message: `Version ${result.latestVersion}`,
-        });
-        recordNotifiedUpdateVersion(result.latestVersion);
-      } catch {
-        // The shared check timestamp schedules a quiet retry after a failure.
+      if (!cancelled) {
+        checkTimer = window.setTimeout(() => void runAutomaticCheck(), delay);
       }
     };
 
     const scheduleAutomaticCheck = () => {
-      clearCheckTimer();
+      scheduleCheck(getTimeUntilAutomaticUpdateCheck());
+    };
 
-      if (cancelled || isManualUpdateCheckActive()) {
+    const scheduleUpdatePoll = () => {
+      updatePollCount += 1;
+
+      if (updatePollCount > updatePollLimit) {
+        updatePollCount = 0;
+        scheduleCheck(failedUpdateCheckRetryInterval);
         return;
       }
 
-      checkTimer = window.setTimeout(
-        () => void runAutomaticCheck(),
-        getTimeUntilAutomaticUpdateCheck(),
-      );
+      scheduleCheck(updatePollInterval);
     };
 
-    window.addEventListener(updateCheckStateEvent, scheduleAutomaticCheck);
+    const runAutomaticCheck = async () => {
+      checkTimer = null;
+
+      try {
+        const result = await checkForWebUpdate(currentVersion);
+
+        if (cancelled) {
+          return;
+        }
+
+        if (result.updateReady) {
+          window.location.reload();
+          return;
+        }
+
+        if (result.updateAvailable && result.latestVersion !== null) {
+          if (!wasUpdateVersionNotified(result.latestVersion)) {
+            notify({
+              title: "Web update available",
+              message: `Version ${result.latestVersion}`,
+            });
+            recordNotifiedUpdateVersion(result.latestVersion);
+          }
+
+          scheduleUpdatePoll();
+          return;
+        }
+
+        updatePollCount = 0;
+        scheduleAutomaticCheck();
+      } catch {
+        if (cancelled) {
+          return;
+        }
+
+        if (updatePollCount > 0) {
+          scheduleUpdatePoll();
+          return;
+        }
+
+        scheduleAutomaticCheck();
+      }
+    };
     scheduleAutomaticCheck();
 
     return () => {
       cancelled = true;
       clearCheckTimer();
-      window.removeEventListener(updateCheckStateEvent, scheduleAutomaticCheck);
     };
   }, [currentVersion, notify]);
 
