@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { useAppWindow } from "@/appearance/WindowProvider";
 import { useZoom } from "@/appearance/ZoomProvider";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -332,6 +333,8 @@ export function MenuBar({
   const { t } = useUiLanguage();
   const { setThemeMode } = useTheme();
   const { canZoomIn, canZoomOut, resetZoom, zoomIn, zoomOut } = useZoom();
+  const { canMaximize, canRestore, maximize, minimize, restore } =
+    useAppWindow();
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [editContext, setEditContext] = useState<EditContext>(emptyEditContext);
@@ -595,9 +598,26 @@ export function MenuBar({
           label: "Window",
           icon: Monitor,
           items: [
-            { id: "minimize", label: "Minimize", icon: Minimize2 },
-            { id: "restore", label: "Restore", icon: RotateCcw },
-            { id: "maximize", label: "Maximize", icon: Maximize2 },
+            {
+              id: "minimize",
+              label: "Minimize",
+              icon: Minimize2,
+              onSelect: minimize,
+            },
+            {
+              id: "restore",
+              label: "Restore",
+              icon: RotateCcw,
+              disabled: !canRestore,
+              onSelect: restore,
+            },
+            {
+              id: "maximize",
+              label: "Maximize",
+              icon: Maximize2,
+              disabled: !canMaximize,
+              onSelect: maximize,
+            },
           ],
         },
       ],

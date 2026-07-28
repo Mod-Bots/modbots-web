@@ -1,5 +1,6 @@
 // biome-ignore-all lint/security/noDangerouslySetInnerHtml: This fixed app-owned script applies the saved theme before first paint.
 import type { Metadata, Viewport } from "next";
+import { WindowProvider } from "@/appearance/WindowProvider";
 import { ZoomProvider } from "@/appearance/ZoomProvider";
 import { CookieConsent } from "@/components/shared/CookieConsent";
 import { ThemeProvider } from "@/theme/ThemeProvider";
@@ -47,6 +48,7 @@ export default function RootLayout({
       className="h-full antialiased"
       data-theme="dark"
       data-theme-mode="system"
+      data-window-state="normal"
       suppressHydrationWarning
     >
       <head>
@@ -65,10 +67,12 @@ export default function RootLayout({
       </head>
       <body className="modbots-interface-zoom min-h-full flex flex-col">
         <ZoomProvider>
-          <ThemeProvider>
-            {children}
-            <CookieConsent />
-          </ThemeProvider>
+          <WindowProvider>
+            <ThemeProvider>
+              {children}
+              <CookieConsent />
+            </ThemeProvider>
+          </WindowProvider>
         </ZoomProvider>
       </body>
     </html>

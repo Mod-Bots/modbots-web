@@ -209,6 +209,14 @@ body {
   zoom: var(--modbots-interface-zoom);
 }
 
+.modbots-window-content {
+  display: contents;
+}
+
+[data-window-state="minimized"] .modbots-window-content {
+  display: none;
+}
+
 body {
   margin: 0;
   color: var(--foreground);
