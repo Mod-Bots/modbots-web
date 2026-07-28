@@ -4,7 +4,7 @@ import notFoundImage from "../assets/404-page.png";
 import { Footer } from "@/components/entry/Footer";
 
 const NotFoundPage = (): React.ReactElement => (
-  <div className="modbots-scroll flex h-screen h-dvh flex-col overflow-y-auto bg-[#0b0b0b] text-zinc-100">
+  <div className="modbots-scroll flex h-screen h-dvh flex-col overflow-y-auto bg-modbots-canvas text-zinc-100">
     <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-10">
       <Image
         src={notFoundImage}

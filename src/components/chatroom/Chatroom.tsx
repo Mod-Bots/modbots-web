@@ -841,7 +841,7 @@ function ActorProfilePicture({
         )}
       </div>
       {actor !== undefined && actor.type !== "human" ? (
-        <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-black/70 bg-[#0d0d0d] text-zinc-300">
+        <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-modbots-avatar-edge bg-modbots-panel text-zinc-300">
           {roleBadgeIcon(actor.type)}
         </span>
       ) : null}
@@ -866,7 +866,7 @@ function StatusBar({
   const { t } = useUiLanguage();
 
   return (
-    <footer className="modbots-print-hidden flex h-7 shrink-0 items-center justify-between gap-4 border-t border-white/[0.08] bg-[#0a0a0a] px-3 text-[11px] text-zinc-500">
+    <footer className="modbots-print-hidden flex h-7 shrink-0 items-center justify-between gap-4 border-t border-white/[0.08] bg-modbots-chrome px-3 text-[11px] text-zinc-500">
       <div className="flex items-center gap-3">
         <span className="flex items-center gap-2">
           <span
@@ -905,7 +905,7 @@ function MessageActions({ onReply }: { onReply?: () => void }) {
   const { t } = useUiLanguage();
 
   return (
-    <div className="modbots-print-hidden absolute right-4 top-0 flex items-center rounded-window border border-white/10 bg-[#181818] p-0.5 opacity-80 shadow-xl lg:right-6 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100">
+    <div className="modbots-print-hidden absolute right-4 top-0 flex items-center rounded-window border border-white/10 bg-modbots-popover p-0.5 opacity-80 shadow-xl lg:right-6 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100">
       <button
         type="button"
         onClick={onReply}
@@ -1112,7 +1112,7 @@ function ChatMessage({
           </time>
         </div>
         {isReply ? (
-          <div className="mt-2 flex min-w-0 max-w-[64ch] items-stretch overflow-hidden rounded-xl border border-white/[0.08] bg-[#121212] shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+          <div className="mt-2 flex min-w-0 max-w-[64ch] items-stretch overflow-hidden rounded-xl border border-white/[0.08] bg-modbots-panel-raised shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
             <span className="w-1 shrink-0 bg-zinc-400/80" />
             <div className="min-w-0 px-3 py-2">
               {repliedEvent === null ? (
@@ -1162,7 +1162,7 @@ function DayDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3 px-4 py-3 sm:px-6">
       <span className="h-px flex-1 bg-white/[0.07]" />
-      <span className="rounded-full border border-white/10 bg-[#141414] px-3 py-0.5 text-[11px] font-medium text-zinc-500">
+      <span className="rounded-full border border-white/10 bg-modbots-card px-3 py-0.5 text-[11px] font-medium text-zinc-500">
         {label}
       </span>
       <span className="h-px flex-1 bg-white/[0.07]" />
@@ -1343,7 +1343,7 @@ function ParticipantRow({
           size="sm"
         />
         <span
-          className={`absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0d0d0d] ${currentStatus.dot}`}
+          className={`absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full border-2 border-modbots-panel ${currentStatus.dot}`}
           title={t(currentStatus.label)}
         />
       </div>
@@ -1416,7 +1416,7 @@ function SessionRestoreScreen({ restoring }: { restoring: boolean }) {
   const { t } = useUiLanguage();
 
   return (
-    <section className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden bg-[#0b0b0b] px-6 py-12 text-zinc-100">
+    <section className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden bg-modbots-canvas px-6 py-12 text-zinc-100">
       <img
         src={startScreenBg.src}
         alt=""
@@ -2820,7 +2820,7 @@ export function Chatroom() {
   };
 
   return (
-    <div className="modbots-chatroom flex h-screen h-dvh flex-col overflow-hidden bg-[#0b0b0b] text-zinc-100">
+    <div className="modbots-chatroom flex h-screen h-dvh flex-col overflow-hidden bg-modbots-canvas text-zinc-100">
       <input
         ref={profilePictureInput}
         type="file"
@@ -2863,7 +2863,7 @@ export function Chatroom() {
               setMobilePanel(null);
               setUserMenuOpen(false);
             }}
-            className="fixed inset-x-0 bottom-7 top-11 z-30 bg-black/65 backdrop-blur-[2px] lg:hidden"
+            className="fixed inset-x-0 bottom-7 top-11 z-30 bg-modbots-overlay backdrop-blur-[2px] lg:hidden"
           />
         ) : null}
         <div className="modbots-print-chat-layout relative flex min-h-0 flex-1">
@@ -2873,7 +2873,7 @@ export function Chatroom() {
             <>
               {membersOpen ? (
                 <aside
-                  className={`fixed bottom-7 left-0 top-11 z-40 w-[min(88vw,340px)] shrink-0 flex-col border-r border-white/[0.08] bg-[#0d0d0d] shadow-[20px_0_60px_rgba(0,0,0,0.5)] lg:static lg:z-auto lg:flex lg:w-[var(--participants-width)] lg:shadow-none ${
+                  className={`fixed bottom-7 left-0 top-11 z-40 w-[min(88vw,340px)] shrink-0 flex-col border-r border-white/[0.08] bg-modbots-panel shadow-[20px_0_60px_rgba(0,0,0,0.5)] lg:static lg:z-auto lg:flex lg:w-[var(--participants-width)] lg:shadow-none ${
                     mobilePanel === "participants" ? "flex" : "hidden"
                   }`}
                   style={
@@ -2932,7 +2932,7 @@ export function Chatroom() {
                     localActor !== undefined &&
                     localProfile !== null ? (
                       <div
-                        className="absolute bottom-full left-3 z-30 mb-2 max-h-[calc(100vh-120px)] w-[320px] max-w-[calc(100vw-24px)] overflow-y-auto rounded-window border border-white/10 bg-[linear-gradient(180deg,rgba(28,28,28,0.98),rgba(17,17,17,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.58)] backdrop-blur-xl"
+                        className="absolute bottom-full left-3 z-30 mb-2 max-h-[calc(100vh-120px)] w-[320px] max-w-[calc(100vw-24px)] overflow-y-auto rounded-window border border-white/10 bg-[image:var(--modbots-profile-background)] shadow-[0_24px_80px_rgba(0,0,0,0.58)] backdrop-blur-xl"
                         role="dialog"
                         aria-label={t("Your profile")}
                       >
@@ -2948,7 +2948,7 @@ export function Chatroom() {
                               <button
                                 type="button"
                                 onClick={chooseProfilePicture}
-                                className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.1] bg-[#181818] text-zinc-300 shadow-[0_10px_22px_rgba(0,0,0,0.35)] transition-colors hover:border-white/20 hover:bg-[#202020] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                                className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.1] bg-modbots-popover text-zinc-300 shadow-[0_10px_22px_rgba(0,0,0,0.35)] transition-colors hover:border-white/20 hover:bg-modbots-hover hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                                 aria-label={t("Change profile picture")}
                                 title={t("Change profile picture")}
                               >
@@ -3062,7 +3062,7 @@ export function Chatroom() {
                           />
                           {localActor !== undefined ? (
                             <span
-                              className={`absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-[#0d0d0d] ${localParticipantStatusStyle.dot}`}
+                              className={`absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-modbots-panel ${localParticipantStatusStyle.dot}`}
                               aria-label={t(localParticipantStatusStyle.label)}
                               title={t(localParticipantStatusStyle.label)}
                             />
@@ -3097,10 +3097,10 @@ export function Chatroom() {
               ) : null}
 
               <div className="modbots-print-chat-column flex min-w-0 flex-1 flex-col">
-                <header className="modbots-print-chat-header z-10 flex h-14 shrink-0 items-center gap-2 border-b border-white/[0.08] bg-[#0d0d0d] px-3 lg:h-[68px] lg:gap-4 lg:px-5">
+                <header className="modbots-print-chat-header z-10 flex h-14 shrink-0 items-center gap-2 border-b border-white/[0.08] bg-modbots-panel px-3 lg:h-[68px] lg:gap-4 lg:px-5">
                   {mobileSearchOpen ? (
                     <div className="flex min-w-0 flex-1 items-center gap-2 lg:hidden">
-                      <div className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/10 bg-[#181818] px-3">
+                      <div className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/10 bg-modbots-popover px-3">
                         <Search className="h-4 w-4 shrink-0 text-zinc-500" />
                         <input
                           ref={searchInput}
@@ -3130,7 +3130,7 @@ export function Chatroom() {
                         {t("Chat")}
                       </h2>
                       <div className="hidden flex-1 lg:block" />
-                      <div className="hidden h-9 w-[min(32vw,380px)] items-center gap-2 rounded-lg border border-white/10 bg-[#181818] px-3 lg:flex">
+                      <div className="hidden h-9 w-[min(32vw,380px)] items-center gap-2 rounded-lg border border-white/10 bg-modbots-popover px-3 lg:flex">
                         <Search className="h-4 w-4 shrink-0 text-zinc-500" />
                         <input
                           ref={searchInput}
@@ -3197,7 +3197,7 @@ export function Chatroom() {
                 </header>
 
                 {connectionProblem || error instanceof Error ? (
-                  <div className="modbots-print-hidden flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] bg-[#151515] px-4 py-2 text-xs text-zinc-300 lg:px-7">
+                  <div className="modbots-print-hidden flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] bg-modbots-menu px-4 py-2 text-xs text-zinc-300 lg:px-7">
                     <span>
                       {historyUnavailable
                         ? "We couldn't load the conversation right now. Try again in a moment."
@@ -3229,7 +3229,7 @@ export function Chatroom() {
                           </div>
                         ) : timeline.length === 0 ? (
                           <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-[#171717] text-zinc-400">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-modbots-field text-zinc-400">
                               {searchQuery.length > 0 ? (
                                 <Search className="h-5 w-5" />
                               ) : (
@@ -3269,7 +3269,7 @@ export function Chatroom() {
 
                     <div className="modbots-print-hidden shrink-0 px-3 pb-3 pt-2 sm:px-7 sm:pb-5">
                       {translationError !== null ? (
-                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-modbots-menu px-3 py-2 text-xs text-zinc-300">
                           <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
                           <span className="flex-1">{translationError}</span>
                           <button
@@ -3283,7 +3283,7 @@ export function Chatroom() {
                         </div>
                       ) : null}
                       {attachmentError !== null ? (
-                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-modbots-menu px-3 py-2 text-xs text-zinc-300">
                           <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
                           <span className="flex-1">{attachmentError}</span>
                           <button
@@ -3297,7 +3297,7 @@ export function Chatroom() {
                         </div>
                       ) : null}
                       {mutedNotice !== null ? (
-                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-modbots-menu px-3 py-2 text-xs text-zinc-300">
                           <MicOff className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
                           <span className="flex-1">{mutedNotice}</span>
                           <button
@@ -3312,10 +3312,10 @@ export function Chatroom() {
                       ) : null}
                       <form
                         onSubmit={(event) => void submitMessage(event)}
-                        className="relative rounded-window border border-white/10 bg-[#171717] shadow-[0_16px_50px_rgba(0,0,0,0.35)] focus-within:border-white/20"
+                        className="relative rounded-window border border-white/10 bg-modbots-field shadow-[0_16px_50px_rgba(0,0,0,0.35)] focus-within:border-white/20"
                       >
                         {mention !== null && mentionOptions.length > 0 ? (
-                          <div className="absolute bottom-full left-0 mb-2 w-72 overflow-hidden rounded-window border border-white/10 bg-[#181818] p-1 shadow-2xl">
+                          <div className="absolute bottom-full left-0 mb-2 w-72 overflow-hidden rounded-window border border-white/10 bg-modbots-popover p-1 shadow-2xl">
                             <p className="px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-600">
                               Address someone
                             </p>
@@ -3540,7 +3540,7 @@ export function Chatroom() {
                             <button
                               type="submit"
                               disabled={!canSend}
-                              className="flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#171717] disabled:cursor-default disabled:bg-zinc-800 disabled:text-zinc-500"
+                              className="flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-modbots-field disabled:cursor-default disabled:bg-zinc-800 disabled:text-zinc-500"
                             >
                               <span>
                                 {translatingSubmission
@@ -3568,7 +3568,7 @@ export function Chatroom() {
               ) : null}
               {aboutPanelOpen ? (
                 <aside
-                  className={`fixed bottom-7 right-0 top-11 z-40 w-[min(88vw,360px)] shrink-0 flex-col border-l border-white/[0.08] bg-[#0d0d0d] shadow-[-20px_0_60px_rgba(0,0,0,0.5)] lg:static lg:z-auto lg:flex lg:w-[var(--about-width)] lg:shadow-none ${
+                  className={`fixed bottom-7 right-0 top-11 z-40 w-[min(88vw,360px)] shrink-0 flex-col border-l border-white/[0.08] bg-modbots-panel shadow-[-20px_0_60px_rgba(0,0,0,0.5)] lg:static lg:z-auto lg:flex lg:w-[var(--about-width)] lg:shadow-none ${
                     mobilePanel === "about" ? "flex" : "hidden"
                   }`}
                   style={
@@ -3648,7 +3648,7 @@ export function Chatroom() {
                           {t("Activity")}
                         </p>
                         <div
-                          className="flex rounded-md border border-white/[0.08] bg-[#0f0f0f] p-0.5"
+                          className="flex rounded-md border border-white/[0.08] bg-modbots-inset p-0.5"
                           role="tablist"
                           aria-label={t("Activity period")}
                         >
@@ -3954,11 +3954,11 @@ export function Chatroom() {
 
         {aboutOpen ? (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-modbots-overlay p-6"
             onClick={() => setAboutOpen(false)}
           >
             <div
-              className="w-[360px] rounded-window border border-white/10 bg-[#111111] p-6 shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
+              className="w-[360px] rounded-window border border-white/10 bg-modbots-dialog p-6 shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-center gap-3">

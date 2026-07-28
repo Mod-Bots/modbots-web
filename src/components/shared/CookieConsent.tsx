@@ -121,7 +121,7 @@ export const CookieConsent = (): React.ReactElement | null => {
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[100] px-4 pb-4 sm:px-6 sm:pb-6">
       <section
         aria-label="Cookies"
-        className="pointer-events-auto mx-auto flex w-full max-w-[860px] flex-col gap-5 rounded-window border border-white/10 bg-[#141414]/95 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:flex-row sm:items-center sm:gap-6 sm:p-6"
+        className="pointer-events-auto mx-auto flex w-full max-w-[860px] flex-col gap-5 rounded-window border border-white/10 bg-modbots-card/95 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:flex-row sm:items-center sm:gap-6 sm:p-6"
       >
         <p className="text-sm leading-6 text-zinc-300">
           We would like to measure how this site is used, which needs analytics

@@ -54,7 +54,7 @@ export function LoginForm() {
           }
         }}
         noValidate
-        className="mt-8 rounded-window border border-white/10 bg-[#141414] p-6 shadow-[0_16px_50px_rgba(0,0,0,0.35)]"
+        className="mt-8 rounded-window border border-white/10 bg-modbots-card p-6 shadow-[0_16px_50px_rgba(0,0,0,0.35)]"
       >
         {uid !== null ? <input type="hidden" name="uid" value={uid} /> : null}
         {uid === null && returnTo !== null ? (
@@ -73,7 +73,7 @@ export function LoginForm() {
             name="acceptPolicy"
             required
           />
-          <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border border-zinc-600 text-transparent transition-colors hover:border-zinc-400 peer-checked:border-white peer-checked:bg-white peer-checked:text-black peer-focus-visible:ring-2 peer-focus-visible:ring-white/40 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#141414]">
+          <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border border-zinc-600 text-transparent transition-colors hover:border-zinc-400 peer-checked:border-white peer-checked:bg-white peer-checked:text-black peer-focus-visible:ring-2 peer-focus-visible:ring-white/40 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-modbots-card">
             <svg
               className="h-3 w-3"
               viewBox="0 0 12 12"
@@ -110,7 +110,7 @@ export function LoginForm() {
           <span className="text-xs font-medium text-zinc-400">Username</span>
         </label>
         <input
-          className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-[#181818] px-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-white/25"
+          className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-modbots-popover px-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-white/25"
           id="username"
           name="username"
           type="text"
@@ -123,7 +123,7 @@ export function LoginForm() {
           <span className="text-xs font-medium text-zinc-400">Password</span>
         </label>
         <input
-          className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-[#181818] px-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-white/25"
+          className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-modbots-popover px-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-white/25"
           id="password"
           name="password"
           type="password"
@@ -132,7 +132,7 @@ export function LoginForm() {
         />
 
         <button
-          className="mt-4 flex h-11 w-full items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] disabled:pointer-events-none disabled:opacity-60"
+          className="mt-4 flex h-11 w-full items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-modbots-card disabled:pointer-events-none disabled:opacity-60"
           type="submit"
           disabled={!accountFormReady}
         >
@@ -155,7 +155,7 @@ export function LoginForm() {
             <span className="font-normal text-zinc-400">(optional)</span>
           </span>
           <input
-            className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-[#181818] px-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-white/25"
+            className="mt-1.5 h-10 w-full rounded-md border border-white/10 bg-modbots-popover px-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-white/25"
             id="displayName"
             name="displayName"
             type="text"

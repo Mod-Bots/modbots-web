@@ -224,7 +224,7 @@ export function RegisterForm() {
           }
         }}
         noValidate
-        className="mt-8 rounded-window border border-white/10 bg-[#141414] p-6 shadow-[0_16px_50px_rgba(0,0,0,0.35)]"
+        className="mt-8 rounded-window border border-white/10 bg-modbots-card p-6 shadow-[0_16px_50px_rgba(0,0,0,0.35)]"
       >
         {uid !== null ? <input type="hidden" name="uid" value={uid} /> : null}
         {uid === null && loginUrl !== null ? (
@@ -239,7 +239,7 @@ export function RegisterForm() {
           Username
         </label>
         <input
-          className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
+          className="mt-1.5 w-full rounded-xl border border-white/10 bg-modbots-inset px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
           id="username"
           name="username"
           type="text"
@@ -261,7 +261,7 @@ export function RegisterForm() {
           <span className="font-normal text-zinc-400">(optional)</span>
         </label>
         <input
-          className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
+          className="mt-1.5 w-full rounded-xl border border-white/10 bg-modbots-inset px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
           id="displayName"
           name="displayName"
           type="text"
@@ -276,7 +276,7 @@ export function RegisterForm() {
           Password
         </label>
         <input
-          className="mt-1.5 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
+          className="mt-1.5 w-full rounded-xl border border-white/10 bg-modbots-inset px-3 py-2.5 text-[15px] text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-white/25"
           id="password"
           name="password"
           type="password"
@@ -287,7 +287,7 @@ export function RegisterForm() {
 
         <label className="mt-5 flex items-start gap-2.5 text-sm text-zinc-400">
           <input
-            className="mt-0.5 h-4 w-4 rounded border-white/20 bg-[#0f0f0f]"
+            className="mt-0.5 h-4 w-4 rounded border-white/20 bg-modbots-inset"
             type="checkbox"
             name="acceptPolicy"
           />

@@ -14,7 +14,7 @@ export const Footer = (): React.ReactElement => {
   }, []);
 
   return (
-    <footer className="border-t border-white/[0.07] bg-[#0c0c0c]">
+    <footer className="border-t border-white/[0.07] bg-modbots-header">
       <div className="mx-auto w-full max-w-[1100px] px-6 py-14 sm:px-10">
         <nav aria-label="Policies">
           <ul className="flex flex-wrap gap-x-8 gap-y-3">

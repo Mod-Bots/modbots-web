@@ -8,7 +8,7 @@ import { Footer } from "@/components/entry/Footer";
 
 export function AuthPageShell({ children }: { children: ReactNode }) {
   return (
-    <main className="flex h-screen h-dvh flex-col overflow-hidden bg-[#0b0b0b] text-zinc-100">
+    <main className="flex h-screen h-dvh flex-col overflow-hidden bg-modbots-canvas text-zinc-100">
       <section className="modbots-scroll relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-8 sm:px-6">
         <Image
           className="pointer-events-none object-cover object-center"

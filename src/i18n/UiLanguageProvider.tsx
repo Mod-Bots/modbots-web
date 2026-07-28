@@ -35,6 +35,7 @@ const simplifiedChinese: Record<string, string> = {
   "Chat bots": "聊天机器人",
   "Chat language": "聊天语言",
   "Chat settings": "聊天设置",
+  "Auto Mode": "自动模式",
   "Check for Updates": "检查更新",
   "Choose how messages appear and how you send them.":
     "选择消息的显示方式和发送方式。",
@@ -53,6 +54,7 @@ const simplifiedChinese: Record<string, string> = {
   Copy: "复制",
   Cut: "剪切",
   Custom: "自定义",
+  "Dark Mode": "深色模式",
   Documentation: "文档",
   Edit: "编辑",
   English: "English",
@@ -66,6 +68,7 @@ const simplifiedChinese: Record<string, string> = {
   Idle: "空闲",
   "Interface language": "界面语言",
   Links: "链接",
+  "Light Mode": "浅色模式",
   "Log out": "退出登录",
   Language: "语言",
   "Language settings": "语言设置",
@@ -116,6 +119,7 @@ const simplifiedChinese: Record<string, string> = {
   Send: "发送",
   "Send with Enter": "按 Enter 发送",
   Settings: "设置",
+  "System Mode": "系统模式",
   "Starting Mod Bots...": "正在启动 Mod Bots...",
   "Shift + Enter for a new line": "按 Shift + Enter 换行",
   "Show menus, buttons, and settings in English.":

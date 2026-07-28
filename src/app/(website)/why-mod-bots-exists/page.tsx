@@ -116,7 +116,7 @@ export default function WhyPage() {
         </article>
       </div>
 
-      <figure className="border-y border-white/[0.07] bg-[#0c0c0c]">
+      <figure className="border-y border-white/[0.07] bg-modbots-header">
         <div className="mx-auto grid w-full max-w-[1100px] items-center gap-10 px-6 py-16 sm:px-10 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="relative aspect-[5/4] w-full overflow-hidden rounded-window border border-white/[0.07]">
             <Image

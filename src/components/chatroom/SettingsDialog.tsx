@@ -139,7 +139,7 @@ function ToggleRow({
         onChange={(event) => onChange(event.currentTarget.checked)}
         className="peer sr-only"
       />
-      <span className="relative h-5 w-9 shrink-0 rounded-full border border-white/10 bg-zinc-800 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-3.5 after:w-3.5 after:rounded-full after:bg-zinc-400 after:transition-transform peer-checked:bg-zinc-100 peer-checked:after:translate-x-4 peer-checked:after:bg-zinc-900 peer-focus-visible:ring-2 peer-focus-visible:ring-white/40 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#101010]" />
+      <span className="relative h-5 w-9 shrink-0 rounded-full border border-white/10 bg-zinc-800 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-3.5 after:w-3.5 after:rounded-full after:bg-zinc-400 after:transition-transform peer-checked:bg-zinc-100 peer-checked:after:translate-x-4 peer-checked:after:bg-zinc-900 peer-focus-visible:ring-2 peer-focus-visible:ring-white/40 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-modbots-window" />
     </label>
   );
 }
@@ -168,7 +168,7 @@ function SectionButton({
       {active ? (
         <span className="absolute bottom-2 left-0 top-2 w-0.5 rounded-r-full bg-zinc-100" />
       ) : null}
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/[0.08] bg-black/20">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/[0.08] bg-modbots-inset-overlay">
         {icon}
       </span>
       <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
@@ -190,7 +190,7 @@ function DetailCard({
   return (
     <section className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-white/[0.08] bg-black/20 text-zinc-300">
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-white/[0.08] bg-modbots-inset-overlay text-zinc-300">
           {icon}
         </span>
         <div className="min-w-0 flex-1">
@@ -546,12 +546,12 @@ export function SettingsDialog({
         type="button"
         aria-label={t("Close settings")}
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-black/65 backdrop-blur-[2px]"
+        className="absolute inset-0 cursor-default bg-modbots-overlay backdrop-blur-[2px]"
       />
       <div
         ref={dialogRef}
         style={positionedWindowStyle}
-        className={`modbots-settings-dialog relative z-10 flex h-dvh w-full flex-col overflow-hidden border border-white/10 bg-[#101010] shadow-[0_28px_90px_rgba(0,0,0,0.7)] sm:absolute sm:h-[min(720px,calc(100dvh-24px))] sm:min-h-[440px] sm:w-[min(880px,calc(100vw-24px))] sm:min-w-[600px] sm:max-h-[calc(100dvh-24px)] sm:max-w-[calc(100vw-24px)] sm:rounded-window ${
+        className={`modbots-settings-dialog relative z-10 flex h-dvh w-full flex-col overflow-hidden border border-white/10 bg-modbots-window shadow-[0_28px_90px_rgba(0,0,0,0.7)] sm:absolute sm:h-[min(720px,calc(100dvh-24px))] sm:min-h-[440px] sm:w-[min(880px,calc(100vw-24px))] sm:min-w-[600px] sm:max-h-[calc(100dvh-24px)] sm:max-w-[calc(100vw-24px)] sm:rounded-window ${
           windowPosition === null
             ? "sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
             : "sm:translate-x-0 sm:translate-y-0"
@@ -565,7 +565,7 @@ export function SettingsDialog({
           onPointerMove={moveWindow}
           onPointerUp={stopWindowMove}
           onPointerCancel={stopWindowMove}
-          className="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.08] bg-[#0c0c0c] px-4 sm:cursor-move sm:touch-none"
+          className="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.08] bg-modbots-header px-4 sm:cursor-move sm:touch-none"
         >
           <button
             type="button"
@@ -598,7 +598,7 @@ export function SettingsDialog({
         </div>
 
         <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] md:grid-cols-[200px_minmax(0,1fr)] md:grid-rows-1">
-          <aside className="border-b border-white/[0.08] bg-[#0d0d0d] p-3 md:border-b-0 md:border-r">
+          <aside className="border-b border-white/[0.08] bg-modbots-panel p-3 md:border-b-0 md:border-r">
             <nav className="grid grid-cols-3 gap-1.5 md:block md:space-y-1">
               <SectionButton
                 label={t("Account")}
@@ -621,7 +621,7 @@ export function SettingsDialog({
             </nav>
           </aside>
 
-          <div className="modbots-scroll min-h-0 overflow-y-auto bg-[#121212] p-4 sm:p-5">
+          <div className="modbots-scroll min-h-0 overflow-y-auto bg-modbots-panel-raised p-4 sm:p-5">
             {section === "account" ? (
               account === null ? null : (
                 <div>
@@ -632,7 +632,7 @@ export function SettingsDialog({
                         <button
                           type="button"
                           onClick={onManageProfilePicture}
-                          className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.1] bg-[#181818] text-zinc-300 shadow-[0_10px_22px_rgba(0,0,0,0.35)] transition-colors hover:border-white/20 hover:bg-[#202020] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                          className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.1] bg-modbots-popover text-zinc-300 shadow-[0_10px_22px_rgba(0,0,0,0.35)] transition-colors hover:border-white/20 hover:bg-modbots-hover hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                           aria-label={t("Change profile picture")}
                           title={t("Change profile picture")}
                         >
@@ -675,7 +675,7 @@ export function SettingsDialog({
                           onChange={(event) => setBio(event.target.value)}
                           maxLength={160}
                           rows={3}
-                          className="mt-1.5 w-full resize-y rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full resize-y rounded-md border border-white/[0.08] bg-modbots-inset-overlay px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                       <label>
@@ -686,7 +686,7 @@ export function SettingsDialog({
                           value={pronouns}
                           onChange={(event) => setPronouns(event.target.value)}
                           maxLength={40}
-                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-modbots-inset-overlay px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                       <label>
@@ -697,7 +697,7 @@ export function SettingsDialog({
                           value={location}
                           onChange={(event) => setLocation(event.target.value)}
                           maxLength={80}
-                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-modbots-inset-overlay px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                       <label className="sm:col-span-2">
@@ -707,7 +707,7 @@ export function SettingsDialog({
                         <input
                           value={links}
                           onChange={(event) => setLinks(event.target.value)}
-                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-modbots-inset-overlay px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                     </div>
@@ -719,7 +719,7 @@ export function SettingsDialog({
                     <button
                       type="submit"
                       disabled={profileSaving}
-                      className="mt-4 rounded-md bg-white px-4 py-2 text-[12px] font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212] disabled:cursor-wait disabled:opacity-50"
+                      className="mt-4 rounded-md bg-white px-4 py-2 text-[12px] font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-modbots-panel-raised disabled:cursor-wait disabled:opacity-50"
                     >
                       {profileSaving ? t("Saving...") : t("Save profile")}
                     </button>
@@ -838,7 +838,7 @@ export function SettingsDialog({
                       onChange={(event) =>
                         setUiLanguage(event.currentTarget.value as UiLanguage)
                       }
-                      className="mt-3 w-full rounded-md border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                      className="mt-3 w-full rounded-md border border-white/[0.1] bg-modbots-field px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10"
                     >
                       <option value="en">English</option>
                       <option value="zh-CN">简体中文</option>
@@ -879,7 +879,7 @@ export function SettingsDialog({
                           event.currentTarget.value as ChatLanguage,
                         )
                       }
-                      className="mt-3 w-full rounded-md border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:cursor-default disabled:opacity-50"
+                      className="mt-3 w-full rounded-md border border-white/[0.1] bg-modbots-field px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:cursor-default disabled:opacity-50"
                     >
                       <option value="zh-CN">简体中文</option>
                     </select>

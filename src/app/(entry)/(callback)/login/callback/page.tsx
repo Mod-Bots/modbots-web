@@ -61,7 +61,7 @@ const LoginCallback = (): React.ReactElement => {
   }, []);
 
   return (
-    <div className="flex min-h-screen min-h-dvh flex-col bg-[#0b0b0b] text-zinc-100">
+    <div className="flex min-h-screen min-h-dvh flex-col bg-modbots-canvas text-zinc-100">
       <main className="flex flex-1 items-center justify-center p-8">
         <div className="max-w-md text-center">
           {manualCode === null ? (

@@ -9,6 +9,7 @@ import {
   ChevronRight,
   CircleHelp,
   ClipboardPaste,
+  Clock3,
   Copy,
   Download,
   FileText,
@@ -18,6 +19,7 @@ import {
   Menu as MenuIcon,
   Minimize2,
   Monitor,
+  Moon,
   Palette,
   Printer,
   Redo2,
@@ -25,6 +27,7 @@ import {
   RotateCcw,
   Scissors,
   Settings2,
+  Sun,
   SwatchBook,
   TextSelect,
   Undo2,
@@ -36,6 +39,7 @@ import {
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
+import { useTheme } from "@/theme/ThemeProvider";
 
 type MenuId = "file" | "edit" | "view" | "tools" | "help";
 
@@ -169,7 +173,7 @@ function MenuItems({
             <div
               role="menu"
               aria-label={item.label}
-              className="absolute left-full top-0 z-50 ml-0.5 min-w-[224px] rounded-window border border-white/10 bg-[#151515] p-1 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
+              className="absolute left-full top-0 z-50 ml-0.5 min-w-[224px] rounded-window border border-white/10 bg-modbots-menu p-1 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
             >
               <MenuItems items={item.items} onAction={onAction} />
             </div>
@@ -325,6 +329,7 @@ export function MenuBar({
   onExportChatLog: () => void;
 }) {
   const { t } = useUiLanguage();
+  const { setThemeMode } = useTheme();
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [editContext, setEditContext] = useState<EditContext>(emptyEditContext);
@@ -514,7 +519,38 @@ export function MenuBar({
               label: "Theme",
               icon: SwatchBook,
               items: [
-                { id: "preset-theme", label: "Preset", icon: Palette },
+                {
+                  kind: "submenu",
+                  id: "preset-theme",
+                  label: "Preset",
+                  icon: Palette,
+                  items: [
+                    {
+                      id: "light-mode",
+                      label: "Light Mode",
+                      icon: Sun,
+                      onSelect: () => setThemeMode("light"),
+                    },
+                    {
+                      id: "dark-mode",
+                      label: "Dark Mode",
+                      icon: Moon,
+                      onSelect: () => setThemeMode("dark"),
+                    },
+                    {
+                      id: "system-mode",
+                      label: "System Mode",
+                      icon: Monitor,
+                      onSelect: () => setThemeMode("system"),
+                    },
+                    {
+                      id: "auto-mode",
+                      label: "Auto Mode",
+                      icon: Clock3,
+                      onSelect: () => setThemeMode("auto"),
+                    },
+                  ],
+                },
                 { id: "custom-theme", label: "Custom", icon: Settings2 },
               ],
             },
@@ -751,7 +787,7 @@ export function MenuBar({
 
       <div
         ref={menuBarRef}
-        className="modbots-print-hidden relative z-30 flex h-11 shrink-0 items-center border-b border-white/[0.08] bg-[#101010] px-2 shadow-[0_1px_0_rgba(0,0,0,0.45)] lg:h-8 lg:bg-[#0a0a0a] lg:px-2.5 lg:shadow-none"
+        className="modbots-print-hidden relative z-30 flex h-11 shrink-0 items-center border-b border-white/[0.08] bg-modbots-window px-2 shadow-[0_1px_0_rgba(0,0,0,0.45)] lg:h-8 lg:bg-modbots-chrome lg:px-2.5 lg:shadow-none"
       >
         <button
           type="button"
@@ -774,7 +810,7 @@ export function MenuBar({
         </span>
 
         {mobileOpen ? (
-          <div className="absolute left-2 top-full z-40 mt-1 w-[min(19rem,calc(100vw-1rem))] overflow-hidden rounded-window border border-white/[0.11] bg-[#181818]/[0.98] shadow-[0_16px_44px_rgba(0,0,0,0.6)] ring-1 ring-black/40 backdrop-blur-xl lg:hidden">
+          <div className="absolute left-2 top-full z-40 mt-1 w-[min(19rem,calc(100vw-1rem))] overflow-hidden rounded-window border border-white/[0.11] bg-modbots-popover/[0.98] shadow-[0_16px_44px_rgba(0,0,0,0.6)] ring-1 ring-modbots-overlay-ring backdrop-blur-xl lg:hidden">
             <MobileMenu
               menus={menus}
               onAction={(action) => {
@@ -842,7 +878,7 @@ export function MenuBar({
                   role="menu"
                   aria-label={menu.label}
                   onKeyDown={(event) => handleMenuKeyDown(event, menu.id)}
-                  className="absolute left-0 top-full z-40 mt-0.5 min-w-[224px] rounded-window border border-white/10 bg-[#151515] p-1 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
+                  className="absolute left-0 top-full z-40 mt-0.5 min-w-[224px] rounded-window border border-white/10 bg-modbots-menu p-1 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
                 >
                   <MenuItems
                     items={menu.items}
