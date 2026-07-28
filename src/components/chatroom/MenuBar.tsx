@@ -488,10 +488,16 @@ export function MenuBar({
               id: "release-notes",
               label: "Release Notes",
               icon: FileText,
+              onSelect: () =>
+                window.open(
+                  "https://github.com/wsucauid798/modbots-web/releases",
+                  "_blank",
+                  "noopener,noreferrer",
+                ),
             },
             {
-              id: "terms-and-conditions",
-              label: "Terms and Conditions",
+              id: "user-manual",
+              label: "User Manual",
               icon: FileText,
             },
           ],

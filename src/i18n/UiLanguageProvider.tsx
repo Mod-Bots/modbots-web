@@ -125,7 +125,7 @@ const simplifiedChinese: Record<string, string> = {
   "Translate messages": "翻译消息",
   "Translate messages into": "将消息翻译为",
   "Take a Screenshot": "截取屏幕截图",
-  "Terms and Conditions": "条款与条件",
+  "User Manual": "用户手册",
   Theme: "主题",
   Today: "今天",
   Tools: "工具",
