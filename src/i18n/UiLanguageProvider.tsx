@@ -58,7 +58,6 @@ const simplifiedChinese: Record<string, string> = {
   Documentation: "文档",
   Edit: "编辑",
   English: "English",
-  "Export Chat Log": "导出聊天记录",
   File: "文件",
   "Find in Chat": "在聊天中查找",
   "Getting Started": "入门指南",

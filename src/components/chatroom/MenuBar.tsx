@@ -11,7 +11,6 @@ import {
   ClipboardPaste,
   Clock3,
   Copy,
-  Download,
   FileText,
   Info,
   Lightbulb,
@@ -318,7 +317,6 @@ export function MenuBar({
   onRedoMessage,
   onOpenSettings,
   onTakeScreenshot,
-  onExportChatLog,
 }: {
   canUndoMessage: boolean;
   canRedoMessage: boolean;
@@ -326,7 +324,6 @@ export function MenuBar({
   onRedoMessage: () => void;
   onOpenSettings: () => void;
   onTakeScreenshot: () => void;
-  onExportChatLog: () => void;
 }) {
   const { t } = useUiLanguage();
   const { setThemeMode } = useTheme();
@@ -636,12 +633,6 @@ export function MenuBar({
           label: "Take a Screenshot",
           icon: Camera,
           onSelect: onTakeScreenshot,
-        },
-        {
-          id: "export-chat-log",
-          label: "Export Chat Log",
-          icon: Download,
-          onSelect: onExportChatLog,
         },
       ],
     },
