@@ -1,6 +1,6 @@
 "use client";
 
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import {
   AtSign,
   Bell,
@@ -2729,6 +2729,47 @@ export function Chatroom() {
     }
   };
   const takeScreenshot = async () => {
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+
+    const chatroom = chatroomRoot.current;
+
+    if (chatroom === null) {
+      return;
+    }
+
+    let blob: Blob | null = null;
+
+    try {
+      const canvas = await html2canvas(chatroom, {
+        backgroundColor: null,
+        height: chatroom.clientHeight,
+        logging: false,
+        scale: Math.min(window.devicePixelRatio, 2),
+        useCORS: true,
+        width: chatroom.clientWidth,
+        windowHeight: chatroom.clientHeight,
+        windowWidth: chatroom.clientWidth,
+      });
+      blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/png"),
+      );
+    } catch (captureError) {
+      notify({
+        title: "Screenshot could not be created.",
+        message:
+          captureError instanceof Error ? captureError.message : undefined,
+        tone: "error",
+      });
+      return;
+    }
+
+    if (blob === null) {
+      notify({ title: "Screenshot could not be created.", tone: "error" });
+      return;
+    }
+
     const saveFilePicker = (window as SaveFilePickerWindow).showSaveFilePicker;
 
     if (saveFilePicker === undefined) {
@@ -2764,35 +2805,6 @@ export function Chatroom() {
         return;
       }
 
-      notify({ title: "Screenshot could not be saved.", tone: "error" });
-      return;
-    }
-
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-    });
-
-    const chatroom = chatroomRoot.current;
-
-    if (chatroom === null) {
-      return;
-    }
-
-    const canvas = await html2canvas(chatroom, {
-      backgroundColor: null,
-      height: chatroom.clientHeight,
-      logging: false,
-      scale: Math.min(window.devicePixelRatio, 2),
-      useCORS: true,
-      width: chatroom.clientWidth,
-      windowHeight: chatroom.clientHeight,
-      windowWidth: chatroom.clientWidth,
-    });
-    const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, "image/png"),
-    );
-
-    if (blob === null) {
       notify({ title: "Screenshot could not be saved.", tone: "error" });
       return;
     }
