@@ -4,7 +4,6 @@ import {
   GripHorizontal,
   Languages,
   MessageSquare,
-  MoveDiagonal2,
   Shield,
   UserRound,
   X,
@@ -58,8 +57,11 @@ interface WindowSize {
   height: number;
 }
 
+type WindowResizeEdge = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
+
 interface WindowResize {
   pointerId: number;
+  edge: WindowResizeEdge;
   startX: number;
   startY: number;
   originX: number;
@@ -69,6 +71,43 @@ interface WindowResize {
 }
 
 const settingsWindowMargin = 12;
+const settingsResizeHandles: ReadonlyArray<{
+  edge: WindowResizeEdge;
+  className: string;
+}> = [
+  {
+    edge: "n",
+    className: "left-3 right-3 top-0 h-2 cursor-n-resize",
+  },
+  {
+    edge: "e",
+    className: "bottom-3 right-0 top-3 w-2 cursor-e-resize",
+  },
+  {
+    edge: "s",
+    className: "bottom-0 left-3 right-3 h-2 cursor-s-resize",
+  },
+  {
+    edge: "w",
+    className: "bottom-3 left-0 top-3 w-2 cursor-w-resize",
+  },
+  {
+    edge: "ne",
+    className: "right-0 top-0 h-3 w-3 cursor-ne-resize",
+  },
+  {
+    edge: "se",
+    className: "bottom-0 right-0 h-3 w-3 cursor-se-resize",
+  },
+  {
+    edge: "sw",
+    className: "bottom-0 left-0 h-3 w-3 cursor-sw-resize",
+  },
+  {
+    edge: "nw",
+    className: "left-0 top-0 h-3 w-3 cursor-nw-resize",
+  },
+];
 
 const clamp = (value: number, minimum: number, maximum: number): number =>
   Math.min(Math.max(value, minimum), maximum);
@@ -389,56 +428,94 @@ export function SettingsDialog({
     }
   };
 
-  const startWindowResize = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    const dialog = dialogRef.current;
+  const startWindowResize =
+    (edge: WindowResizeEdge) => (event: ReactPointerEvent<HTMLDivElement>) => {
+      const dialog = dialogRef.current;
 
-    if (dialog === null || window.innerWidth < 640) {
-      return;
-    }
+      if (dialog === null || window.innerWidth < 640) {
+        return;
+      }
 
-    const bounds = dialog.getBoundingClientRect();
-    windowResize.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      originX: bounds.left,
-      originY: bounds.top,
-      width: bounds.width,
-      height: bounds.height,
+      const bounds = dialog.getBoundingClientRect();
+      windowResize.current = {
+        pointerId: event.pointerId,
+        edge,
+        startX: event.clientX,
+        startY: event.clientY,
+        originX: bounds.left,
+        originY: bounds.top,
+        width: bounds.width,
+        height: bounds.height,
+      };
+      setWindowPosition({ x: bounds.left, y: bounds.top });
+      setWindowSize({ width: bounds.width, height: bounds.height });
+      event.currentTarget.setPointerCapture(event.pointerId);
+      event.preventDefault();
     };
-    setWindowPosition({ x: bounds.left, y: bounds.top });
-    setWindowSize({ width: bounds.width, height: bounds.height });
-    event.currentTarget.setPointerCapture(event.pointerId);
-    event.preventDefault();
-  };
 
-  const resizeWindow = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const resizeWindow = (event: ReactPointerEvent<HTMLDivElement>) => {
     const resize = windowResize.current;
 
     if (resize === null || resize.pointerId !== event.pointerId) {
       return;
     }
 
-    const bounds = dialogRef.current?.getBoundingClientRect();
-    const originX = bounds?.left ?? resize.originX;
-    const originY = bounds?.top ?? resize.originY;
-    const maxWidth = window.innerWidth - originX - settingsWindowMargin;
-    const maxHeight = window.innerHeight - originY - settingsWindowMargin;
-    setWindowSize({
-      width: clamp(
-        resize.width + event.clientX - resize.startX,
-        Math.min(600, maxWidth),
-        maxWidth,
-      ),
-      height: clamp(
-        resize.height + event.clientY - resize.startY,
-        Math.min(440, maxHeight),
-        maxHeight,
-      ),
-    });
+    const deltaX = event.clientX - resize.startX;
+    const deltaY = event.clientY - resize.startY;
+    const right = resize.originX + resize.width;
+    const bottom = resize.originY + resize.height;
+    const minimumWidth = Math.min(
+      600,
+      window.innerWidth - settingsWindowMargin * 2,
+    );
+    const minimumHeight = Math.min(
+      440,
+      window.innerHeight - settingsWindowMargin * 2,
+    );
+    let x = resize.originX;
+    let y = resize.originY;
+    let width = resize.width;
+    let height = resize.height;
+
+    if (resize.edge.includes("e")) {
+      width = clamp(
+        resize.width + deltaX,
+        minimumWidth,
+        window.innerWidth - resize.originX - settingsWindowMargin,
+      );
+    }
+
+    if (resize.edge.includes("w")) {
+      x = clamp(
+        resize.originX + deltaX,
+        settingsWindowMargin,
+        right - minimumWidth,
+      );
+      width = right - x;
+    }
+
+    if (resize.edge.includes("s")) {
+      height = clamp(
+        resize.height + deltaY,
+        minimumHeight,
+        window.innerHeight - resize.originY - settingsWindowMargin,
+      );
+    }
+
+    if (resize.edge.includes("n")) {
+      y = clamp(
+        resize.originY + deltaY,
+        settingsWindowMargin,
+        bottom - minimumHeight,
+      );
+      height = bottom - y;
+    }
+
+    setWindowPosition({ x, y });
+    setWindowSize({ width, height });
   };
 
-  const stopWindowResize = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const stopWindowResize = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (windowResize.current?.pointerId !== event.pointerId) {
       return;
     }
@@ -859,18 +936,17 @@ export function SettingsDialog({
             )}
           </div>
         </div>
-        <button
-          type="button"
-          onPointerDown={startWindowResize}
-          onPointerMove={resizeWindow}
-          onPointerUp={stopWindowResize}
-          onPointerCancel={stopWindowResize}
-          className="absolute bottom-0 right-0 hidden h-6 w-6 touch-none cursor-se-resize items-end justify-end p-1 text-zinc-600 transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/30 sm:flex"
-          aria-label={t("Resize settings window")}
-          title={t("Resize settings window")}
-        >
-          <MoveDiagonal2 className="h-3.5 w-3.5" />
-        </button>
+        {settingsResizeHandles.map((handle) => (
+          <div
+            key={handle.edge}
+            aria-hidden="true"
+            onPointerDown={startWindowResize(handle.edge)}
+            onPointerMove={resizeWindow}
+            onPointerUp={stopWindowResize}
+            onPointerCancel={stopWindowResize}
+            className={`absolute z-20 hidden touch-none sm:block ${handle.className}`}
+          />
+        ))}
       </div>
     </div>
   );
