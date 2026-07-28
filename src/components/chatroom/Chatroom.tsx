@@ -1,5 +1,6 @@
 "use client";
 
+import html2canvas from "html2canvas";
 import {
   AtSign,
   Bot,
@@ -1543,6 +1544,7 @@ export function Chatroom() {
   // room renders until the person finishes the browser-side sign-in flow.
   const [entered, setEntered] = useState(false);
   const presenceJoinedAs = useRef<string | null>(null);
+  const chatroomRoot = useRef<HTMLDivElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
   const previousConversationHeight = useRef<number | null>(null);
   const conversationPositioned = useRef(false);
@@ -2523,36 +2525,35 @@ export function Chatroom() {
     }
   };
   const takeScreenshot = async () => {
-    const stream = await navigator.mediaDevices.getDisplayMedia({
-      audio: false,
-      video: true,
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
     });
 
-    try {
-      const video = document.createElement("video");
-      video.muted = true;
-      video.srcObject = stream;
-      await video.play();
+    const chatroom = chatroomRoot.current;
 
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext("2d")?.drawImage(video, 0, 0);
+    if (chatroom === null) {
+      return;
+    }
 
-      const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, "image/png"),
+    const canvas = await html2canvas(chatroom, {
+      backgroundColor: null,
+      height: chatroom.clientHeight,
+      logging: false,
+      scale: Math.min(window.devicePixelRatio, 2),
+      useCORS: true,
+      width: chatroom.clientWidth,
+      windowHeight: chatroom.clientHeight,
+      windowWidth: chatroom.clientWidth,
+    });
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/png"),
+    );
+
+    if (blob !== null) {
+      downloadBlob(
+        blob,
+        `mod-bots-screenshot-${new Date().toISOString().replace(/[:.]/g, "-")}.png`,
       );
-
-      if (blob !== null) {
-        downloadBlob(
-          blob,
-          `mod-bots-screenshot-${new Date().toISOString().replace(/[:.]/g, "-")}.png`,
-        );
-      }
-    } finally {
-      for (const track of stream.getTracks()) {
-        track.stop();
-      }
     }
   };
   const exportChatLog = () => {
@@ -2820,7 +2821,10 @@ export function Chatroom() {
   };
 
   return (
-    <div className="modbots-chatroom flex h-screen h-dvh flex-col overflow-hidden bg-modbots-canvas text-zinc-100">
+    <div
+      ref={chatroomRoot}
+      className="modbots-chatroom flex h-screen h-dvh flex-col overflow-hidden bg-modbots-canvas text-zinc-100"
+    >
       <input
         ref={profilePictureInput}
         type="file"
