@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+repository_root="$(git rev-parse --show-toplevel)"
+cd "$repository_root"
+
+echo "Running Biome before push..."
+if [ -f "./node_modules/.bin/biome.cmd" ]; then
+  ./node_modules/.bin/biome.cmd check
+else
+  ./node_modules/.bin/biome check
+fi
