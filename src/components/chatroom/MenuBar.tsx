@@ -319,6 +319,7 @@ export function MenuBar({
   onReportProblem,
   onRequestFeature,
   onCheckForUpdates,
+  onOpenAbout,
   onTakeScreenshot,
 }: {
   canUndoMessage: boolean;
@@ -329,6 +330,7 @@ export function MenuBar({
   onReportProblem: () => void;
   onRequestFeature: () => void;
   onCheckForUpdates: () => void;
+  onOpenAbout: () => void;
   onTakeScreenshot: () => void;
 }) {
   const { t } = useUiLanguage();
@@ -667,7 +669,12 @@ export function MenuBar({
           onSelect: onCheckForUpdates,
         },
         { kind: "separator", id: "help-about" },
-        { id: "about", label: "About Mod Bots", icon: Info },
+        {
+          id: "about",
+          label: "About Mod Bots",
+          icon: Info,
+          onSelect: onOpenAbout,
+        },
       ],
     },
   ];

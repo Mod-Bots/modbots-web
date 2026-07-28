@@ -3117,6 +3117,7 @@ export function Chatroom() {
             onReportProblem={() => setReportProblemOpen(true)}
             onRequestFeature={() => setRequestFeatureOpen(true)}
             onCheckForUpdates={() => setCheckForUpdatesOpen(true)}
+            onOpenAbout={() => setAboutOpen(true)}
             onTakeScreenshot={() => void takeScreenshot()}
           />
         </>
