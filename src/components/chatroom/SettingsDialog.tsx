@@ -359,10 +359,15 @@ export function SettingsDialog({
     return () => window.removeEventListener("resize", keepWindowVisible);
   }, []);
 
-  const startWindowMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const startWindowMove = (event: ReactPointerEvent<HTMLElement>) => {
     const dialog = dialogRef.current;
+    const target = event.target as Element;
 
-    if (dialog === null || window.innerWidth < 640) {
+    if (
+      dialog === null ||
+      window.innerWidth < 640 ||
+      target.closest("[data-window-move-ignore]") !== null
+    ) {
       return;
     }
 
@@ -382,7 +387,7 @@ export function SettingsDialog({
     event.preventDefault();
   };
 
-  const moveWindow = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const moveWindow = (event: ReactPointerEvent<HTMLElement>) => {
     const drag = windowDrag.current;
 
     if (drag === null || drag.pointerId !== event.pointerId) {
@@ -409,7 +414,7 @@ export function SettingsDialog({
     });
   };
 
-  const stopWindowMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const stopWindowMove = (event: ReactPointerEvent<HTMLElement>) => {
     if (windowDrag.current?.pointerId !== event.pointerId) {
       return;
     }
@@ -568,13 +573,15 @@ export function SettingsDialog({
         aria-modal="true"
         aria-labelledby="modbots-settings-title"
       >
-        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.08] bg-[#0c0c0c] px-4">
+        <div
+          onPointerDown={startWindowMove}
+          onPointerMove={moveWindow}
+          onPointerUp={stopWindowMove}
+          onPointerCancel={stopWindowMove}
+          className="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.08] bg-[#0c0c0c] px-4 sm:cursor-move sm:touch-none"
+        >
           <button
             type="button"
-            onPointerDown={startWindowMove}
-            onPointerMove={moveWindow}
-            onPointerUp={stopWindowMove}
-            onPointerCancel={stopWindowMove}
             className="hidden h-8 w-8 shrink-0 touch-none cursor-move items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-white/[0.05] hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 sm:flex"
             aria-label={t("Move settings window")}
             title={t("Move settings window")}
@@ -595,7 +602,8 @@ export function SettingsDialog({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+            data-window-move-ignore
+            className="flex h-8 w-8 shrink-0 cursor-default items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
             aria-label={t("Close settings")}
           >
             <X className="h-4 w-4" />
