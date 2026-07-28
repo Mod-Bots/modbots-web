@@ -191,44 +191,44 @@
   --font-mono: "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
 }
 [data-theme=light] {
-  --background: #f8fafc;
-  --foreground: #18181b;
+  --background: #ffffff;
+  --foreground: #111827;
   --modbots-body-background:
-    radial-gradient(circle at top, rgba(24, 24, 27, 0.04), transparent 26%),
-    linear-gradient(180deg, #f8fafc 0%, #f4f4f5 44%, #ffffff 100%);
-  --modbots-color-chrome: #e4e4e7;
-  --modbots-color-canvas: #f8fafc;
-  --modbots-color-header: #f4f4f5;
-  --modbots-color-panel: #f1f5f9;
-  --modbots-color-inset: #e4e4e7;
-  --modbots-color-window: #ffffff;
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.06), transparent 30%),
+    linear-gradient(180deg, #f5f7fa 0%, #e9eef4 100%);
+  --modbots-color-chrome: #d8dee7;
+  --modbots-color-canvas: #ffffff;
+  --modbots-color-header: #edf1f5;
+  --modbots-color-panel: #e6ebf1;
+  --modbots-color-inset: #dce3eb;
+  --modbots-color-window: #f5f7fa;
   --modbots-color-dialog: #ffffff;
-  --modbots-color-panel-raised: #fafafa;
-  --modbots-color-card: #f4f4f5;
+  --modbots-color-panel-raised: #f7f9fb;
+  --modbots-color-card: #f0f3f6;
   --modbots-color-menu: #ffffff;
   --modbots-color-field: #ffffff;
-  --modbots-color-popover: #fafafa;
-  --modbots-color-hover: #f4f4f5;
-  --modbots-color-inset-overlay: rgba(24, 24, 27, 0.04);
+  --modbots-color-popover: #ffffff;
+  --modbots-color-hover: #e5eaf0;
+  --modbots-color-inset-overlay: rgba(15, 23, 42, 0.06);
   --modbots-color-avatar-edge: rgba(255, 255, 255, 0.9);
   --modbots-profile-background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.98),
-    rgba(244, 244, 245, 0.98)
+    rgba(237, 241, 245, 0.98)
   );
-  --color-white: #18181b;
+  --color-white: #0f172a;
   --color-black: #ffffff;
-  --color-zinc-50: #09090b;
-  --color-zinc-100: #18181b;
-  --color-zinc-200: #27272a;
-  --color-zinc-300: #3f3f46;
-  --color-zinc-400: #52525b;
-  --color-zinc-500: #71717a;
-  --color-zinc-600: #a1a1aa;
-  --color-zinc-700: #d4d4d8;
-  --color-zinc-800: #e4e4e7;
-  --color-zinc-900: #f4f4f5;
-  --color-zinc-950: #fafafa;
+  --color-zinc-50: #020617;
+  --color-zinc-100: #111827;
+  --color-zinc-200: #1f2937;
+  --color-zinc-300: #334155;
+  --color-zinc-400: #475569;
+  --color-zinc-500: #64748b;
+  --color-zinc-600: #94a3b8;
+  --color-zinc-700: #cbd5e1;
+  --color-zinc-800: #e2e8f0;
+  --color-zinc-900: #f1f5f9;
+  --color-zinc-950: #f8fafc;
   color-scheme: light;
 }
 
