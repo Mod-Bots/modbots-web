@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently --names styles,next --prefix-colors magenta,cyan \"npm:styles:watch\" \"npm:dev:next\"",
     "dev:next": "next dev",
-    "styles:build": "sass src/styles/globals.scss src/app/globals.css --no-source-map",
+    "styles:build": "sass src/styles/globals.scss src/app/globals.css --no-source-map && biome format --write src/app/globals.css",
     "styles:watch": "sass --watch src/styles/globals.scss:src/app/globals.css --no-source-map",
     "build": "npm run styles:build && next build",
     "start": "next start",
