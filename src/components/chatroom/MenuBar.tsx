@@ -330,6 +330,10 @@ export function MenuBar({
     document.execCommand(command);
   };
 
+  const closeChatroom = () => {
+    window.location.replace("about:blank");
+  };
+
   const englishMenus: MenuSpec[] = [
     {
       id: "file",
@@ -356,7 +360,7 @@ export function MenuBar({
           label: "Close",
           icon: X,
           shortcut: "Ctrl+W",
-          onSelect: () => window.close(),
+          onSelect: closeChatroom,
         },
       ],
     },
