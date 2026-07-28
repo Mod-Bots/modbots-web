@@ -1,18 +1,14 @@
 "use client";
 
 import { RefreshCw, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
-import { useNotifications } from "@/notifications/NotificationProvider";
+import {
+  beginManualUpdateCheck,
+  checkForWebUpdate,
+} from "@/updates/update-check";
 
 type UpdatePhase = "checking" | "current" | "updating" | "error";
-
-interface UpdateResponse {
-  error?: unknown;
-  latestVersion?: unknown;
-  updateAvailable?: unknown;
-  updateReady?: unknown;
-}
 
 interface CheckForUpdatesDialogProps {
   currentVersion: string;
@@ -27,13 +23,13 @@ export function CheckForUpdatesDialog({
   onClose,
 }: CheckForUpdatesDialogProps) {
   const { t } = useUiLanguage();
-  const { notify } = useNotifications();
   const [phase, setPhase] = useState<UpdatePhase>("checking");
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [checkNumber, setCheckNumber] = useState(0);
-  const resultNotificationSent = useRef(false);
   const canClose = phase !== "updating";
+
+  useEffect(() => beginManualUpdateCheck(), []);
 
   useEffect(() => {
     if (!canClose) {
@@ -66,11 +62,6 @@ export function CheckForUpdatesDialog({
         );
         setPhase("error");
         setError(message);
-
-        if (!resultNotificationSent.current) {
-          notify({ title: t("Update failed"), message, tone: "error" });
-          resultNotificationSent.current = true;
-        }
         return;
       }
 
@@ -79,61 +70,20 @@ export function CheckForUpdatesDialog({
 
     const check = async () => {
       try {
-        const response = await fetch(
-          `/api/check-updates?currentVersion=${encodeURIComponent(currentVersion)}&check=${checkNumber}`,
-          { cache: "no-store" },
-        );
-        const result = (await response.json()) as UpdateResponse;
+        const result = await checkForWebUpdate(currentVersion, checkNumber);
 
         if (cancelled) {
           return;
         }
 
-        if (!response.ok) {
-          throw new Error(
-            typeof result.error === "string"
-              ? t(result.error)
-              : t("GitHub could not be checked for updates."),
-          );
-        }
-
-        if (
-          typeof result.updateAvailable !== "boolean" ||
-          typeof result.updateReady !== "boolean" ||
-          !(
-            result.latestVersion === null ||
-            typeof result.latestVersion === "string"
-          ) ||
-          (result.updateAvailable && typeof result.latestVersion !== "string")
-        ) {
-          throw new Error(t("GitHub could not be checked for updates."));
-        }
-
         if (!result.updateAvailable) {
           setPhase("current");
-
-          if (!resultNotificationSent.current) {
-            notify({
-              title: t("Mod Bots is up to date."),
-              message: `${t("Version")} ${currentVersion}`,
-              tone: "success",
-            });
-            resultNotificationSent.current = true;
-          }
           return;
         }
 
         updateFound = true;
         setLatestVersion(result.latestVersion);
         setPhase("updating");
-
-        if (!resultNotificationSent.current) {
-          notify({
-            title: t("Web update available"),
-            message: `${t("Version")} ${result.latestVersion}`,
-          });
-          resultNotificationSent.current = true;
-        }
 
         if (result.updateReady) {
           reloadTimer = window.setTimeout(() => window.location.reload(), 400);
@@ -154,14 +104,9 @@ export function CheckForUpdatesDialog({
         setPhase("error");
         const message =
           checkError instanceof Error
-            ? checkError.message
+            ? t(checkError.message)
             : t("GitHub could not be checked for updates.");
         setError(message);
-
-        if (!resultNotificationSent.current) {
-          notify({ title: t("Update check failed"), message, tone: "error" });
-          resultNotificationSent.current = true;
-        }
       }
     };
 
@@ -178,13 +123,12 @@ export function CheckForUpdatesDialog({
         window.clearTimeout(reloadTimer);
       }
     };
-  }, [checkNumber, currentVersion, notify, t]);
+  }, [checkNumber, currentVersion, t]);
 
   const retry = () => {
     setPhase("checking");
     setLatestVersion(null);
     setError(null);
-    resultNotificationSent.current = false;
     setCheckNumber((current) => current + 1);
   };
 

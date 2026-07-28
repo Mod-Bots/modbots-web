@@ -46,8 +46,6 @@ const simplifiedChinese: Record<string, string> = {
   "Trying to reconnect...": "正在尝试重新连接...",
   "Connection restored": "连接已恢复",
   "Web update available": "有可用的网页更新",
-  "Update failed": "更新失败",
-  "Update check failed": "更新检查失败",
   "Checking GitHub for web updates...": "正在检查 GitHub 上的网页更新...",
   "Mod Bots is up to date.": "Mod Bots 已是最新版本。",
   Version: "版本",

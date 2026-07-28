@@ -60,6 +60,7 @@ import {
   type NotificationTone,
   useNotifications,
 } from "@/notifications/NotificationProvider";
+import { AutomaticUpdateChecker } from "./AutomaticUpdateChecker";
 import { CheckForUpdatesDialog } from "./CheckForUpdatesDialog";
 import { MenuBar } from "./MenuBar";
 import { ReportProblemDialog } from "./ReportProblemDialog";
@@ -3046,17 +3047,22 @@ export function Chatroom() {
         }}
       />
       {entered ? (
-        <MenuBar
-          canUndoMessage={draftHistoryAvailability.canUndo}
-          canRedoMessage={draftHistoryAvailability.canRedo}
-          onUndoMessage={() => moveDraftHistory("undo")}
-          onRedoMessage={() => moveDraftHistory("redo")}
-          onOpenSettings={() => openSettings("account")}
-          onReportProblem={() => setReportProblemOpen(true)}
-          onRequestFeature={() => setRequestFeatureOpen(true)}
-          onCheckForUpdates={() => setCheckForUpdatesOpen(true)}
-          onTakeScreenshot={() => void takeScreenshot().catch(() => undefined)}
-        />
+        <>
+          <AutomaticUpdateChecker currentVersion={appVersion} />
+          <MenuBar
+            canUndoMessage={draftHistoryAvailability.canUndo}
+            canRedoMessage={draftHistoryAvailability.canRedo}
+            onUndoMessage={() => moveDraftHistory("undo")}
+            onRedoMessage={() => moveDraftHistory("redo")}
+            onOpenSettings={() => openSettings("account")}
+            onReportProblem={() => setReportProblemOpen(true)}
+            onRequestFeature={() => setRequestFeatureOpen(true)}
+            onCheckForUpdates={() => setCheckForUpdatesOpen(true)}
+            onTakeScreenshot={() =>
+              void takeScreenshot().catch(() => undefined)
+            }
+          />
+        </>
       ) : null}
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         {userMenuOpen ? (
