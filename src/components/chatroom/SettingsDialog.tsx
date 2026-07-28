@@ -626,7 +626,7 @@ export function SettingsDialog({
               account === null ? null : (
                 <div>
                   <section className="rounded-lg border border-white/[0.08] bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.015))] p-4">
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-3">
                       <div className="relative shrink-0">
                         {accountAvatar}
                         <button
@@ -640,23 +640,20 @@ export function SettingsDialog({
                         </button>
                       </div>
                       <div className="min-w-0 flex-1 pt-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="truncate text-[15px] font-semibold text-zinc-50">
-                            {account.display}
-                          </p>
+                        <p className="truncate text-[15px] font-semibold leading-5 text-zinc-50">
+                          {account.display}
+                        </p>
+                        <p className="mt-0.5 truncate text-[14px] text-zinc-400">
+                          {account.alias}
+                        </p>
+                        <div className="mt-0.5 flex items-center gap-1.5">
                           {account.registered ? (
                             <RegisteredMark className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
                           ) : null}
-                          <span className="inline-flex h-4 items-center text-[13px] font-medium leading-none text-zinc-400">
+                          <span className="inline-flex h-4 items-center text-[13px] font-medium leading-none text-zinc-400 underline decoration-zinc-600 underline-offset-2">
                             {account.accountLabel}
                           </span>
                         </div>
-                        <p className="mt-1 truncate text-[14px] text-zinc-400">
-                          {account.alias}
-                        </p>
-                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-600">
-                          {account.identityLabel}
-                        </p>
                       </div>
                     </div>
                   </section>
