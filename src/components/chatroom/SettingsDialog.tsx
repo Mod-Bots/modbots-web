@@ -654,9 +654,6 @@ export function SettingsDialog({
                             {account.accountLabel}
                           </span>
                         </div>
-                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-600">
-                          {account.identityLabel}
-                        </p>
                       </div>
                     </div>
                   </section>
