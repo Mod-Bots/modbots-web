@@ -146,7 +146,6 @@ const simplifiedChinese: Record<string, string> = {
   "Briefly describe the feature": "简要描述该功能",
   "Explain the feature and how it would improve Mod Bots.":
     "说明该功能，以及它将如何改进 Mod Bots。",
-  "Submit feature request": "提交功能请求",
   "The feature request could not be created. Please try again.":
     "无法创建功能请求，请重试。",
   "Feature requests are not configured.": "功能请求尚未配置。",
