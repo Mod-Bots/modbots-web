@@ -276,7 +276,7 @@ export function SettingsDialog({
     setBio(account?.bio ?? "");
     setPronouns(account?.pronouns ?? "");
     setLocation(account?.location ?? "");
-    setLinks(account?.links?.join("\n") ?? "");
+    setLinks(account?.links?.join(" ") ?? "");
   }, [account?.bio, account?.location, account?.pronouns, account?.links]);
 
   useEffect(() => {
@@ -522,7 +522,7 @@ export function SettingsDialog({
       pronouns: pronouns.trim() || null,
       location: location.trim() || null,
       links: links
-        .split("\n")
+        .split(/\s+/)
         .map((link) => link.trim())
         .filter((link) => link.length > 0),
     });
@@ -707,11 +707,10 @@ export function SettingsDialog({
                         <span className="text-[11px] font-medium text-zinc-300">
                           {t("Links")}
                         </span>
-                        <textarea
+                        <input
                           value={links}
                           onChange={(event) => setLinks(event.target.value)}
-                          rows={3}
-                          className="mt-1.5 w-full resize-none rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                     </div>
