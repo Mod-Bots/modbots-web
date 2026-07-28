@@ -78,6 +78,8 @@ const simplifiedChinese: Record<string, string> = {
   Minimize: "最小化",
   "Mod bots": "管理机器人",
   Moderation: "管理",
+  "Move settings window": "移动设置窗口",
+  "Resize settings window": "调整设置窗口大小",
   "No recent mod bot action is attached to this account.":
     "此账户最近没有管理机器人的操作记录。",
   "Open application menu": "打开应用菜单",

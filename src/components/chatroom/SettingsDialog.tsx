@@ -1,14 +1,21 @@
 import {
   ArrowUpRight,
   Camera,
+  GripHorizontal,
   Languages,
   MessageSquare,
+  MoveDiagonal2,
   Shield,
   UserRound,
   X,
 } from "lucide-react";
-import type { FormEvent, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import type {
+  CSSProperties,
+  FormEvent,
+  ReactNode,
+  PointerEvent as ReactPointerEvent,
+} from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChatLanguage } from "@/data/contracts";
 import { type UiLanguage, useUiLanguage } from "@/i18n/UiLanguageProvider";
 
@@ -30,6 +37,41 @@ export interface AccountSettingsSummary {
   location: string | null;
   links: string[];
 }
+
+interface WindowPosition {
+  x: number;
+  y: number;
+}
+
+interface WindowDrag {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  originX: number;
+  originY: number;
+  width: number;
+  height: number;
+}
+
+interface WindowSize {
+  width: number;
+  height: number;
+}
+
+interface WindowResize {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  originX: number;
+  originY: number;
+  width: number;
+  height: number;
+}
+
+const settingsWindowMargin = 12;
+
+const clamp = (value: number, minimum: number, maximum: number): number =>
+  Math.min(Math.max(value, minimum), maximum);
 
 function RegisteredMark({ className = "h-3.5 w-3.5" }: { className?: string }) {
   return (
@@ -66,14 +108,15 @@ function ToggleRow({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 text-sm text-zinc-200">
-      <span>{label}</span>
+    <label className="flex items-center justify-between gap-4 rounded-lg border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-sm text-zinc-200 transition-colors hover:border-white/[0.12] hover:bg-white/[0.04]">
+      <span className="font-medium">{label}</span>
       <input
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.currentTarget.checked)}
-        className="h-4 w-4 accent-white"
+        className="peer sr-only"
       />
+      <span className="relative h-5 w-9 shrink-0 rounded-full border border-white/10 bg-zinc-800 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-3.5 after:w-3.5 after:rounded-full after:bg-zinc-400 after:transition-transform peer-checked:bg-zinc-100 peer-checked:after:translate-x-4 peer-checked:after:bg-zinc-900 peer-focus-visible:ring-2 peer-focus-visible:ring-white/40 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#101010]" />
     </label>
   );
 }
@@ -93,13 +136,16 @@ function SectionButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-center gap-2.5 rounded-2xl px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+      className={`relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
         active
-          ? "bg-white/[0.08] text-white"
+          ? "bg-white/[0.08] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]"
           : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
       }`}
     >
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-black/20">
+      {active ? (
+        <span className="absolute bottom-2 left-0 top-2 w-0.5 rounded-r-full bg-zinc-100" />
+      ) : null}
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/[0.08] bg-black/20">
         {icon}
       </span>
       <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
@@ -119,9 +165,9 @@ function DetailCard({
   action?: ReactNode;
 }) {
   return (
-    <section className="rounded-[22px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
+    <section className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-black/20 text-zinc-300">
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-white/[0.08] bg-black/20 text-zinc-300">
           {icon}
         </span>
         <div className="min-w-0 flex-1">
@@ -195,6 +241,13 @@ export function SettingsDialog({
   const [pronouns, setPronouns] = useState("");
   const [location, setLocation] = useState("");
   const [links, setLinks] = useState("");
+  const [windowPosition, setWindowPosition] = useState<WindowPosition | null>(
+    null,
+  );
+  const [windowSize, setWindowSize] = useState<WindowSize | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const windowDrag = useRef<WindowDrag | null>(null);
+  const windowResize = useRef<WindowResize | null>(null);
 
   useEffect(() => {
     setBio(account?.bio ?? "");
@@ -202,6 +255,199 @@ export function SettingsDialog({
     setLocation(account?.location ?? "");
     setLinks(account?.links?.join("\n") ?? "");
   }, [account?.bio, account?.location, account?.pronouns, account?.links]);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+
+    if (dialog === null || window.innerWidth < 640) {
+      return;
+    }
+
+    const bounds = dialog.getBoundingClientRect();
+    setWindowPosition({ x: bounds.left, y: bounds.top });
+    setWindowSize({ width: bounds.width, height: bounds.height });
+  }, []);
+
+  useEffect(() => {
+    const keepWindowVisible = () => {
+      if (window.innerWidth < 640) {
+        setWindowPosition(null);
+        setWindowSize(null);
+        return;
+      }
+
+      const dialog = dialogRef.current;
+
+      if (dialog === null) {
+        return;
+      }
+
+      const bounds = dialog.getBoundingClientRect();
+      const nextPosition = {
+        x: clamp(
+          bounds.left,
+          settingsWindowMargin,
+          Math.max(
+            settingsWindowMargin,
+            window.innerWidth - bounds.width - settingsWindowMargin,
+          ),
+        ),
+        y: clamp(
+          bounds.top,
+          settingsWindowMargin,
+          Math.max(
+            settingsWindowMargin,
+            window.innerHeight - bounds.height - settingsWindowMargin,
+          ),
+        ),
+      };
+
+      setWindowPosition((current) => (current === null ? null : nextPosition));
+      setWindowSize((current) =>
+        current === null
+          ? null
+          : {
+              width: Math.min(
+                current.width,
+                window.innerWidth - nextPosition.x - settingsWindowMargin,
+              ),
+              height: Math.min(
+                current.height,
+                window.innerHeight - nextPosition.y - settingsWindowMargin,
+              ),
+            },
+      );
+    };
+
+    window.addEventListener("resize", keepWindowVisible);
+    return () => window.removeEventListener("resize", keepWindowVisible);
+  }, []);
+
+  const startWindowMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const dialog = dialogRef.current;
+
+    if (dialog === null || window.innerWidth < 640) {
+      return;
+    }
+
+    const bounds = dialog.getBoundingClientRect();
+    windowDrag.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: bounds.left,
+      originY: bounds.top,
+      width: bounds.width,
+      height: bounds.height,
+    };
+    setWindowPosition({ x: bounds.left, y: bounds.top });
+    setWindowSize({ width: bounds.width, height: bounds.height });
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  const moveWindow = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const drag = windowDrag.current;
+
+    if (drag === null || drag.pointerId !== event.pointerId) {
+      return;
+    }
+
+    setWindowPosition({
+      x: clamp(
+        drag.originX + event.clientX - drag.startX,
+        settingsWindowMargin,
+        Math.max(
+          settingsWindowMargin,
+          window.innerWidth - drag.width - settingsWindowMargin,
+        ),
+      ),
+      y: clamp(
+        drag.originY + event.clientY - drag.startY,
+        settingsWindowMargin,
+        Math.max(
+          settingsWindowMargin,
+          window.innerHeight - drag.height - settingsWindowMargin,
+        ),
+      ),
+    });
+  };
+
+  const stopWindowMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (windowDrag.current?.pointerId !== event.pointerId) {
+      return;
+    }
+
+    windowDrag.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const startWindowResize = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const dialog = dialogRef.current;
+
+    if (dialog === null || window.innerWidth < 640) {
+      return;
+    }
+
+    const bounds = dialog.getBoundingClientRect();
+    windowResize.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: bounds.left,
+      originY: bounds.top,
+      width: bounds.width,
+      height: bounds.height,
+    };
+    setWindowPosition({ x: bounds.left, y: bounds.top });
+    setWindowSize({ width: bounds.width, height: bounds.height });
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  const resizeWindow = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const resize = windowResize.current;
+
+    if (resize === null || resize.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const bounds = dialogRef.current?.getBoundingClientRect();
+    const originX = bounds?.left ?? resize.originX;
+    const originY = bounds?.top ?? resize.originY;
+    const maxWidth = window.innerWidth - originX - settingsWindowMargin;
+    const maxHeight = window.innerHeight - originY - settingsWindowMargin;
+    setWindowSize({
+      width: clamp(
+        resize.width + event.clientX - resize.startX,
+        Math.min(600, maxWidth),
+        maxWidth,
+      ),
+      height: clamp(
+        resize.height + event.clientY - resize.startY,
+        Math.min(440, maxHeight),
+        maxHeight,
+      ),
+    });
+  };
+
+  const stopWindowResize = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (windowResize.current?.pointerId !== event.pointerId) {
+      return;
+    }
+
+    windowResize.current = null;
+    const bounds = dialogRef.current?.getBoundingClientRect();
+    if (bounds !== undefined) {
+      setWindowPosition({ x: bounds.left, y: bounds.top });
+      setWindowSize({ width: bounds.width, height: bounds.height });
+    }
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
 
   const submitProfile = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -216,43 +462,75 @@ export function SettingsDialog({
     });
   };
 
+  const positionedWindowStyle: CSSProperties | undefined =
+    windowPosition === null
+      ? undefined
+      : {
+          left: `${windowPosition.x}px`,
+          top: `${windowPosition.y}px`,
+          maxWidth: `calc(100vw - ${windowPosition.x + settingsWindowMargin}px)`,
+          maxHeight: `calc(100dvh - ${windowPosition.y + settingsWindowMargin}px)`,
+          width: windowSize === null ? undefined : `${windowSize.width}px`,
+          height: windowSize === null ? undefined : `${windowSize.height}px`,
+        };
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/60 sm:items-center sm:p-6"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-stretch justify-center sm:items-center sm:p-3">
+      <button
+        type="button"
+        aria-label={t("Close settings")}
+        onClick={onClose}
+        className="absolute inset-0 cursor-default bg-black/65 backdrop-blur-[2px]"
+      />
       <div
-        className="modbots-settings-dialog flex h-dvh w-full flex-col border border-white/10 bg-[#111111] shadow-[0_24px_70px_rgba(0,0,0,0.6)] sm:w-[min(780px,100%)] sm:rounded-[28px]"
-        onClick={(event) => event.stopPropagation()}
+        ref={dialogRef}
+        style={positionedWindowStyle}
+        className={`modbots-settings-dialog relative z-10 flex h-dvh w-full flex-col overflow-hidden border border-white/10 bg-[#101010] shadow-[0_28px_90px_rgba(0,0,0,0.7)] sm:absolute sm:h-[min(720px,calc(100dvh-24px))] sm:min-h-[440px] sm:w-[min(880px,calc(100vw-24px))] sm:min-w-[600px] sm:max-h-[calc(100dvh-24px)] sm:max-w-[calc(100vw-24px)] sm:rounded-lg ${
+          windowPosition === null
+            ? "sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
+            : "sm:translate-x-0 sm:translate-y-0"
+        }`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modbots-settings-title"
       >
-        <div className="flex items-center justify-between gap-4 border-b border-white/[0.08] px-5 py-4">
-          <div>
+        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.08] bg-[#0c0c0c] px-4">
+          <button
+            type="button"
+            onPointerDown={startWindowMove}
+            onPointerMove={moveWindow}
+            onPointerUp={stopWindowMove}
+            onPointerCancel={stopWindowMove}
+            className="hidden h-8 w-8 shrink-0 touch-none cursor-move items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-white/[0.05] hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 sm:flex"
+            aria-label={t("Move settings window")}
+            title={t("Move settings window")}
+          >
+            <GripHorizontal className="h-4 w-4" />
+          </button>
+          <div className="min-w-0 flex-1">
             <h2
               id="modbots-settings-title"
-              className="text-sm font-semibold text-white"
+              className="truncate text-sm font-semibold text-white"
             >
               {t("Settings")}
             </h2>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-0.5 truncate text-xs text-zinc-500">
               {t("Manage your Mod Bots settings.")}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl p-2 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
             aria-label={t("Close settings")}
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-0 md:grid-cols-[220px_minmax(0,1fr)] md:grid-rows-1">
-          <aside className="border-b border-white/[0.08] p-4 md:border-b-0 md:border-r">
-            <nav className="grid grid-cols-3 gap-2 md:block md:space-y-2">
+        <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] md:grid-cols-[200px_minmax(0,1fr)] md:grid-rows-1">
+          <aside className="border-b border-white/[0.08] bg-[#0d0d0d] p-3 md:border-b-0 md:border-r">
+            <nav className="grid grid-cols-3 gap-1.5 md:block md:space-y-1">
               <SectionButton
                 label={t("Account")}
                 icon={<UserRound className="h-4 w-4" />}
@@ -274,11 +552,11 @@ export function SettingsDialog({
             </nav>
           </aside>
 
-          <div className="min-h-0 overflow-y-auto p-4 sm:p-5 md:max-h-[min(78vh,760px)]">
+          <div className="modbots-scroll min-h-0 overflow-y-auto bg-[#121212] p-4 sm:p-5">
             {section === "account" ? (
               account === null ? null : (
                 <div>
-                  <section className="rounded-[24px] border border-white/[0.08] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_46%)] p-4">
+                  <section className="rounded-lg border border-white/[0.08] bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.015))] p-4">
                     <div className="flex items-start gap-4">
                       <div className="relative shrink-0">
                         {accountAvatar}
@@ -316,7 +594,7 @@ export function SettingsDialog({
 
                   <form
                     onSubmit={submitProfile}
-                    className="mt-4 rounded-[22px] border border-white/[0.08] bg-white/[0.02] p-4"
+                    className="mt-4 rounded-lg border border-white/[0.08] bg-white/[0.025] p-4"
                   >
                     <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
                       {t("Profile")}
@@ -331,7 +609,7 @@ export function SettingsDialog({
                           onChange={(event) => setBio(event.target.value)}
                           maxLength={160}
                           rows={3}
-                          className="mt-1.5 w-full resize-none rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full resize-y rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                       <label>
@@ -342,7 +620,7 @@ export function SettingsDialog({
                           value={pronouns}
                           onChange={(event) => setPronouns(event.target.value)}
                           maxLength={40}
-                          className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                       <label>
@@ -353,7 +631,7 @@ export function SettingsDialog({
                           value={location}
                           onChange={(event) => setLocation(event.target.value)}
                           maxLength={80}
-                          className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                       <label className="sm:col-span-2">
@@ -364,7 +642,7 @@ export function SettingsDialog({
                           value={links}
                           onChange={(event) => setLinks(event.target.value)}
                           rows={3}
-                          className="mt-1.5 w-full resize-none rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full resize-y rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                     </div>
@@ -376,7 +654,7 @@ export function SettingsDialog({
                     <button
                       type="submit"
                       disabled={profileSaving}
-                      className="mt-4 rounded-xl bg-white px-4 py-2 text-[12px] font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-wait disabled:opacity-50"
+                      className="mt-4 rounded-md bg-white px-4 py-2 text-[12px] font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212] disabled:cursor-wait disabled:opacity-50"
                     >
                       {profileSaving ? t("Saving...") : t("Save profile")}
                     </button>
@@ -392,7 +670,7 @@ export function SettingsDialog({
                             type="button"
                             onClick={onManageProfilePicture}
                             disabled={profilePictureSaving}
-                            className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-zinc-200 transition-colors hover:border-white/15 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-wait disabled:opacity-50"
+                            className="inline-flex items-center gap-2 rounded-md border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-zinc-200 transition-colors hover:border-white/15 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-wait disabled:opacity-50"
                           >
                             <Camera className="h-3.5 w-3.5" />
                             {profilePictureSaving
@@ -404,7 +682,7 @@ export function SettingsDialog({
                               type="button"
                               onClick={onRemoveProfilePicture}
                               disabled={profilePictureSaving}
-                              className="rounded-full px-3 py-1.5 text-[11px] font-semibold text-zinc-500 transition-colors hover:bg-white/[0.05] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-wait disabled:opacity-50"
+                              className="rounded-md px-3 py-1.5 text-[11px] font-semibold text-zinc-500 transition-colors hover:bg-white/[0.05] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-wait disabled:opacity-50"
                             >
                               {t("Remove picture")}
                             </button>
@@ -437,7 +715,7 @@ export function SettingsDialog({
                     </DetailCard>
                   </div>
 
-                  <div className="mt-4 rounded-[22px] border border-white/[0.08] bg-white/[0.02] p-4">
+                  <div className="mt-4 rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
                       {t("Member since")}
                     </p>
@@ -447,7 +725,7 @@ export function SettingsDialog({
                     <button
                       type="button"
                       onClick={onOpenAccountPage}
-                      className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-zinc-200 transition-colors hover:border-white/15 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                      className="mt-4 inline-flex items-center gap-2 rounded-md border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-zinc-200 transition-colors hover:border-white/15 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                     >
                       {t("Open full account page")}
                       <ArrowUpRight className="h-3.5 w-3.5" />
@@ -457,7 +735,7 @@ export function SettingsDialog({
               )
             ) : section === "chat" ? (
               <div>
-                <section className="rounded-[24px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
+                <section className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
                     {t("Chat settings")}
                   </p>
@@ -476,7 +754,7 @@ export function SettingsDialog({
               </div>
             ) : (
               <div>
-                <section className="rounded-[24px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
+                <section className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
                     {t("Language settings")}
                   </p>
@@ -488,7 +766,7 @@ export function SettingsDialog({
                 </section>
 
                 <div className="mt-4 space-y-3">
-                  <label className="block rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3">
+                  <label className="block rounded-lg border border-white/[0.08] bg-white/[0.025] px-4 py-3">
                     <span className="block text-sm text-zinc-200">
                       {t("Interface language")}
                     </span>
@@ -497,7 +775,7 @@ export function SettingsDialog({
                       onChange={(event) =>
                         setUiLanguage(event.currentTarget.value as UiLanguage)
                       }
-                      className="mt-3 w-full rounded-xl border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                      className="mt-3 w-full rounded-md border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10"
                     >
                       <option value="en">English</option>
                       <option value="zh-CN">简体中文</option>
@@ -515,7 +793,7 @@ export function SettingsDialog({
                     checked={translationEnabled}
                     onChange={onTranslationEnabledChange}
                   />
-                  <label className="block rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3">
+                  <label className="block rounded-lg border border-white/[0.08] bg-white/[0.025] px-4 py-3">
                     <span className="block text-sm text-zinc-200">
                       {t("Translate messages into")}
                     </span>
@@ -527,7 +805,7 @@ export function SettingsDialog({
                           event.currentTarget.value as ChatLanguage,
                         )
                       }
-                      className="mt-3 w-full rounded-xl border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="mt-3 w-full rounded-md border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <option value="zh-CN">简体中文</option>
                     </select>
@@ -542,6 +820,18 @@ export function SettingsDialog({
             )}
           </div>
         </div>
+        <button
+          type="button"
+          onPointerDown={startWindowResize}
+          onPointerMove={resizeWindow}
+          onPointerUp={stopWindowResize}
+          onPointerCancel={stopWindowResize}
+          className="absolute bottom-0 right-0 hidden h-6 w-6 touch-none cursor-se-resize items-end justify-end p-1 text-zinc-600 transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/30 sm:flex"
+          aria-label={t("Resize settings window")}
+          title={t("Resize settings window")}
+        >
+          <MoveDiagonal2 className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   );
