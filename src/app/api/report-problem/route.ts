@@ -1,5 +1,5 @@
 const githubIssuesEndpoint =
-  "https://api.github.com/repos/wsucauid798/modbots-web/issues";
+  "https://api.github.com/repos/Mod-Bots/modbots-web/issues";
 
 interface ProblemReport {
   title: string;

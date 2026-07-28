@@ -1,7 +1,7 @@
 import packageJson from "../../../../package.json";
 
 const githubReleasesEndpoint =
-  "https://api.github.com/repos/wsucauid798/modbots-web/releases?per_page=30";
+  "https://api.github.com/repos/Mod-Bots/modbots-web/releases?per_page=30";
 
 interface GitHubRelease {
   draft: boolean;

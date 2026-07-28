@@ -21,7 +21,7 @@ Install dependencies:
 npm install
 ```
 
-Start the [Mod Bots backend](https://github.com/wsucauid798/modbots-backend):
+Start the [Mod Bots backend](https://github.com/Mod-Bots/modbots-backend):
 
 ```powershell
 Set-Location modbots-backend

@@ -503,7 +503,7 @@ export function MenuBar({
               icon: FileText,
               onSelect: () =>
                 window.open(
-                  "https://github.com/wsucauid798/modbots-web/releases",
+                  "https://github.com/Mod-Bots/modbots-web/releases",
                   "_blank",
                   "noopener,noreferrer",
                 ),
