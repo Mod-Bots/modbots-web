@@ -260,6 +260,25 @@
 [data-theme=light] .modbots-participant-row:hover {
   background: rgba(15, 23, 42, 0.06);
 }
+[data-theme=light] .modbots-profile-picture {
+  overflow: hidden;
+  color: #ffffff;
+  border-color: rgba(15, 23, 42, 0.14);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 2px 5px rgba(15, 23, 42, 0.12);
+}
+[data-theme=light] .modbots-profile-picture img {
+  border-radius: inherit;
+}
+[data-theme=light] .modbots-profile-type-badge {
+  color: #475569;
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.16);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.14);
+}
+[data-theme=light] .modbots-profile-status-dot {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.1);
+}
 [data-theme=light] .modbots-participant-status[data-status=active] {
   color: #047857;
 }

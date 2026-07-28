@@ -826,7 +826,7 @@ function ActorProfilePicture({
   return (
     <div className="relative shrink-0">
       <div
-        className={`flex ${dimensions} items-center justify-center border border-white/10 font-semibold text-zinc-100`}
+        className={`modbots-profile-picture flex ${dimensions} items-center justify-center border border-white/10 font-semibold text-zinc-100`}
         style={{ backgroundColor: shadeFor(actorId) }}
       >
         {imageUrl !== null && !imageFailed ? (
@@ -841,7 +841,7 @@ function ActorProfilePicture({
         )}
       </div>
       {actor !== undefined && actor.type !== "human" ? (
-        <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-modbots-avatar-edge bg-modbots-panel text-zinc-300">
+        <span className="modbots-profile-type-badge absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-modbots-avatar-edge bg-modbots-panel text-zinc-300">
           {roleBadgeIcon(actor.type)}
         </span>
       ) : null}
@@ -1343,7 +1343,7 @@ function ParticipantRow({
           size="sm"
         />
         <span
-          className={`absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full border-2 border-modbots-panel ${currentStatus.dot}`}
+          className={`modbots-profile-status-dot absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full border-2 border-modbots-panel ${currentStatus.dot}`}
           title={t(currentStatus.label)}
         />
       </div>
@@ -3065,7 +3065,7 @@ export function Chatroom() {
                           />
                           {localActor !== undefined ? (
                             <span
-                              className={`absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-modbots-panel ${localParticipantStatusStyle.dot}`}
+                              className={`modbots-profile-status-dot absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-modbots-panel ${localParticipantStatusStyle.dot}`}
                               aria-label={t(localParticipantStatusStyle.label)}
                               title={t(localParticipantStatusStyle.label)}
                             />
