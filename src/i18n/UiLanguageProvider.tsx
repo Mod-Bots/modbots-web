@@ -37,6 +37,17 @@ const simplifiedChinese: Record<string, string> = {
   "Chat settings": "聊天设置",
   "Auto Mode": "自动模式",
   "Check for Updates": "检查更新",
+  "Checking GitHub for web updates...": "正在检查 GitHub 上的网页更新...",
+  "Mod Bots is up to date.": "Mod Bots 已是最新版本。",
+  Version: "版本",
+  "Downloading and installing the update...": "正在下载并安装更新...",
+  "Mod Bots will reopen when the update is ready.":
+    "更新准备好后，Mod Bots 将自动重新打开。",
+  "The installed version could not be checked.": "无法检查已安装的版本。",
+  "GitHub could not be checked for updates.": "无法在 GitHub 上检查更新。",
+  "The update is taking longer than expected. Try again.":
+    "更新所需时间超过预期，请重试。",
+  "Try again": "重试",
   "Choose how messages appear and how you send them.":
     "选择消息的显示方式和发送方式。",
   "Choose how you send messages.": "选择消息的发送方式。",

@@ -318,6 +318,7 @@ export function MenuBar({
   onOpenSettings,
   onReportProblem,
   onRequestFeature,
+  onCheckForUpdates,
   onTakeScreenshot,
 }: {
   canUndoMessage: boolean;
@@ -327,6 +328,7 @@ export function MenuBar({
   onOpenSettings: () => void;
   onReportProblem: () => void;
   onRequestFeature: () => void;
+  onCheckForUpdates: () => void;
   onTakeScreenshot: () => void;
 }) {
   const { t } = useUiLanguage();
@@ -662,6 +664,7 @@ export function MenuBar({
           id: "check-updates",
           label: "Check for Updates",
           icon: RefreshCw,
+          onSelect: onCheckForUpdates,
         },
         { kind: "separator", id: "help-about" },
         { id: "about", label: "About Mod Bots", icon: Info },
