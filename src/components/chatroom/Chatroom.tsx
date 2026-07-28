@@ -1474,6 +1474,10 @@ export function Chatroom() {
     updateProfile,
   } = useRoomActivity(roomId);
   const [draft, setDraft] = useState("");
+  const [draftHistoryAvailability, setDraftHistoryAvailability] = useState({
+    canUndo: false,
+    canRedo: false,
+  });
   const [attachment, setAttachment] = useState<File | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [mutedNotice, setMutedNotice] = useState<string | null>(null);
@@ -1545,11 +1549,63 @@ export function Chatroom() {
   const followLatestMessage = useRef(true);
   const wasEntered = useRef(false);
   const composerRef = useRef<HTMLTextAreaElement>(null);
+  const draftValueRef = useRef("");
+  const draftUndoRef = useRef<string[]>([]);
+  const draftRedoRef = useRef<string[]>([]);
   const attachmentInput = useRef<HTMLInputElement>(null);
   const profilePictureInput = useRef<HTMLInputElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
   const pendingTranslations = useRef(new Set<string>());
   const failedTranslations = useRef(new Set<string>());
+  const updateDraftHistoryAvailability = () =>
+    setDraftHistoryAvailability({
+      canUndo: draftUndoRef.current.length > 0,
+      canRedo: draftRedoRef.current.length > 0,
+    });
+  const applyDraft = (value: string) => {
+    const current = draftValueRef.current;
+
+    if (value === current) {
+      return;
+    }
+
+    draftUndoRef.current = [...draftUndoRef.current.slice(-99), current];
+    draftRedoRef.current = [];
+    draftValueRef.current = value;
+    setDraft(value);
+    updateDraftHistoryAvailability();
+  };
+  const resetDraft = (value: string) => {
+    draftValueRef.current = value;
+    draftUndoRef.current = [];
+    draftRedoRef.current = [];
+    setDraft(value);
+    updateDraftHistoryAvailability();
+  };
+  const moveDraftHistory = (direction: "undo" | "redo") => {
+    const source = direction === "undo" ? draftUndoRef : draftRedoRef;
+    const destination = direction === "undo" ? draftRedoRef : draftUndoRef;
+    const value = source.current.pop();
+
+    if (value === undefined) {
+      return;
+    }
+
+    destination.current.push(draftValueRef.current);
+    draftValueRef.current = value;
+    setDraft(value);
+    setMention(null);
+    updateDraftHistoryAvailability();
+
+    requestAnimationFrame(() => {
+      const composer = composerRef.current;
+
+      if (composer !== null) {
+        composer.focus();
+        composer.setSelectionRange(value.length, value.length);
+      }
+    });
+  };
   const apiConnected = apiHealth.data?.status === "ok";
   const chatBotCount = onlineActorIds.filter(
     (actorId) => actors.get(actorId)?.type === "chat_bot",
@@ -2392,7 +2448,7 @@ export function Chatroom() {
     const after = draft.slice(caret);
     const nextCaret = before.length + insertion.length;
 
-    setDraft(`${before}${insertion}${after}`);
+    applyDraft(`${before}${insertion}${after}`);
     setMention(null);
 
     requestAnimationFrame(() => {
@@ -2407,6 +2463,18 @@ export function Chatroom() {
   const handleComposerKeyDown = (
     event: ReactKeyboardEvent<HTMLTextAreaElement>,
   ) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+      event.preventDefault();
+      moveDraftHistory(event.shiftKey ? "redo" : "undo");
+      return;
+    }
+
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y") {
+      event.preventDefault();
+      moveDraftHistory("redo");
+      return;
+    }
+
     if (mention !== null && mentionOptions.length > 0) {
       const count = mentionOptions.length;
       const active = Math.min(mention.index, count - 1);
@@ -2685,7 +2753,7 @@ export function Chatroom() {
       return;
     }
 
-    setDraft("");
+    resetDraft("");
     setMention(null);
     setMutedNotice(null);
     setTranslationError(null);
@@ -2735,7 +2803,7 @@ export function Chatroom() {
       }
       setReplyTarget(null);
     } catch (sendFailure) {
-      setDraft(content);
+      resetDraft(content);
 
       if (isMutedError(sendFailure)) {
         setMutedNotice(
@@ -2769,7 +2837,10 @@ export function Chatroom() {
       />
       {entered ? (
         <MenuBar
-          onFindInChat={openSearch}
+          canUndoMessage={draftHistoryAvailability.canUndo}
+          canRedoMessage={draftHistoryAvailability.canRedo}
+          onUndoMessage={() => moveDraftHistory("undo")}
+          onRedoMessage={() => moveDraftHistory("redo")}
           onOpenSettings={() => openSettings("account")}
           onRefreshChatroom={() => void refresh()}
           onTakeScreenshot={() => void takeScreenshot().catch(() => undefined)}
@@ -3381,10 +3452,11 @@ export function Chatroom() {
                         />
                         <textarea
                           ref={composerRef}
+                          data-message-composer
                           value={draft}
                           onChange={(event) => {
                             const value = event.currentTarget.value;
-                            setDraft(value);
+                            applyDraft(value);
                             updateMentionState(
                               value,
                               event.currentTarget.selectionStart ??

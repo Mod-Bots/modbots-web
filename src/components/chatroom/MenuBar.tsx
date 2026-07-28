@@ -24,7 +24,6 @@ import {
   RefreshCw,
   RotateCcw,
   Scissors,
-  Search,
   Settings2,
   SwatchBook,
   TextSelect,
@@ -68,6 +67,18 @@ interface MenuSpec {
   items: MenuItemSpec[];
   icon: LucideIcon;
 }
+
+interface EditContext {
+  hasTarget: boolean;
+  hasText: boolean;
+  hasSelection: boolean;
+}
+
+const emptyEditContext: EditContext = {
+  hasTarget: false,
+  hasText: false,
+  hasSelection: false,
+};
 
 const menuOrder: MenuId[] = ["file", "edit", "view", "tools", "help"];
 
@@ -293,13 +304,19 @@ function MobileMenu({
 }
 
 export function MenuBar({
-  onFindInChat,
+  canUndoMessage,
+  canRedoMessage,
+  onUndoMessage,
+  onRedoMessage,
   onOpenSettings,
   onRefreshChatroom,
   onTakeScreenshot,
   onExportChatLog,
 }: {
-  onFindInChat: () => void;
+  canUndoMessage: boolean;
+  canRedoMessage: boolean;
+  onUndoMessage: () => void;
+  onRedoMessage: () => void;
   onOpenSettings: () => void;
   onRefreshChatroom: () => void;
   onTakeScreenshot: () => void;
@@ -308,26 +325,45 @@ export function MenuBar({
   const { t } = useUiLanguage();
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [editContext, setEditContext] = useState<EditContext>(emptyEditContext);
   const menuBarRef = useRef<HTMLDivElement>(null);
-  const editTargetRef = useRef<HTMLElement | null>(null);
+  const editTargetRef = useRef<HTMLTextAreaElement | null>(null);
   const menuButtonRefs = useRef<
     Partial<Record<MenuId, HTMLButtonElement | null>>
   >({});
 
   const rememberEditTarget = (candidate: EventTarget | null) => {
-    if (
-      candidate instanceof HTMLElement &&
-      (candidate.matches("input, textarea") || candidate.isContentEditable)
-    ) {
-      editTargetRef.current = candidate;
+    if (candidate instanceof Node && menuBarRef.current?.contains(candidate)) {
+      return;
     }
+
+    const target =
+      candidate instanceof HTMLTextAreaElement &&
+      candidate.matches("[data-message-composer]") &&
+      !candidate.disabled
+        ? candidate
+        : null;
+
+    editTargetRef.current = target;
+    setEditContext(
+      target === null
+        ? emptyEditContext
+        : {
+            hasTarget: true,
+            hasText: target.value.length > 0,
+            hasSelection: target.selectionStart !== target.selectionEnd,
+          },
+    );
   };
 
-  const runEditCommand = (
-    command: "undo" | "redo" | "cut" | "copy" | "paste" | "selectAll",
-  ) => {
+  const runEditCommand = (command: "cut" | "copy" | "paste" | "selectAll") => {
     editTargetRef.current?.focus();
     document.execCommand(command);
+  };
+
+  const runHistoryCommand = (action: () => void) => {
+    editTargetRef.current?.focus();
+    action();
   };
 
   const closeChatroom = () => {
@@ -374,14 +410,16 @@ export function MenuBar({
           label: "Undo",
           icon: Undo2,
           shortcut: "Ctrl+Z",
-          onSelect: () => runEditCommand("undo"),
+          disabled: !editContext.hasTarget || !canUndoMessage,
+          onSelect: () => runHistoryCommand(onUndoMessage),
         },
         {
           id: "redo",
           label: "Redo",
           icon: Redo2,
           shortcut: "Ctrl+Y",
-          onSelect: () => runEditCommand("redo"),
+          disabled: !editContext.hasTarget || !canRedoMessage,
+          onSelect: () => runHistoryCommand(onRedoMessage),
         },
         { kind: "separator", id: "edit-history" },
         {
@@ -389,6 +427,7 @@ export function MenuBar({
           label: "Cut",
           icon: Scissors,
           shortcut: "Ctrl+X",
+          disabled: !editContext.hasSelection,
           onSelect: () => runEditCommand("cut"),
         },
         {
@@ -396,6 +435,7 @@ export function MenuBar({
           label: "Copy",
           icon: Copy,
           shortcut: "Ctrl+C",
+          disabled: !editContext.hasSelection,
           onSelect: () => runEditCommand("copy"),
         },
         {
@@ -403,6 +443,7 @@ export function MenuBar({
           label: "Paste",
           icon: ClipboardPaste,
           shortcut: "Ctrl+V",
+          disabled: !editContext.hasTarget,
           onSelect: () => runEditCommand("paste"),
         },
         {
@@ -410,15 +451,8 @@ export function MenuBar({
           label: "Select All",
           icon: TextSelect,
           shortcut: "Ctrl+A",
+          disabled: !editContext.hasText,
           onSelect: () => runEditCommand("selectAll"),
-        },
-        { kind: "separator", id: "edit-find" },
-        {
-          id: "find-in-chat",
-          label: "Find in Chat",
-          icon: Search,
-          shortcut: "Ctrl+F",
-          onSelect: onFindInChat,
         },
       ],
     },
