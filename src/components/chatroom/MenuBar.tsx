@@ -317,6 +317,7 @@ export function MenuBar({
   onRedoMessage,
   onOpenSettings,
   onReportProblem,
+  onRequestFeature,
   onTakeScreenshot,
 }: {
   canUndoMessage: boolean;
@@ -325,6 +326,7 @@ export function MenuBar({
   onRedoMessage: () => void;
   onOpenSettings: () => void;
   onReportProblem: () => void;
+  onRequestFeature: () => void;
   onTakeScreenshot: () => void;
 }) {
   const { t } = useUiLanguage();
@@ -654,6 +656,7 @@ export function MenuBar({
           id: "request-feature",
           label: "Request a Feature",
           icon: Lightbulb,
+          onSelect: onRequestFeature,
         },
         {
           id: "check-updates",

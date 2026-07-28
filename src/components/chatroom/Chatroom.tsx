@@ -54,6 +54,7 @@ import { useRoomActivity } from "@/hooks/useRoomActivity";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
 import { MenuBar } from "./MenuBar";
 import { ReportProblemDialog } from "./ReportProblemDialog";
+import { RequestFeatureDialog } from "./RequestFeatureDialog";
 import {
   type AccountSettingsSummary,
   SettingsDialog,
@@ -1524,6 +1525,7 @@ export function Chatroom() {
   } | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [reportProblemOpen, setReportProblemOpen] = useState(false);
+  const [requestFeatureOpen, setRequestFeatureOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection>("account");
@@ -2830,6 +2832,7 @@ export function Chatroom() {
           onRedoMessage={() => moveDraftHistory("redo")}
           onOpenSettings={() => openSettings("account")}
           onReportProblem={() => setReportProblemOpen(true)}
+          onRequestFeature={() => setRequestFeatureOpen(true)}
           onTakeScreenshot={() => void takeScreenshot().catch(() => undefined)}
         />
       ) : null}
@@ -3940,6 +3943,10 @@ export function Chatroom() {
 
         {reportProblemOpen ? (
           <ReportProblemDialog onClose={() => setReportProblemOpen(false)} />
+        ) : null}
+
+        {requestFeatureOpen ? (
+          <RequestFeatureDialog onClose={() => setRequestFeatureOpen(false)} />
         ) : null}
 
         {aboutOpen ? (

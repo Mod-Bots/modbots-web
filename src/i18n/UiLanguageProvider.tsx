@@ -122,6 +122,19 @@ const simplifiedChinese: Record<string, string> = {
   "View issue": "查看议题",
   Done: "完成",
   "Request a Feature": "建议新功能",
+  "Feature title": "功能标题",
+  "Briefly describe the feature": "简要描述该功能",
+  "Explain the feature and how it would improve Mod Bots.":
+    "说明该功能，以及它将如何改进 Mod Bots。",
+  "Submit feature request": "提交功能请求",
+  "The feature request could not be created. Please try again.":
+    "无法创建功能请求，请重试。",
+  "Feature requests are not configured.": "功能请求尚未配置。",
+  "Enter a feature title and description.": "请输入功能标题和详细说明。",
+  "GitHub could not create the feature request. Please try again.":
+    "GitHub 无法创建功能请求，请重试。",
+  "The GitHub feature request was created successfully.":
+    "GitHub 功能请求已成功创建。",
   "Reset Zoom": "重置缩放",
   Restore: "还原",
   "Restoring your session...": "正在恢复你的会话...",
