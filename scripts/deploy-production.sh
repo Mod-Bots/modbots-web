@@ -11,6 +11,7 @@ for variable in \
   NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL \
   NEXT_PUBLIC_MODBOTS_REALTIME_HEALTH_URL \
   NEXT_PUBLIC_MODBOTS_ACCOUNT_URL \
+  NEXT_PUBLIC_MODBOTS_RELEASE_VERSION \
   MODBOTS_GITHUB_ISSUES_TOKEN; do
   if [ -z "$(printenv "$variable")" ]; then
     echo "Missing production variable: $variable"

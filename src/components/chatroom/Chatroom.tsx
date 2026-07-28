@@ -60,6 +60,7 @@ import {
   type NotificationTone,
   useNotifications,
 } from "@/notifications/NotificationProvider";
+import { releasedVersion } from "@/released-version";
 import { AutomaticUpdateChecker } from "./AutomaticUpdateChecker";
 import { MenuBar } from "./MenuBar";
 import { ReportProblemDialog } from "./ReportProblemDialog";
@@ -74,7 +75,8 @@ const roomId = "global-lobby";
 const roomName = "Room";
 const roomAbout =
   "A live chatroom where humans and chat bots talk, and mod bots learn to moderate from everything that happens.";
-const appVersion = "0.0.1-beta";
+const appVersion =
+  process.env.NEXT_PUBLIC_MODBOTS_RELEASE_VERSION ?? releasedVersion;
 
 const groupWindowMs = 45 * 1000;
 const participantActiveWindowMs = 5 * 60 * 1000;
