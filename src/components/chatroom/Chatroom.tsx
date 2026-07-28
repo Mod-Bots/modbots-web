@@ -2556,6 +2556,25 @@ export function Chatroom() {
       );
     }
   };
+  const exportChatLog = () => {
+    const messages = (events.data ?? []).filter(
+      (event) =>
+        event.type === "message_posted" || event.type === "content_posted",
+    );
+    const lines = messages.map(
+      (event) =>
+        `[${new Date(event.occurredAt).toISOString()}] ${actorLabel(
+          event.actorId,
+          actors,
+        )}: ${eventContent(event)}`,
+    );
+    const contents = `${lines.join("\n\n")}\n`;
+
+    downloadBlob(
+      new Blob([contents], { type: "text/plain;charset=utf-8" }),
+      `mod-bots-chat-log-${new Date().toISOString().slice(0, 10)}.txt`,
+    );
+  };
   const logOut = () => {
     setUserMenuOpen(false);
     void signOut();
