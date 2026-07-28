@@ -42,6 +42,9 @@ const simplifiedChinese: Record<string, string> = {
   "Clear all": "全部清除",
   "No notifications": "没有通知",
   "Dismiss notification": "关闭通知",
+  "Screenshot could not be saved.": "无法保存截图。",
+  "This browser does not provide a Save As dialog.":
+    "此浏览器不提供另存为对话框。",
   "Connection interrupted": "连接中断",
   "Trying to reconnect...": "正在尝试重新连接...",
   "Connection restored": "连接已恢复",

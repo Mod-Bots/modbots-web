@@ -1638,14 +1638,16 @@ function SessionRestoreScreen({ restoring }: { restoring: boolean }) {
   );
 }
 
-const downloadBlob = (blob: Blob, fileName: string) => {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  link.click();
-  URL.revokeObjectURL(url);
-};
+interface SaveFilePickerWindow extends Window {
+  showSaveFilePicker?: (options: {
+    excludeAcceptAllOption?: boolean;
+    suggestedName?: string;
+    types?: Array<{
+      accept: Record<string, string[]>;
+      description?: string;
+    }>;
+  }) => Promise<FileSystemFileHandle>;
+}
 
 export function Chatroom() {
   const router = useRouter();
@@ -2727,6 +2729,45 @@ export function Chatroom() {
     }
   };
   const takeScreenshot = async () => {
+    const saveFilePicker = (window as SaveFilePickerWindow).showSaveFilePicker;
+
+    if (saveFilePicker === undefined) {
+      notify({
+        title: "Screenshot could not be saved.",
+        message: "This browser does not provide a Save As dialog.",
+        tone: "error",
+      });
+      return;
+    }
+
+    const suggestedName = `mod-bots-screenshot-${new Date()
+      .toISOString()
+      .replace(/[:.]/g, "-")}.png`;
+    let fileHandle: FileSystemFileHandle;
+
+    try {
+      fileHandle = await saveFilePicker.call(window, {
+        excludeAcceptAllOption: true,
+        suggestedName,
+        types: [
+          {
+            accept: { "image/png": [".png"] },
+            description: "PNG image",
+          },
+        ],
+      });
+    } catch (saveError) {
+      if (
+        saveError instanceof DOMException &&
+        saveError.name === "AbortError"
+      ) {
+        return;
+      }
+
+      notify({ title: "Screenshot could not be saved.", tone: "error" });
+      return;
+    }
+
     await new Promise<void>((resolve) => {
       requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
     });
@@ -2751,11 +2792,17 @@ export function Chatroom() {
       canvas.toBlob(resolve, "image/png"),
     );
 
-    if (blob !== null) {
-      downloadBlob(
-        blob,
-        `mod-bots-screenshot-${new Date().toISOString().replace(/[:.]/g, "-")}.png`,
-      );
+    if (blob === null) {
+      notify({ title: "Screenshot could not be saved.", tone: "error" });
+      return;
+    }
+
+    try {
+      const writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    } catch {
+      notify({ title: "Screenshot could not be saved.", tone: "error" });
     }
   };
   const logOut = () => {
@@ -3058,9 +3105,7 @@ export function Chatroom() {
             onReportProblem={() => setReportProblemOpen(true)}
             onRequestFeature={() => setRequestFeatureOpen(true)}
             onCheckForUpdates={() => setCheckForUpdatesOpen(true)}
-            onTakeScreenshot={() =>
-              void takeScreenshot().catch(() => undefined)
-            }
+            onTakeScreenshot={() => void takeScreenshot()}
           />
         </>
       ) : null}
