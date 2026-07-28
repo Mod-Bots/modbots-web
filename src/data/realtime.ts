@@ -108,11 +108,12 @@ export const runWebTransport = async (
     throw new Error("WebTransport is unavailable in this WebView");
   }
 
-  const hashes: WebTransportHash[] =
-    config.primary.serverCertificateHashes.map((hash) => ({
+  const hashes: WebTransportHash[] = config.primary.serverCertificateHashes.map(
+    (hash) => ({
       algorithm: hash.algorithm,
       value: new Uint8Array(hash.value),
-    }));
+    }),
+  );
   const transport = new WebTransport(
     realtimeUrl(config.primary.url, roomId, after),
     { serverCertificateHashes: hashes },

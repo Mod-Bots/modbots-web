@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import notFoundImage from "../assets/404-page.png";
 import { Footer } from "@/components/entry/Footer";
+import notFoundImage from "../assets/404-page.png";
 
 const NotFoundPage = (): React.ReactElement => (
   <div className="modbots-scroll flex h-screen h-dvh flex-col overflow-y-auto bg-modbots-canvas text-zinc-100">

@@ -92,8 +92,7 @@ const requestJson = async <Result>(
   return (await response.json()) as Result;
 };
 
-const apiUrl = (path: string): string =>
-  new URL(path, apiBaseUrl).toString();
+const apiUrl = (path: string): string => new URL(path, apiBaseUrl).toString();
 
 export const mediaAssetDataUrl = (
   roomId: string,
@@ -136,14 +135,11 @@ export const updateActorProfile = (
     links: string[];
   },
 ): Promise<Actor> =>
-  requestJson(
-    apiUrl(`/api/actors/${encodeURIComponent(actorId)}/profile`),
-    {
-      method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(profile),
-    },
-  );
+  requestJson(apiUrl(`/api/actors/${encodeURIComponent(actorId)}/profile`), {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(profile),
+  });
 
 export const getRoomRules = (): Promise<RoomRules> =>
   requestJson(apiUrl("/api/rules"));
@@ -229,7 +225,9 @@ const base64 = (data: ArrayBuffer): string => {
   let binary = "";
 
   for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+    binary += String.fromCharCode(
+      ...bytes.subarray(offset, offset + chunkSize),
+    );
   }
 
   return btoa(binary);
@@ -273,18 +271,19 @@ export const postRoomMediaAsset = async (
   file: File,
 ): Promise<MediaAsset> => {
   const filenameParts = file.name.split(".");
-  const extension = filenameParts[filenameParts.length - 1]?.toLowerCase() ?? "";
+  const extension =
+    filenameParts[filenameParts.length - 1]?.toLowerCase() ?? "";
   const imageExtensions = new Set(["gif", "jpeg", "jpg", "png", "webp"]);
   const audioExtensions = new Set(["aac", "flac", "m4a", "mp3", "ogg", "wav"]);
   const videoExtensions = new Set(["avi", "mkv", "mov", "mp4", "webm"]);
   const mediaKind: MediaKind =
     file.type.startsWith("image/") || imageExtensions.has(extension)
-    ? "image"
-    : file.type.startsWith("audio/") || audioExtensions.has(extension)
-      ? "audio"
-      : file.type.startsWith("video/") || videoExtensions.has(extension)
-        ? "video"
-        : "file";
+      ? "image"
+      : file.type.startsWith("audio/") || audioExtensions.has(extension)
+        ? "audio"
+        : file.type.startsWith("video/") || videoExtensions.has(extension)
+          ? "video"
+          : "file";
   const inferredMediaType =
     mediaKind === "image"
       ? `image/${extension === "jpg" ? "jpeg" : extension}`

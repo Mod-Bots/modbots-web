@@ -37,10 +37,7 @@ const randomValue = (): string => {
 const challengeFor = async (verifier: string): Promise<string> =>
   base64Url(
     new Uint8Array(
-      await crypto.subtle.digest(
-        "SHA-256",
-        new TextEncoder().encode(verifier),
-      ),
+      await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
     ),
   );
 
@@ -332,7 +329,11 @@ const awaitCallbackParams = (): Promise<URLSearchParams> =>
   });
 
 export const openInBrowser = async (url: string): Promise<void> => {
-  callbackWindow = window.open(url, "modbots-login", "popup,width=520,height=720");
+  callbackWindow = window.open(
+    url,
+    "modbots-login",
+    "popup,width=520,height=720",
+  );
 
   if (callbackWindow === null) {
     // The window was blocked. The manual code path stays available, and the

@@ -57,7 +57,7 @@
   .modbots-print-hidden,
   .modbots-chatroom .fixed,
   .modbots-chatroom aside,
-  .modbots-chatroom [role=separator] {
+  .modbots-chatroom [role="separator"] {
     display: none !important;
   }
   .modbots-chatroom,
@@ -148,7 +148,17 @@
     rgba(17, 17, 17, 0.98)
   );
   color-scheme: dark;
-  font-family: var(--modbots-ui-font, "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", Aptos, "Helvetica Neue", Helvetica, Arial, sans-serif);
+  font-family: var(
+    --modbots-ui-font,
+    "Segoe UI Variable Text",
+    "Segoe UI Variable",
+    "Segoe UI",
+    Aptos,
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif
+  );
   font-synthesis: none;
   font-kerning: normal;
   text-rendering: optimizeLegibility;
@@ -191,7 +201,7 @@
   );
   --font-mono: "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
 }
-[data-theme=light] {
+[data-theme="light"] {
   --background: #ffffff;
   --foreground: #111827;
   --modbots-body-background:
@@ -232,27 +242,29 @@
   --color-zinc-950: #f8fafc;
   color-scheme: light;
 }
-[data-theme=light] .modbots-profile-picture {
+[data-theme="light"] .modbots-profile-picture {
   overflow: hidden;
   color: #ffffff;
   border-color: rgba(15, 23, 42, 0.14);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 2px 5px rgba(15, 23, 42, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 2px 5px rgba(15, 23, 42, 0.12);
 }
-[data-theme=light] .modbots-profile-picture img {
+[data-theme="light"] .modbots-profile-picture img {
   border-radius: inherit;
 }
-[data-theme=light] .modbots-profile-type-badge {
+[data-theme="light"] .modbots-profile-type-badge {
   color: #475569;
   background: #ffffff;
   border-color: rgba(15, 23, 42, 0.16);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.14);
 }
-[data-theme=light] .modbots-profile-status-dot {
+[data-theme="light"] .modbots-profile-status-dot {
   border-color: #ffffff;
   box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.1);
 }
 
-[data-theme=dark] {
+[data-theme="dark"] {
   color-scheme: dark;
 }
 
@@ -273,7 +285,7 @@ body {
   display: contents;
 }
 
-[data-window-state=minimized] .modbots-window-content {
+[data-window-state="minimized"] .modbots-window-content {
   display: none;
 }
 

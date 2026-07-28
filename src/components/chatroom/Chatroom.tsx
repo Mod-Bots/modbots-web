@@ -111,6 +111,16 @@ const payloadString = (event: RoomEvent, key: string): string | null => {
   return typeof value === "string" ? value : null;
 };
 
+const mediaCaptionTrackUrl = (caption: string | null): string => {
+  const text = caption?.trim();
+  const track =
+    text === undefined || text.length === 0
+      ? "WEBVTT\n\n"
+      : `WEBVTT\n\n00:00:00.000 --> 99:59:59.999\n${text}\n`;
+
+  return `data:text/vtt;charset=utf-8,${encodeURIComponent(track)}`;
+};
+
 interface EventAssetPart {
   partId: string;
   kind: "image" | "audio" | "video" | "file";
@@ -748,7 +758,7 @@ function PanelResizeHandle({
     startWidth: number;
   } | null>(null);
 
-  const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const endDrag = (event: ReactPointerEvent<HTMLHRElement>) => {
     if (drag.current?.pointerId !== event.pointerId) {
       return;
     }
@@ -762,8 +772,7 @@ function PanelResizeHandle({
   };
 
   return (
-    <div
-      role="separator"
+    <hr
       aria-orientation="vertical"
       aria-label={label}
       aria-valuemin={limits.min}
@@ -797,17 +806,12 @@ function PanelResizeHandle({
           onWidthChange(width + grow * direction * panelResizeStep);
         }
       }}
-      className="group relative z-10 -mx-1 hidden w-2 shrink-0 cursor-col-resize touch-none focus-visible:outline-none lg:block"
-    >
-      <span
-        aria-hidden="true"
-        className={`absolute inset-y-0 left-1/2 w-px -translate-x-1/2 transition-colors ${
-          dragging
-            ? "bg-white/40"
-            : "bg-transparent group-hover:bg-white/25 group-focus-visible:bg-white/40"
-        }`}
-      />
-    </div>
+      className={`group relative z-10 -mx-1 hidden w-2 shrink-0 cursor-col-resize touch-none border-0 after:absolute after:inset-y-0 after:left-1/2 after:w-px after:-translate-x-1/2 after:transition-colors focus-visible:outline-none lg:block ${
+        dragging
+          ? "after:bg-white/40"
+          : "after:bg-transparent hover:after:bg-white/25 focus-visible:after:bg-white/40"
+      }`}
+    />
   );
 }
 
@@ -829,11 +833,7 @@ function ActorProfilePicture({
         ? "h-16 w-16 rounded-2xl text-[15px]"
         : "h-10 w-10 rounded-xl text-[11px]";
   const imageUrl = actorProfilePictureUrl(actor);
-  const [imageFailed, setImageFailed] = useState(false);
-
-  useEffect(() => {
-    setImageFailed(false);
-  }, [imageUrl]);
+  const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
 
   return (
     <div className="relative shrink-0">
@@ -841,12 +841,12 @@ function ActorProfilePicture({
         className={`modbots-profile-picture flex ${dimensions} items-center justify-center border border-white/10 font-semibold text-zinc-100`}
         style={{ backgroundColor: shadeFor(actorId) }}
       >
-        {imageUrl !== null && !imageFailed ? (
+        {imageUrl !== null && imageUrl !== failedImageUrl ? (
           <img
             src={imageUrl}
             alt={name}
             className="h-full w-full rounded-inherit object-cover"
-            onError={() => setImageFailed(true)}
+            onError={() => setFailedImageUrl(imageUrl)}
           />
         ) : (
           monogram(name)
@@ -1173,7 +1173,15 @@ function MessageMedia({ event }: { event: RoomEvent }) {
                 preload="metadata"
                 src={url}
                 className="max-h-[460px] max-w-full rounded-xl border border-white/10"
-              />
+              >
+                <track
+                  default
+                  kind="captions"
+                  src={mediaCaptionTrackUrl(part.caption)}
+                  srcLang="und"
+                  label="Message caption"
+                />
+              </video>
               {part.caption !== null ? (
                 <figcaption className="mt-1 text-xs text-zinc-500">
                   {part.caption}
@@ -1191,7 +1199,15 @@ function MessageMedia({ event }: { event: RoomEvent }) {
                 preload="metadata"
                 src={url}
                 className="w-full max-w-xl"
-              />
+              >
+                <track
+                  default
+                  kind="captions"
+                  src={mediaCaptionTrackUrl(part.caption)}
+                  srcLang="und"
+                  label="Message caption"
+                />
+              </audio>
               {part.caption !== null ? (
                 <figcaption className="mt-1 text-xs text-zinc-500">
                   {part.caption}
@@ -1751,6 +1767,9 @@ export function Chatroom() {
   const previousConversationHeight = useRef<number | null>(null);
   const conversationPositioned = useRef(false);
   const followLatestMessage = useRef(true);
+  const previousEntered = useRef(entered);
+  const previousSearchQuery = useRef(searchQuery);
+  const previousVisibleEventCount = useRef(visibleEventCount);
   const wasEntered = useRef(false);
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const draftValueRef = useRef("");
@@ -2173,6 +2192,7 @@ export function Chatroom() {
   ]);
   const latestRoomEventSequence =
     roomEvents[roomEvents.length - 1]?.sequence ?? null;
+  const previousLatestRoomEventSequence = useRef(latestRoomEventSequence);
   // Replies reference the content item behind a message; this resolves the
   // reference back to the original message for the quoted line.
   const messagesByContentItem = useMemo(() => {
@@ -2871,14 +2891,14 @@ export function Chatroom() {
     }
   }, [connectionLabel, notify]);
 
-  const scrollToLatest = () => {
+  const scrollToLatest = useCallback(() => {
     const viewport = conversationViewport.current;
 
     if (viewport !== null) {
       viewport.scrollTop = viewport.scrollHeight;
       followLatestMessage.current = true;
     }
-  };
+  }, []);
 
   const loadEarlierMessages = () => {
     const viewport = conversationViewport.current;
@@ -2911,9 +2931,14 @@ export function Chatroom() {
   };
 
   useEffect(() => {
+    if (previousEntered.current === entered) {
+      return;
+    }
+
+    previousEntered.current = entered;
     conversationPositioned.current = false;
     followLatestMessage.current = true;
-  }, [entered, roomId]);
+  }, [entered]);
 
   useEffect(() => {
     if (consumeEnterAfterLogin()) {
@@ -2922,10 +2947,20 @@ export function Chatroom() {
   }, []);
 
   useEffect(() => {
+    if (previousSearchQuery.current === searchQuery) {
+      return;
+    }
+
+    previousSearchQuery.current = searchQuery;
     setVisibleEventCount(conversationPageSize);
-  }, [roomId, searchQuery]);
+  }, [searchQuery]);
 
   useEffect(() => {
+    if (previousVisibleEventCount.current === visibleEventCount) {
+      return;
+    }
+
+    previousVisibleEventCount.current = visibleEventCount;
     const previousHeight = previousConversationHeight.current;
     const viewport = conversationViewport.current;
 
@@ -2938,15 +2973,22 @@ export function Chatroom() {
   }, [visibleEventCount]);
 
   useEffect(() => {
+    const eventSequenceChanged =
+      previousLatestRoomEventSequence.current !== latestRoomEventSequence;
+    previousLatestRoomEventSequence.current = latestRoomEventSequence;
+
     if (!entered || searchQuery.length > 0) {
       return;
     }
 
-    if (!conversationPositioned.current || followLatestMessage.current) {
+    if (
+      !conversationPositioned.current ||
+      (eventSequenceChanged && followLatestMessage.current)
+    ) {
       scrollToLatest();
       conversationPositioned.current = true;
     }
-  }, [entered, latestRoomEventSequence, searchQuery]);
+  }, [entered, latestRoomEventSequence, searchQuery, scrollToLatest]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -2974,7 +3016,7 @@ export function Chatroom() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [entered, openSearch]);
+  }, [entered, openSearch, openSettings]);
 
   // Signing out (or a stale identity being dropped) closes the door again.
   useEffect(() => {
@@ -3334,6 +3376,7 @@ export function Chatroom() {
                           />
                           {localActor !== undefined ? (
                             <span
+                              role="img"
                               className={`modbots-profile-status-dot absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-modbots-panel ${localParticipantStatusStyle.dot}`}
                               aria-label={t(localParticipantStatusStyle.label)}
                               title={t(localParticipantStatusStyle.label)}
@@ -4233,13 +4276,18 @@ export function Chatroom() {
         ) : null}
 
         {aboutOpen ? (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-modbots-overlay p-6"
-            onClick={() => setAboutOpen(false)}
-          >
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <button
+              type="button"
+              aria-label="Close About Mod Bots"
+              className="absolute inset-0 cursor-default bg-modbots-overlay"
+              onClick={() => setAboutOpen(false)}
+            />
             <div
-              className="w-[360px] rounded-window border border-white/10 bg-modbots-dialog p-6 shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
-              onClick={(event) => event.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="about-mod-bots-title"
+              className="relative w-[360px] rounded-window border border-white/10 bg-modbots-dialog p-6 shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
             >
               <div className="flex items-center gap-3">
                 <img
@@ -4248,7 +4296,10 @@ export function Chatroom() {
                   className="h-11 w-11 rounded-xl"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-white">
+                  <p
+                    id="about-mod-bots-title"
+                    className="text-sm font-semibold text-white"
+                  >
                     Mod Bots Web
                   </p>
                   <p className="text-xs text-zinc-500">Version {appVersion}</p>

@@ -12,21 +12,22 @@ import type {
   RoomEvent,
   RoomRoster,
 } from "../data/contracts";
+import type { StoredIdentity } from "../data/identity";
 import {
   clearStoredIdentity,
   loadStoredIdentity,
   saveStoredIdentity,
 } from "../data/identity";
-import type { StoredIdentity } from "../data/identity";
+import type { BrowserLoginOutcome } from "../data/oauth";
 import {
   getActor,
   getApiHealth,
-  getRoomRules,
   getRealtimeConfig,
   getRealtimeHealth,
   getRoomEvents,
   getRoomOverview,
   getRoomRoster,
+  getRoomRules,
   joinAsGuest,
   PlatformRequestError,
   postRoomContent,
@@ -39,7 +40,6 @@ import {
   updateActorProfile,
   uploadActorProfilePicture,
 } from "../data/platform";
-import type { BrowserLoginOutcome } from "../data/oauth";
 import { runWebSocket, runWebTransport } from "../data/realtime";
 import { mergeEvents, onlineActorIds } from "../data/room-state";
 
@@ -93,10 +93,7 @@ export const useRoomActivity = (roomId: string) => {
     () => ["room-overview", roomId] as const,
     [roomId],
   );
-  const rosterKey = useMemo(
-    () => ["room-roster", roomId] as const,
-    [roomId],
-  );
+  const rosterKey = useMemo(() => ["room-roster", roomId] as const, [roomId]);
 
   useEffect(() => {
     setIdentity(restoreIdentity());
@@ -178,21 +175,16 @@ export const useRoomActivity = (roomId: string) => {
   });
   const localActor = desktopSession.data ?? undefined;
   const cacheActor = (actor: Actor): void => {
-    queryClient.setQueryData(
-      ["desktop-session", roomId, actor.id],
-      actor,
-    );
+    queryClient.setQueryData(["desktop-session", roomId, actor.id], actor);
     queryClient.setQueryData(["actor", actor.id], actor);
-    queryClient.setQueryData<RoomRoster | undefined>(
-      rosterKey,
-      (current) =>
-        current === undefined
-          ? current
-          : {
-              actors: current.actors.map((candidate) =>
-                candidate.id === actor.id ? actor : candidate,
-              ),
-            },
+    queryClient.setQueryData<RoomRoster | undefined>(rosterKey, (current) =>
+      current === undefined
+        ? current
+        : {
+            actors: current.actors.map((candidate) =>
+              candidate.id === actor.id ? actor : candidate,
+            ),
+          },
     );
   };
 
@@ -450,27 +442,24 @@ export const useRoomActivity = (roomId: string) => {
       retry: 1,
     })),
   });
-  const actors = useMemo(
-    () => {
-      const actorMap = new Map(
-        actorQueries
-          .map((query) => query.data)
-          .filter((actor): actor is Actor => actor !== undefined)
-          .map((actor) => [actor.id, actor]),
-      );
+  const actors = useMemo(() => {
+    const actorMap = new Map(
+      actorQueries
+        .map((query) => query.data)
+        .filter((actor): actor is Actor => actor !== undefined)
+        .map((actor) => [actor.id, actor]),
+    );
 
-      for (const actor of roster.data?.actors ?? []) {
-        actorMap.set(actor.id, actor);
-      }
+    for (const actor of roster.data?.actors ?? []) {
+      actorMap.set(actor.id, actor);
+    }
 
-      if (localActor !== undefined) {
-        actorMap.set(localActor.id, localActor);
-      }
+    if (localActor !== undefined) {
+      actorMap.set(localActor.id, localActor);
+    }
 
-      return actorMap;
-    },
-    [actorQueries, localActor, roster.data],
-  );
+    return actorMap;
+  }, [actorQueries, localActor, roster.data]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -517,8 +506,7 @@ export const useRoomActivity = (roomId: string) => {
       while (!controller.signal.aborted) {
         const currentEvents =
           queryClient.getQueryData<RoomEvent[]>(eventsKey) ?? [];
-        const after =
-          currentEvents[currentEvents.length - 1]?.sequence ?? "0";
+        const after = currentEvents[currentEvents.length - 1]?.sequence ?? "0";
 
         setRealtimeStatus({
           state: hasConnected ? "reconnecting" : "connecting",
@@ -604,7 +592,7 @@ export const useRoomActivity = (roomId: string) => {
         window.clearTimeout(overviewInvalidation);
       }
     };
-  }, [eventsKey, fetchPersistedEvents, overviewKey, queryClient, roomId, rosterKey]);
+  }, [eventsKey, fetchPersistedEvents, overviewKey, queryClient, roomId]);
 
   const refresh = async () => {
     await Promise.all([

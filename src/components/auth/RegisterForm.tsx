@@ -2,7 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { saveStoredIdentity } from "@/data/identity";
 import type { BrowserLoginOutcome, BrowserLoginSession } from "@/data/oauth";
 import {
@@ -16,6 +22,16 @@ import { setSessionToken } from "@/data/platform";
 import { uidQuery, useLaunchUid } from "@/hooks/useAuthRoute";
 
 const browserLoginWaitMs = 90_000;
+
+const loginFailureMessage = (error: unknown, fallback: string): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return typeof error === "string" && error.trim().length > 0
+    ? error
+    : fallback;
+};
 
 export function RegisterForm() {
   const router = useRouter();
@@ -31,57 +47,53 @@ export function RegisterForm() {
   const uid = useLaunchUid();
   const accountFormReady = uid !== null || loginUrl !== null;
 
-  const onSignedIn = (outcome: BrowserLoginOutcome) => {
-    saveStoredIdentity({
-      actorId: outcome.actor.id,
-      token: outcome.session.token,
-    });
-    setSessionToken(outcome.session.token);
-    markEnterAfterLogin();
-    router.replace("/chatroom");
-  };
+  const onSignedIn = useCallback(
+    (outcome: BrowserLoginOutcome) => {
+      saveStoredIdentity({
+        actorId: outcome.actor.id,
+        token: outcome.session.token,
+      });
+      setSessionToken(outcome.session.token);
+      markEnterAfterLogin();
+      router.replace("/chatroom");
+    },
+    [router],
+  );
 
-  const loginFailureMessage = (error: unknown, fallback: string): string => {
-    if (error instanceof Error) {
-      return error.message;
-    }
+  const bindBrowserSession = useCallback(
+    (prepared: BrowserLoginSession) => {
+      setSession(prepared);
+      setLoginUrl(prepared.authorizeUrl);
 
-    return typeof error === "string" && error.trim().length > 0
-      ? error
-      : fallback;
-  };
+      if (boundBrowserSession.current === prepared) {
+        return prepared;
+      }
 
-  const bindBrowserSession = (prepared: BrowserLoginSession) => {
-    setSession(prepared);
-    setLoginUrl(prepared.authorizeUrl);
+      boundBrowserSession.current = prepared;
+      prepared.automatic.then(
+        (outcome) => {
+          if (boundBrowserSession.current === prepared) {
+            onSignedIn(outcome);
+          }
+        },
+        (error: unknown) => {
+          if (boundBrowserSession.current !== prepared) {
+            return;
+          }
 
-    if (boundBrowserSession.current === prepared) {
+          boundBrowserSession.current = null;
+          setSession((current) => (current === prepared ? null : current));
+          setWaitingForBrowser(false);
+          setLoginError(
+            loginFailureMessage(error, "The Browser log-in did not complete."),
+          );
+        },
+      );
+
       return prepared;
-    }
-
-    boundBrowserSession.current = prepared;
-    prepared.automatic.then(
-      (outcome) => {
-        if (boundBrowserSession.current === prepared) {
-          onSignedIn(outcome);
-        }
-      },
-      (error: unknown) => {
-        if (boundBrowserSession.current !== prepared) {
-          return;
-        }
-
-        boundBrowserSession.current = null;
-        setSession((current) => (current === prepared ? null : current));
-        setWaitingForBrowser(false);
-        setLoginError(
-          loginFailureMessage(error, "The Browser log-in did not complete."),
-        );
-      },
-    );
-
-    return prepared;
-  };
+    },
+    [onSignedIn],
+  );
 
   const ensureBrowserSession = async (): Promise<BrowserLoginSession> => {
     if (session !== null) {
@@ -128,7 +140,7 @@ export function RegisterForm() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [bindBrowserSession]);
 
   const resetLoginFlow = useEffectEvent(async (message: string | null) => {
     boundBrowserSession.current = null;
@@ -244,7 +256,6 @@ export function RegisterForm() {
           name="username"
           type="text"
           autoComplete="username"
-          autoFocus
           aria-invalid="false"
           defaultValue=""
         />
