@@ -72,12 +72,14 @@ interface EditContext {
   hasTarget: boolean;
   hasText: boolean;
   hasSelection: boolean;
+  canPaste: boolean;
 }
 
 const emptyEditContext: EditContext = {
   hasTarget: false,
   hasText: false,
   hasSelection: false,
+  canPaste: false,
 };
 
 const menuOrder: MenuId[] = ["file", "edit", "view", "tools", "help"];
@@ -352,8 +354,23 @@ export function MenuBar({
             hasTarget: true,
             hasText: target.value.length > 0,
             hasSelection: target.selectionStart !== target.selectionEnd,
+            canPaste: false,
           },
     );
+
+    if (target !== null && navigator.clipboard !== undefined) {
+      void navigator.clipboard
+        .readText()
+        .then((clipboardText) => {
+          if (editTargetRef.current === target) {
+            setEditContext((current) => ({
+              ...current,
+              canPaste: clipboardText.length > 0,
+            }));
+          }
+        })
+        .catch(() => undefined);
+    }
   };
 
   const runEditCommand = (command: "cut" | "copy" | "paste" | "selectAll") => {
@@ -443,7 +460,7 @@ export function MenuBar({
           label: "Paste",
           icon: ClipboardPaste,
           shortcut: "Ctrl+V",
-          disabled: !editContext.hasTarget,
+          disabled: !editContext.hasTarget || !editContext.canPaste,
           onSelect: () => runEditCommand("paste"),
         },
         {
