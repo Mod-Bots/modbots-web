@@ -597,6 +597,13 @@ export function MenuBar({
           icon: Monitor,
           items: [
             {
+              id: "maximize",
+              label: "Fullscreen",
+              icon: Maximize2,
+              disabled: !canMaximize,
+              onSelect: maximize,
+            },
+            {
               id: "minimize",
               label: "Minimize",
               icon: Minimize2,
@@ -608,13 +615,6 @@ export function MenuBar({
               icon: RotateCcw,
               disabled: !canRestore,
               onSelect: restore,
-            },
-            {
-              id: "maximize",
-              label: "Maximize",
-              icon: Maximize2,
-              disabled: !canMaximize,
-              onSelect: maximize,
             },
           ],
         },

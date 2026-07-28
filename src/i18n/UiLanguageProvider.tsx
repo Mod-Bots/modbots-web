@@ -75,6 +75,7 @@ const simplifiedChinese: Record<string, string> = {
   Location: "位置",
   "Manage your account and chat settings.": "管理你的账户和聊天设置。",
   "Manage your Mod Bots settings.": "管理你的 Mod Bots 设置。",
+  Fullscreen: "全屏",
   Maximize: "最大化",
   "Member since": "加入时间",
   Menu: "菜单",
