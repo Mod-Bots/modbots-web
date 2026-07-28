@@ -6,7 +6,14 @@ cd "$repository_root"
 
 echo "Running Biome before push..."
 if [ -f "./node_modules/.bin/biome.cmd" ]; then
-  ./node_modules/.bin/biome.cmd check
+  biome_command="./node_modules/.bin/biome.cmd"
 else
-  ./node_modules/.bin/biome check
+  biome_command="./node_modules/.bin/biome"
+fi
+
+if ! "$biome_command" check; then
+  echo ""
+  echo "Push blocked: Biome lint failed."
+  echo "Run npm run lint, fix every reported error, then push again."
+  exit 1
 fi
