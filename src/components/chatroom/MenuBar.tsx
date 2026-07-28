@@ -186,7 +186,7 @@ function MenuItems({
         disabled={item.disabled}
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => onAction(item.onSelect)}
-        className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[clamp(11px,calc(1.364vw+2px),14px)] text-zinc-300 hover:bg-white/[0.07] hover:text-white focus-visible:bg-white/[0.07] focus-visible:text-white focus-visible:outline-none disabled:cursor-not-allowed disabled:text-zinc-600 disabled:hover:bg-transparent"
+        className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[clamp(11px,calc(1.364vw+2px),14px)] text-zinc-300 hover:bg-white/[0.07] hover:text-white focus-visible:bg-white/[0.07] focus-visible:text-white focus-visible:outline-none disabled:cursor-default disabled:text-zinc-600 disabled:hover:bg-transparent"
       >
         <ItemIcon className="h-3.5 w-3.5 shrink-0 text-zinc-500 group-hover:text-zinc-300" />
         <span className="flex-1 whitespace-nowrap">{item.label}</span>
@@ -287,7 +287,7 @@ function MobileMenu({
             role="menuitem"
             disabled={item.disabled}
             onClick={() => onAction(item.onSelect)}
-            className="group flex min-h-9 w-full items-center gap-2.5 rounded px-2 py-1.5 text-left text-[14px] font-medium text-zinc-200 hover:bg-white/[0.08] focus-visible:bg-white/[0.08] focus-visible:outline-none disabled:cursor-not-allowed disabled:text-zinc-600 disabled:hover:bg-transparent"
+            className="group flex min-h-9 w-full items-center gap-2.5 rounded px-2 py-1.5 text-left text-[14px] font-medium text-zinc-200 hover:bg-white/[0.08] focus-visible:bg-white/[0.08] focus-visible:outline-none disabled:cursor-default disabled:text-zinc-600 disabled:hover:bg-transparent"
           >
             <ItemIcon className="h-4 w-4 shrink-0 text-zinc-500 group-hover:text-zinc-300" />
             <span className="min-w-0 flex-1 truncate">{item.label}</span>

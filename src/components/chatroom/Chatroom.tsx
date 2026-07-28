@@ -910,7 +910,7 @@ function MessageActions({ onReply }: { onReply?: () => void }) {
         type="button"
         onClick={onReply}
         disabled={onReply === undefined}
-        className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-zinc-500"
+        className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-zinc-500"
         aria-label={t("Reply to message")}
         title={t("Reply")}
       >
@@ -3479,7 +3479,7 @@ export function Chatroom() {
                               ? "Preparing your session..."
                               : t("Message the room")
                           }
-                          className="max-h-40 min-h-[58px] w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[14px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed"
+                          className="max-h-40 min-h-[58px] w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[14px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-default"
                         />
                         <div className="flex items-center justify-between px-2 pb-2">
                           <div className="flex items-center gap-0.5">
@@ -3489,7 +3489,7 @@ export function Chatroom() {
                                 !apiConnected || localActor === undefined
                               }
                               onClick={() => openAttachmentPicker("")}
-                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
+                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-default"
                               aria-label={t("Add files or media")}
                               title={t("Add a file, image, audio, or video")}
                             >
@@ -3501,7 +3501,7 @@ export function Chatroom() {
                                 !apiConnected || localActor === undefined
                               }
                               onClick={() => openAttachmentPicker("image/*")}
-                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
+                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-default"
                               aria-label={t("Add image")}
                               title={t("Add an image")}
                             >
@@ -3513,7 +3513,7 @@ export function Chatroom() {
                                 !apiConnected || localActor === undefined
                               }
                               onClick={() => openAttachmentPicker("audio/*")}
-                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
+                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-default"
                               aria-label={t("Record voice message")}
                               title={t("Add an audio recording")}
                             >
@@ -3523,7 +3523,7 @@ export function Chatroom() {
                             <button
                               type="button"
                               disabled
-                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-not-allowed"
+                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-default"
                               aria-label={t("Add reaction")}
                               title={t("Reactions are not connected yet")}
                             >
@@ -3540,7 +3540,7 @@ export function Chatroom() {
                             <button
                               type="submit"
                               disabled={!canSend}
-                              className="flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#171717] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
+                              className="flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#171717] disabled:cursor-default disabled:bg-zinc-800 disabled:text-zinc-500"
                             >
                               <span>
                                 {translatingSubmission

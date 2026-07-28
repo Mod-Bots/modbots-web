@@ -879,7 +879,7 @@ export function SettingsDialog({
                           event.currentTarget.value as ChatLanguage,
                         )
                       }
-                      className="mt-3 w-full rounded-md border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="mt-3 w-full rounded-md border border-white/[0.1] bg-[#171717] px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:cursor-default disabled:opacity-50"
                     >
                       <option value="zh-CN">简体中文</option>
                     </select>
