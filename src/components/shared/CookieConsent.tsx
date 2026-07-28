@@ -121,7 +121,7 @@ export const CookieConsent = (): React.ReactElement | null => {
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[100] px-4 pb-4 sm:px-6 sm:pb-6">
       <section
         aria-label="Cookies"
-        className="pointer-events-auto mx-auto flex w-full max-w-[860px] flex-col gap-5 rounded-2xl border border-white/10 bg-[#141414]/95 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:flex-row sm:items-center sm:gap-6 sm:p-6"
+        className="pointer-events-auto mx-auto flex w-full max-w-[860px] flex-col gap-5 rounded-window border border-white/10 bg-[#141414]/95 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:flex-row sm:items-center sm:gap-6 sm:p-6"
       >
         <p className="text-sm leading-6 text-zinc-300">
           We would like to measure how this site is used, which needs analytics
@@ -173,7 +173,7 @@ export const CookieChoicePanel = (): React.ReactElement => {
         : "You have not made a choice on this browser yet.";
 
   return (
-    <div className="mt-10 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 sm:p-8">
+    <div className="mt-10 rounded-window border border-white/[0.07] bg-white/[0.02] p-6 sm:p-8">
       <h3 className="text-lg font-semibold tracking-[-0.015em] text-white">
         Your choice
       </h3>

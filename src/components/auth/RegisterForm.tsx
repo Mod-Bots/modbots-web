@@ -224,7 +224,7 @@ export function RegisterForm() {
           }
         }}
         noValidate
-        className="mt-8 rounded-2xl border border-white/10 bg-[#141414] p-6 shadow-[0_16px_50px_rgba(0,0,0,0.35)]"
+        className="mt-8 rounded-window border border-white/10 bg-[#141414] p-6 shadow-[0_16px_50px_rgba(0,0,0,0.35)]"
       >
         {uid !== null ? <input type="hidden" name="uid" value={uid} /> : null}
         {uid === null && loginUrl !== null ? (

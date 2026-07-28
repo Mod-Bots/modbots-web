@@ -156,7 +156,7 @@ function MenuItems({
             <div
               role="menu"
               aria-label={item.label}
-              className="absolute left-full top-0 z-50 ml-0.5 min-w-[224px] rounded-lg border border-white/10 bg-[#151515] p-1 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
+              className="absolute left-full top-0 z-50 ml-0.5 min-w-[224px] rounded-window border border-white/10 bg-[#151515] p-1 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
             >
               <MenuItems items={item.items} onAction={onAction} />
             </div>
@@ -717,7 +717,7 @@ export function MenuBar({
         </span>
 
         {mobileOpen ? (
-          <div className="absolute left-2 top-full z-40 mt-1 w-[min(19rem,calc(100vw-1rem))] overflow-hidden rounded-md border border-white/[0.11] bg-[#181818]/[0.98] shadow-[0_16px_44px_rgba(0,0,0,0.6)] ring-1 ring-black/40 backdrop-blur-xl lg:hidden">
+          <div className="absolute left-2 top-full z-40 mt-1 w-[min(19rem,calc(100vw-1rem))] overflow-hidden rounded-window border border-white/[0.11] bg-[#181818]/[0.98] shadow-[0_16px_44px_rgba(0,0,0,0.6)] ring-1 ring-black/40 backdrop-blur-xl lg:hidden">
             <MobileMenu
               menus={menus}
               onAction={(action) => {
@@ -785,7 +785,7 @@ export function MenuBar({
                   role="menu"
                   aria-label={menu.label}
                   onKeyDown={(event) => handleMenuKeyDown(event, menu.id)}
-                  className="absolute left-0 top-full z-40 mt-0.5 min-w-[224px] rounded-lg border border-white/10 bg-[#151515] p-1 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
+                  className="absolute left-0 top-full z-40 mt-0.5 min-w-[224px] rounded-window border border-white/10 bg-[#151515] p-1 shadow-[0_16px_50px_rgba(0,0,0,0.5)]"
                 >
                   <MenuItems
                     items={menu.items}

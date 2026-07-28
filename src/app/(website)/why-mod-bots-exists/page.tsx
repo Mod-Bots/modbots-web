@@ -118,7 +118,7 @@ export default function WhyPage() {
 
       <figure className="border-y border-white/[0.07] bg-[#0c0c0c]">
         <div className="mx-auto grid w-full max-w-[1100px] items-center gap-10 px-6 py-16 sm:px-10 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <div className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl border border-white/[0.07]">
+          <div className="relative aspect-[5/4] w-full overflow-hidden rounded-window border border-white/[0.07]">
             <Image
               src={modBotPortrait}
               alt="A mod bot watching the room"
@@ -251,7 +251,7 @@ export default function WhyPage() {
             </div>
           </div>
 
-          <div className="mt-16 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-7 sm:p-9">
+          <div className="mt-16 rounded-window border border-white/[0.07] bg-white/[0.02] p-7 sm:p-9">
             <h3 className="text-xl font-semibold tracking-[-0.015em] text-white">
               Releases
             </h3>

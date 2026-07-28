@@ -905,7 +905,7 @@ function MessageActions({ onReply }: { onReply?: () => void }) {
   const { t } = useUiLanguage();
 
   return (
-    <div className="modbots-print-hidden absolute right-4 top-0 flex items-center rounded-xl border border-white/10 bg-[#181818] p-0.5 opacity-80 shadow-xl lg:right-6 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100">
+    <div className="modbots-print-hidden absolute right-4 top-0 flex items-center rounded-window border border-white/10 bg-[#181818] p-0.5 opacity-80 shadow-xl lg:right-6 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100">
       <button
         type="button"
         onClick={onReply}
@@ -2861,7 +2861,7 @@ export function Chatroom() {
                     localActor !== undefined &&
                     localProfile !== null ? (
                       <div
-                        className="absolute bottom-full left-3 z-30 mb-2 max-h-[calc(100vh-120px)] w-[320px] max-w-[calc(100vw-24px)] overflow-y-auto rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(28,28,28,0.98),rgba(17,17,17,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.58)] backdrop-blur-xl"
+                        className="absolute bottom-full left-3 z-30 mb-2 max-h-[calc(100vh-120px)] w-[320px] max-w-[calc(100vw-24px)] overflow-y-auto rounded-window border border-white/10 bg-[linear-gradient(180deg,rgba(28,28,28,0.98),rgba(17,17,17,0.98))] shadow-[0_24px_80px_rgba(0,0,0,0.58)] backdrop-blur-xl"
                         role="dialog"
                         aria-label={t("Your profile")}
                       >
@@ -2968,7 +2968,7 @@ export function Chatroom() {
                         </div>
                       </div>
                     ) : null}
-                    <div className="flex items-center gap-1 rounded-[20px] border border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.22)]">
+                    <div className="flex items-center gap-1 rounded-window border border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.22)]">
                       <button
                         type="button"
                         onClick={() =>
@@ -3198,7 +3198,7 @@ export function Chatroom() {
 
                     <div className="modbots-print-hidden shrink-0 px-3 pb-3 pt-2 sm:px-7 sm:pb-5">
                       {translationError !== null ? (
-                        <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
                           <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
                           <span className="flex-1">{translationError}</span>
                           <button
@@ -3212,7 +3212,7 @@ export function Chatroom() {
                         </div>
                       ) : null}
                       {attachmentError !== null ? (
-                        <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
                           <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
                           <span className="flex-1">{attachmentError}</span>
                           <button
@@ -3226,7 +3226,7 @@ export function Chatroom() {
                         </div>
                       ) : null}
                       {mutedNotice !== null ? (
-                        <div className="mb-2 flex items-center gap-2 rounded-xl border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
+                        <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-[#151515] px-3 py-2 text-xs text-zinc-300">
                           <MicOff className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
                           <span className="flex-1">{mutedNotice}</span>
                           <button
@@ -3241,10 +3241,10 @@ export function Chatroom() {
                       ) : null}
                       <form
                         onSubmit={(event) => void submitMessage(event)}
-                        className="relative rounded-2xl border border-white/10 bg-[#171717] shadow-[0_16px_50px_rgba(0,0,0,0.35)] focus-within:border-white/20"
+                        className="relative rounded-window border border-white/10 bg-[#171717] shadow-[0_16px_50px_rgba(0,0,0,0.35)] focus-within:border-white/20"
                       >
                         {mention !== null && mentionOptions.length > 0 ? (
-                          <div className="absolute bottom-full left-0 mb-2 w-72 overflow-hidden rounded-xl border border-white/10 bg-[#181818] p-1 shadow-2xl">
+                          <div className="absolute bottom-full left-0 mb-2 w-72 overflow-hidden rounded-window border border-white/10 bg-[#181818] p-1 shadow-2xl">
                             <p className="px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-600">
                               Address someone
                             </p>
@@ -3570,7 +3570,7 @@ export function Chatroom() {
                       </p>
                     </div>
 
-                    <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+                    <div className="mt-4 rounded-window border border-white/[0.06] bg-white/[0.02] p-3.5">
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
                           {t("Activity")}
@@ -3768,7 +3768,7 @@ export function Chatroom() {
                     </div>
 
                     {rules.data !== undefined ? (
-                      <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+                      <div className="mt-4 rounded-window border border-white/[0.06] bg-white/[0.02] p-3.5">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
                           {t("Rules")}
                         </p>
@@ -3886,7 +3886,7 @@ export function Chatroom() {
             onClick={() => setAboutOpen(false)}
           >
             <div
-              className="w-[360px] rounded-2xl border border-white/10 bg-[#111111] p-6 shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
+              className="w-[360px] rounded-window border border-white/10 bg-[#111111] p-6 shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-center gap-3">

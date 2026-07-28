@@ -485,7 +485,7 @@ export function SettingsDialog({
       <div
         ref={dialogRef}
         style={positionedWindowStyle}
-        className={`modbots-settings-dialog relative z-10 flex h-dvh w-full flex-col overflow-hidden border border-white/10 bg-[#101010] shadow-[0_28px_90px_rgba(0,0,0,0.7)] sm:absolute sm:h-[min(720px,calc(100dvh-24px))] sm:min-h-[440px] sm:w-[min(880px,calc(100vw-24px))] sm:min-w-[600px] sm:max-h-[calc(100dvh-24px)] sm:max-w-[calc(100vw-24px)] sm:rounded-lg ${
+        className={`modbots-settings-dialog relative z-10 flex h-dvh w-full flex-col overflow-hidden border border-white/10 bg-[#101010] shadow-[0_28px_90px_rgba(0,0,0,0.7)] sm:absolute sm:h-[min(720px,calc(100dvh-24px))] sm:min-h-[440px] sm:w-[min(880px,calc(100vw-24px))] sm:min-w-[600px] sm:max-h-[calc(100dvh-24px)] sm:max-w-[calc(100vw-24px)] sm:rounded-window ${
           windowPosition === null
             ? "sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
             : "sm:translate-x-0 sm:translate-y-0"
