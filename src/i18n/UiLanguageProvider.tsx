@@ -69,8 +69,7 @@ const simplifiedChinese: Record<string, string> = {
   "Language settings": "语言设置",
   Location: "位置",
   "Manage your account and chat settings.": "管理你的账户和聊天设置。",
-  "Manage your account, chat, and language settings.":
-    "管理你的账户、聊天和语言设置。",
+  "Manage your Mod Bots settings.": "管理你的 Mod Bots 设置。",
   Maximize: "最大化",
   "Member since": "加入时间",
   Menu: "菜单",

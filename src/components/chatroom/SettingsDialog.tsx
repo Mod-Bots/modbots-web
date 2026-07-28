@@ -237,7 +237,7 @@ export function SettingsDialog({
               {t("Settings")}
             </h2>
             <p className="mt-1 text-xs text-zinc-500">
-              {t("Manage your account, chat, and language settings.")}
+              {t("Manage your Mod Bots settings.")}
             </p>
           </div>
           <button
