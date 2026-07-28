@@ -4,6 +4,7 @@ import {
   GripHorizontal,
   Languages,
   MessageSquare,
+  MoveDiagonal2,
   Shield,
   UserRound,
   X,
@@ -94,10 +95,6 @@ const settingsResizeHandles: ReadonlyArray<{
   {
     edge: "ne",
     className: "right-0 top-0 h-3 w-3 cursor-ne-resize",
-  },
-  {
-    edge: "se",
-    className: "bottom-0 right-0 h-3 w-3 cursor-se-resize",
   },
   {
     edge: "sw",
@@ -424,7 +421,7 @@ export function SettingsDialog({
   };
 
   const startWindowResize =
-    (edge: WindowResizeEdge) => (event: ReactPointerEvent<HTMLDivElement>) => {
+    (edge: WindowResizeEdge) => (event: ReactPointerEvent<HTMLElement>) => {
       const dialog = dialogRef.current;
 
       if (dialog === null || window.innerWidth < 640) {
@@ -448,7 +445,7 @@ export function SettingsDialog({
       event.preventDefault();
     };
 
-  const resizeWindow = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const resizeWindow = (event: ReactPointerEvent<HTMLElement>) => {
     const resize = windowResize.current;
 
     if (resize === null || resize.pointerId !== event.pointerId) {
@@ -510,7 +507,7 @@ export function SettingsDialog({
     setWindowSize({ width, height });
   };
 
-  const stopWindowResize = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const stopWindowResize = (event: ReactPointerEvent<HTMLElement>) => {
     if (windowResize.current?.pointerId !== event.pointerId) {
       return;
     }
@@ -917,6 +914,18 @@ export function SettingsDialog({
             className={`absolute z-20 hidden touch-none sm:block ${handle.className}`}
           />
         ))}
+        <button
+          type="button"
+          onPointerDown={startWindowResize("se")}
+          onPointerMove={resizeWindow}
+          onPointerUp={stopWindowResize}
+          onPointerCancel={stopWindowResize}
+          className="absolute bottom-0 right-0 z-30 hidden h-6 w-6 touch-none cursor-se-resize items-end justify-end p-1 text-zinc-600 transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/30 sm:flex"
+          aria-label={t("Resize settings window")}
+          title={t("Resize settings window")}
+        >
+          <MoveDiagonal2 className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   );
