@@ -126,17 +126,19 @@ function SectionButton({
   icon,
   active,
   onClick,
+  className = "",
 }: {
   label: string;
   icon: ReactNode;
   active: boolean;
   onClick: () => void;
+  className?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+      className={`${className} relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
         active
           ? "bg-white/[0.08] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]"
           : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
@@ -541,12 +543,6 @@ export function SettingsDialog({
                 onClick={() => onSectionChange("account")}
               />
               <SectionButton
-                label={t("Chat")}
-                icon={<MessageSquare className="h-4 w-4" />}
-                active={section === "chat"}
-                onClick={() => onSectionChange("chat")}
-              />
-              <SectionButton
                 label={t("Language")}
                 icon={<Languages className="h-4 w-4" />}
                 active={section === "language"}
@@ -556,7 +552,7 @@ export function SettingsDialog({
                 }}
               />
               {section === "language" ? (
-                <div className="col-span-3 ml-9 border-l border-white/[0.08] pl-2 md:mt-1">
+                <div className="order-4 col-span-3 ml-9 border-l border-white/[0.08] pl-2 md:order-none md:mt-1">
                   <button
                     type="button"
                     onClick={() => setLanguagePage("messages")}
@@ -573,6 +569,13 @@ export function SettingsDialog({
                   </button>
                 </div>
               ) : null}
+              <SectionButton
+                label={t("Chat")}
+                icon={<MessageSquare className="h-4 w-4" />}
+                active={section === "chat"}
+                onClick={() => onSectionChange("chat")}
+                className="order-3 md:order-none"
+              />
             </nav>
           </aside>
 
