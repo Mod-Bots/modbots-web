@@ -316,6 +316,7 @@ export function MenuBar({
   onUndoMessage,
   onRedoMessage,
   onOpenSettings,
+  onReportProblem,
   onTakeScreenshot,
 }: {
   canUndoMessage: boolean;
@@ -323,6 +324,7 @@ export function MenuBar({
   onUndoMessage: () => void;
   onRedoMessage: () => void;
   onOpenSettings: () => void;
+  onReportProblem: () => void;
   onTakeScreenshot: () => void;
 }) {
   const { t } = useUiLanguage();
@@ -642,7 +644,12 @@ export function MenuBar({
       icon: CircleHelp,
       items: [
         { id: "getting-started", label: "Getting Started", icon: BookOpen },
-        { id: "report-problem", label: "Report a Problem", icon: Bug },
+        {
+          id: "report-problem",
+          label: "Report a Problem",
+          icon: Bug,
+          onSelect: onReportProblem,
+        },
         {
           id: "request-feature",
           label: "Request a Feature",

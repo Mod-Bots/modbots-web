@@ -104,6 +104,23 @@ const simplifiedChinese: Record<string, string> = {
   "Release Notes": "发行说明",
   "Remove picture": "移除头像",
   "Report a Problem": "报告问题",
+  "Submitting this form creates a public GitHub issue.":
+    "提交此表单会创建一个公开的 GitHub 议题。",
+  "Issue title": "议题标题",
+  "Briefly describe the problem": "简要描述问题",
+  Description: "详细说明",
+  "Explain what happened and what you expected to happen.":
+    "说明发生了什么，以及你原本期望发生什么。",
+  "Submitting...": "正在提交...",
+  "Submit issue": "提交议题",
+  "The issue could not be created. Please try again.": "无法创建议题，请重试。",
+  "Problem reporting is not configured.": "问题报告功能尚未配置。",
+  "Enter an issue title and description.": "请输入议题标题和详细说明。",
+  "GitHub could not create the issue. Please try again.":
+    "GitHub 无法创建议题，请重试。",
+  "The GitHub issue was created successfully.": "GitHub 议题已成功创建。",
+  "View issue": "查看议题",
+  Done: "完成",
   "Request a Feature": "建议新功能",
   "Reset Zoom": "重置缩放",
   Restore: "还原",
