@@ -45,14 +45,14 @@ export default function RootLayout({
       lang="en"
       className="h-full antialiased"
       data-theme="dark"
-      data-theme-mode="dark"
+      data-theme-mode="system"
       suppressHydrationWarning
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html:
-              '(function(){try{var m=localStorage.getItem("modbots.theme-mode");if(m!=="light"&&m!=="dark"&&m!=="system"&&m!=="auto")m="dark";var t=m;if(m==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";if(m==="auto"){var h=new Date().getHours();t=h>=6&&h<18?"light":"dark"}document.documentElement.dataset.themeMode=m;document.documentElement.dataset.theme=t}catch(e){}})()',
+              '(function(){try{var m=localStorage.getItem("modbots.theme-mode");if(m!=="light"&&m!=="dark"&&m!=="system"&&m!=="auto")m="system";var t=m;if(m==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";if(m==="auto"){var h=new Date().getHours();t=h>=6&&h<18?"light":"dark"}document.documentElement.dataset.themeMode=m;document.documentElement.dataset.theme=t}catch(e){}})()',
           }}
         />
       </head>

@@ -24,11 +24,11 @@ const isThemeMode = (value: string | null): value is ThemeMode =>
 
 const storedThemeMode = (): ThemeMode => {
   if (typeof window === "undefined") {
-    return "dark";
+    return "system";
   }
 
   const stored = window.localStorage.getItem(storageKey);
-  return isThemeMode(stored) ? stored : "dark";
+  return isThemeMode(stored) ? stored : "system";
 };
 
 const resolveTheme = (mode: ThemeMode): ResolvedTheme => {
