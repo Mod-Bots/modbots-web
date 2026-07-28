@@ -3,9 +3,11 @@
 import html2canvas from "html2canvas";
 import {
   AtSign,
+  Bell,
   Bot,
   CalendarDays,
   Camera,
+  CheckCircle2,
   ChevronDown,
   CircleAlert,
   CornerUpLeft,
@@ -26,6 +28,7 @@ import {
   Send,
   Shield,
   SmilePlus,
+  TriangleAlert,
   Users,
   X,
 } from "lucide-react";
@@ -52,6 +55,11 @@ import { isMutedError, mediaAssetDataUrl } from "@/data/platform";
 import { actorLabel, actorRole } from "@/data/room-state";
 import { useRoomActivity } from "@/hooks/useRoomActivity";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
+import {
+  type AppNotification,
+  type NotificationTone,
+  useNotifications,
+} from "@/notifications/NotificationProvider";
 import { CheckForUpdatesDialog } from "./CheckForUpdatesDialog";
 import { MenuBar } from "./MenuBar";
 import { ReportProblemDialog } from "./ReportProblemDialog";
@@ -853,9 +861,58 @@ function ActorProfilePicture({
   );
 }
 
-// The status bar surfaces only state the user cannot otherwise perceive:
-// the link to the service, in-flight sends, restrictions on the user, and
-// search feedback. It never repeats what is visible elsewhere.
+const notificationToneIcon = (tone: NotificationTone) => {
+  if (tone === "success") {
+    return CheckCircle2;
+  }
+
+  if (tone === "warning") {
+    return TriangleAlert;
+  }
+
+  if (tone === "error") {
+    return CircleAlert;
+  }
+
+  return Info;
+};
+
+function NotificationRow({
+  notification,
+  onDismiss,
+}: {
+  notification: AppNotification;
+  onDismiss: () => void;
+}) {
+  const { t } = useUiLanguage();
+  const ToneIcon = notificationToneIcon(notification.tone);
+
+  return (
+    <li className="flex items-start gap-2.5 border-t border-white/[0.07] px-3 py-2.5 first:border-t-0">
+      <ToneIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-500" />
+      <div className="min-w-0 flex-1">
+        <p className="text-[12px] font-medium leading-4 text-zinc-200">
+          {t(notification.title)}
+        </p>
+        {notification.message !== undefined ? (
+          <p className="mt-0.5 text-[11px] leading-4 text-zinc-500">
+            {t(notification.message)}
+          </p>
+        ) : null}
+      </div>
+      <button
+        type="button"
+        onClick={onDismiss}
+        className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-zinc-600 hover:bg-white/[0.07] hover:text-zinc-300"
+        aria-label={t("Dismiss notification")}
+        title={t("Dismiss notification")}
+      >
+        <X className="h-3 w-3" />
+      </button>
+    </li>
+  );
+}
+
 function StatusBar({
   connectionLabel,
   sending,
@@ -868,10 +925,53 @@ function StatusBar({
   searchMatches: number | null;
 }) {
   const { t } = useUiLanguage();
+  const {
+    clearNotifications,
+    dismissNotification,
+    markAllNotificationsRead,
+    notifications,
+    unreadCount,
+  } = useNotifications();
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const latestNotification = notifications.at(-1);
+  const LatestToneIcon =
+    latestNotification === undefined
+      ? null
+      : notificationToneIcon(latestNotification.tone);
+
+  useEffect(() => {
+    if (!notificationsOpen) {
+      return;
+    }
+
+    markAllNotificationsRead();
+    const closeNotifications = (event: MouseEvent | KeyboardEvent) => {
+      if (event instanceof KeyboardEvent && event.key === "Escape") {
+        setNotificationsOpen(false);
+        return;
+      }
+
+      if (
+        event instanceof MouseEvent &&
+        event.target instanceof Node &&
+        !notificationsRef.current?.contains(event.target)
+      ) {
+        setNotificationsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeNotifications);
+    document.addEventListener("keydown", closeNotifications);
+    return () => {
+      document.removeEventListener("mousedown", closeNotifications);
+      document.removeEventListener("keydown", closeNotifications);
+    };
+  }, [markAllNotificationsRead, notificationsOpen]);
 
   return (
-    <footer className="modbots-print-hidden flex h-7 shrink-0 items-center justify-between gap-4 border-t border-white/[0.08] bg-modbots-chrome px-3 text-[11px] text-zinc-500">
-      <div className="flex items-center gap-3">
+    <footer className="modbots-print-hidden relative flex h-7 shrink-0 items-center gap-3 border-t border-white/[0.08] bg-modbots-chrome px-3 text-[11px] text-zinc-500">
+      <div className="flex shrink-0 items-center gap-3">
         <span className="flex items-center gap-2">
           <span
             className={`h-2 w-2 rounded-full ${
@@ -896,11 +996,105 @@ function StatusBar({
         ) : null}
       </div>
 
-      {searchMatches !== null ? (
-        <span className="tabular-nums">
-          {searchMatches} {searchMatches === 1 ? "match" : "matches"}
-        </span>
-      ) : null}
+      <div className="flex min-w-0 flex-1 items-center justify-center px-2">
+        {latestNotification !== undefined && LatestToneIcon !== null ? (
+          <div
+            role={
+              latestNotification.tone === "error" ||
+              latestNotification.tone === "warning"
+                ? "alert"
+                : "status"
+            }
+            className="flex min-w-0 max-w-full items-center gap-1.5 text-zinc-400"
+          >
+            <LatestToneIcon className="h-3 w-3 shrink-0" />
+            <span className="truncate">
+              <span className="font-medium text-zinc-300">
+                {t(latestNotification.title)}
+              </span>
+              {latestNotification.message !== undefined
+                ? ` · ${t(latestNotification.message)}`
+                : ""}
+            </span>
+            <button
+              type="button"
+              onClick={() => dismissNotification(latestNotification.id)}
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-zinc-600 hover:bg-white/[0.07] hover:text-zinc-300"
+              aria-label={t("Dismiss notification")}
+              title={t("Dismiss notification")}
+            >
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="flex shrink-0 items-center gap-3">
+        {searchMatches !== null ? (
+          <span className="tabular-nums">
+            {searchMatches} {searchMatches === 1 ? "match" : "matches"}
+          </span>
+        ) : null}
+
+        <div ref={notificationsRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setNotificationsOpen((current) => !current)}
+            className="relative flex h-6 w-6 items-center justify-center rounded text-zinc-500 hover:bg-white/[0.07] hover:text-zinc-200"
+            aria-label={`${t("Notifications")}${
+              unreadCount > 0 ? `, ${unreadCount} ${t("unread")}` : ""
+            }`}
+            aria-haspopup="dialog"
+            aria-expanded={notificationsOpen}
+            title={t("Notifications")}
+          >
+            <Bell className="h-3.5 w-3.5" />
+            {unreadCount > 0 ? (
+              <span className="absolute -right-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-zinc-200 px-0.5 text-[8px] font-bold leading-none text-black">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            ) : null}
+          </button>
+
+          {notificationsOpen ? (
+            <section
+              role="dialog"
+              aria-label={t("Notifications")}
+              className="absolute bottom-[calc(100%+5px)] right-0 z-50 w-[340px] max-w-[calc(100vw-16px)] overflow-hidden rounded-window border border-white/10 bg-modbots-popover shadow-[0_16px_50px_rgba(0,0,0,0.55)]"
+            >
+              <header className="flex h-10 items-center justify-between border-b border-white/[0.08] px-3">
+                <h3 className="text-[12px] font-semibold text-zinc-200">
+                  {t("Notifications")}
+                </h3>
+                {notifications.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={clearNotifications}
+                    className="rounded px-1.5 py-1 text-[10px] text-zinc-500 hover:bg-white/[0.07] hover:text-zinc-300"
+                  >
+                    {t("Clear all")}
+                  </button>
+                ) : null}
+              </header>
+              {notifications.length > 0 ? (
+                <ul className="modbots-scroll max-h-72 overflow-y-auto">
+                  {[...notifications].reverse().map((notification) => (
+                    <NotificationRow
+                      key={notification.id}
+                      notification={notification}
+                      onDismiss={() => dismissNotification(notification.id)}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p className="px-3 py-5 text-center text-[11px] text-zinc-500">
+                  {t("No notifications")}
+                </p>
+              )}
+            </section>
+          ) : null}
+        </div>
+      </div>
     </footer>
   );
 }
@@ -1455,6 +1649,7 @@ const downloadBlob = (blob: Blob, fileName: string) => {
 export function Chatroom() {
   const router = useRouter();
   const { language: uiLanguage, t } = useUiLanguage();
+  const { notify } = useNotifications();
   const {
     actors,
     apiHealth,
@@ -2593,6 +2788,30 @@ export function Chatroom() {
         : realtimeStatus.state === "reconnecting" || realtimeConnected
           ? "Reconnecting"
           : "Connecting";
+  const previousConnectionLabel = useRef<string | null>(null);
+  const hasConnected = useRef(false);
+
+  useEffect(() => {
+    const previous = previousConnectionLabel.current;
+    previousConnectionLabel.current = connectionLabel;
+
+    if (connectionLabel === "Connected") {
+      if (hasConnected.current && previous !== "Connected") {
+        notify({ title: "Connection restored", tone: "success" });
+      }
+
+      hasConnected.current = true;
+      return;
+    }
+
+    if (hasConnected.current && previous === "Connected") {
+      notify({
+        title: "Connection interrupted",
+        message: "Trying to reconnect...",
+        tone: "warning",
+      });
+    }
+  }, [connectionLabel, notify]);
 
   const scrollToLatest = () => {
     const viewport = conversationViewport.current;

@@ -1,8 +1,9 @@
 "use client";
 
 import { RefreshCw, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
+import { useNotifications } from "@/notifications/NotificationProvider";
 
 type UpdatePhase = "checking" | "current" | "updating" | "error";
 
@@ -26,10 +27,12 @@ export function CheckForUpdatesDialog({
   onClose,
 }: CheckForUpdatesDialogProps) {
   const { t } = useUiLanguage();
+  const { notify } = useNotifications();
   const [phase, setPhase] = useState<UpdatePhase>("checking");
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [checkNumber, setCheckNumber] = useState(0);
+  const resultNotificationSent = useRef(false);
   const canClose = phase !== "updating";
 
   useEffect(() => {
@@ -58,8 +61,16 @@ export function CheckForUpdatesDialog({
       pollCount += 1;
 
       if (pollCount > updatePollLimit) {
+        const message = t(
+          "The update is taking longer than expected. Try again.",
+        );
         setPhase("error");
-        setError(t("The update is taking longer than expected. Try again."));
+        setError(message);
+
+        if (!resultNotificationSent.current) {
+          notify({ title: t("Update failed"), message, tone: "error" });
+          resultNotificationSent.current = true;
+        }
         return;
       }
 
@@ -100,12 +111,29 @@ export function CheckForUpdatesDialog({
 
         if (!result.updateAvailable) {
           setPhase("current");
+
+          if (!resultNotificationSent.current) {
+            notify({
+              title: t("Mod Bots is up to date."),
+              message: `${t("Version")} ${currentVersion}`,
+              tone: "success",
+            });
+            resultNotificationSent.current = true;
+          }
           return;
         }
 
         updateFound = true;
         setLatestVersion(result.latestVersion);
         setPhase("updating");
+
+        if (!resultNotificationSent.current) {
+          notify({
+            title: t("Web update available"),
+            message: `${t("Version")} ${result.latestVersion}`,
+          });
+          resultNotificationSent.current = true;
+        }
 
         if (result.updateReady) {
           reloadTimer = window.setTimeout(() => window.location.reload(), 400);
@@ -124,11 +152,16 @@ export function CheckForUpdatesDialog({
         }
 
         setPhase("error");
-        setError(
+        const message =
           checkError instanceof Error
             ? checkError.message
-            : t("GitHub could not be checked for updates."),
-        );
+            : t("GitHub could not be checked for updates.");
+        setError(message);
+
+        if (!resultNotificationSent.current) {
+          notify({ title: t("Update check failed"), message, tone: "error" });
+          resultNotificationSent.current = true;
+        }
       }
     };
 
@@ -145,12 +178,13 @@ export function CheckForUpdatesDialog({
         window.clearTimeout(reloadTimer);
       }
     };
-  }, [checkNumber, currentVersion, t]);
+  }, [checkNumber, currentVersion, notify, t]);
 
   const retry = () => {
     setPhase("checking");
     setLatestVersion(null);
     setError(null);
+    resultNotificationSent.current = false;
     setCheckNumber((current) => current + 1);
   };
 
