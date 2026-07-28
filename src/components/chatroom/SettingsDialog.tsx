@@ -724,7 +724,7 @@ export function SettingsDialog({
                           value={links}
                           onChange={(event) => setLinks(event.target.value)}
                           rows={3}
-                          className="mt-1.5 w-full resize-y rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
+                          className="mt-1.5 w-full resize-none rounded-md border border-white/[0.08] bg-black/20 px-3 py-2 text-[13px] text-zinc-100 outline-none transition focus:border-white/20 focus:ring-2 focus:ring-white/10"
                         />
                       </label>
                     </div>
