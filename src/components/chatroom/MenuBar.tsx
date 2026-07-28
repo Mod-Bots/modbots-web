@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { useZoom } from "@/appearance/ZoomProvider";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -330,6 +331,7 @@ export function MenuBar({
 }) {
   const { t } = useUiLanguage();
   const { setThemeMode } = useTheme();
+  const { canZoomIn, canZoomOut, resetZoom, zoomIn, zoomOut } = useZoom();
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [editContext, setEditContext] = useState<EditContext>(emptyEditContext);
@@ -565,18 +567,23 @@ export function MenuBar({
                   label: "Zoom In",
                   icon: ZoomIn,
                   shortcut: "Ctrl++",
+                  disabled: !canZoomIn,
+                  onSelect: zoomIn,
                 },
                 {
                   id: "zoom-out",
                   label: "Zoom Out",
                   icon: ZoomOut,
                   shortcut: "Ctrl+-",
+                  disabled: !canZoomOut,
+                  onSelect: zoomOut,
                 },
                 {
                   id: "reset-zoom",
                   label: "Reset Zoom",
                   icon: RotateCcw,
                   shortcut: "Ctrl+0",
+                  onSelect: resetZoom,
                 },
               ],
             },

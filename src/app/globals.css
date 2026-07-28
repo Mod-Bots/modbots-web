@@ -119,6 +119,7 @@
   }
 }
 :root {
+  --modbots-interface-zoom: 1;
   --background: #0a0a0a;
   --foreground: #ededed;
   --modbots-body-background:
@@ -286,6 +287,13 @@ html,
 body {
   height: 100%;
   overflow: hidden;
+}
+
+.modbots-interface-zoom {
+  width: calc(100vw / var(--modbots-interface-zoom));
+  height: calc(100dvh / var(--modbots-interface-zoom));
+  min-height: calc(100dvh / var(--modbots-interface-zoom));
+  zoom: var(--modbots-interface-zoom);
 }
 
 body {
