@@ -317,7 +317,6 @@ export function MenuBar({
   onUndoMessage,
   onRedoMessage,
   onOpenSettings,
-  onRefreshChatroom,
   onTakeScreenshot,
   onExportChatLog,
 }: {
@@ -326,7 +325,6 @@ export function MenuBar({
   onUndoMessage: () => void;
   onRedoMessage: () => void;
   onOpenSettings: () => void;
-  onRefreshChatroom: () => void;
   onTakeScreenshot: () => void;
   onExportChatLog: () => void;
 }) {
@@ -631,7 +629,7 @@ export function MenuBar({
           id: "refresh-chatroom",
           label: "Refresh the Chatroom",
           icon: RefreshCw,
-          onSelect: onRefreshChatroom,
+          onSelect: () => window.location.reload(),
         },
         {
           id: "take-screenshot",

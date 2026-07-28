@@ -2843,7 +2843,6 @@ export function Chatroom() {
           onUndoMessage={() => moveDraftHistory("undo")}
           onRedoMessage={() => moveDraftHistory("redo")}
           onOpenSettings={() => openSettings("account")}
-          onRefreshChatroom={() => void refresh()}
           onTakeScreenshot={() => void takeScreenshot().catch(() => undefined)}
           onExportChatLog={exportChatLog}
         />
