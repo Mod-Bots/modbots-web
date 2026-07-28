@@ -166,7 +166,7 @@ export function ReportProblemDialog({ onClose }: ReportProblemDialogProps) {
                 disabled={submitting}
                 className="h-10 rounded-window bg-white px-4 text-sm font-semibold text-black hover:bg-zinc-200 disabled:cursor-default disabled:opacity-60"
               >
-                {submitting ? t("Submitting...") : t("Submit issue")}
+                {submitting ? t("Submitting...") : t("Submit")}
               </button>
             </div>
           </form>

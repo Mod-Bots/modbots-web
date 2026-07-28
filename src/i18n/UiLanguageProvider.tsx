@@ -132,7 +132,7 @@ const simplifiedChinese: Record<string, string> = {
   "Explain what happened and what you expected to happen.":
     "说明发生了什么，以及你原本期望发生什么。",
   "Submitting...": "正在提交...",
-  "Submit issue": "提交议题",
+  Submit: "提交",
   "The issue could not be created. Please try again.": "无法创建议题，请重试。",
   "Problem reporting is not configured.": "问题报告功能尚未配置。",
   "Enter an issue title and description.": "请输入议题标题和详细说明。",
