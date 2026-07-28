@@ -133,41 +133,6 @@
   --color-zinc-950: #f8fafc;
   color-scheme: light;
 
-  .modbots-participants-panel {
-    background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-    border-color: rgba(15, 23, 42, 0.16);
-  }
-
-  .modbots-participants-header {
-    background: #ffffff;
-    border-color: rgba(15, 23, 42, 0.14);
-  }
-
-  .modbots-participants-summary {
-    background: #e9eef4;
-    border-color: rgba(15, 23, 42, 0.12);
-  }
-
-  .modbots-participants-list {
-    padding: 0.625rem;
-  }
-
-  .modbots-participant-group {
-    padding: 0.625rem 0.5rem;
-    border: 1px solid rgba(15, 23, 42, 0.1);
-    border-radius: var(--radius-window);
-    background: rgba(255, 255, 255, 0.78);
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-  }
-
-  .modbots-participant-group-title {
-    color: #64748b;
-  }
-
-  .modbots-participant-row:hover {
-    background: rgba(15, 23, 42, 0.06);
-  }
-
   .modbots-profile-picture {
     overflow: hidden;
     color: #ffffff;
@@ -193,28 +158,6 @@
     box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.1);
   }
 
-  .modbots-participant-status[data-status="active"] {
-    color: #047857;
-  }
-
-  .modbots-participant-status[data-status="idle"] {
-    color: #a16207;
-  }
-
-  .modbots-participant-status[data-status="offline"] {
-    color: #64748b;
-  }
-
-  .modbots-account-dock {
-    background: #e3e9f0;
-    border-color: rgba(15, 23, 42, 0.14);
-  }
-
-  .modbots-account-card {
-    background: #ffffff;
-    border-color: rgba(15, 23, 42, 0.12);
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
-  }
 }
 
 [data-theme="dark"] {
