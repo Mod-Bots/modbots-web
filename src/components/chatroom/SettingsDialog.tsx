@@ -4,7 +4,6 @@ import {
   GripHorizontal,
   Languages,
   MessageSquare,
-  MoveDiagonal2,
   Shield,
   UserRound,
   X,
@@ -58,7 +57,7 @@ interface WindowSize {
   height: number;
 }
 
-type WindowResizeEdge = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
+type WindowResizeEdge = "n" | "e" | "s" | "w";
 
 interface WindowResize {
   pointerId: number;
@@ -91,18 +90,6 @@ const settingsResizeHandles: ReadonlyArray<{
   {
     edge: "w",
     className: "bottom-3 left-0 top-3 w-2 cursor-w-resize",
-  },
-  {
-    edge: "ne",
-    className: "right-0 top-0 h-3 w-3 cursor-ne-resize",
-  },
-  {
-    edge: "sw",
-    className: "bottom-0 left-0 h-3 w-3 cursor-sw-resize",
-  },
-  {
-    edge: "nw",
-    className: "left-0 top-0 h-3 w-3 cursor-nw-resize",
   },
 ];
 
@@ -922,18 +909,6 @@ export function SettingsDialog({
             className={`absolute z-20 hidden touch-none sm:block ${handle.className}`}
           />
         ))}
-        <button
-          type="button"
-          onPointerDown={startWindowResize("se")}
-          onPointerMove={resizeWindow}
-          onPointerUp={stopWindowResize}
-          onPointerCancel={stopWindowResize}
-          className="absolute bottom-0 right-0 z-30 hidden h-6 w-6 touch-none cursor-se-resize items-end justify-end p-1 text-zinc-600 transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/30 sm:flex"
-          aria-label={t("Resize settings window")}
-          title={t("Resize settings window")}
-        >
-          <MoveDiagonal2 className="h-3.5 w-3.5" />
-        </button>
       </div>
     </div>
   );
