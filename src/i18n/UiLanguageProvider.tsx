@@ -39,6 +39,8 @@ const simplifiedChinese: Record<string, string> = {
   "Choose how messages appear and how you send them.":
     "选择消息的显示方式和发送方式。",
   "Choose how you send messages.": "选择消息的发送方式。",
+  "Choose how messages are translated.": "选择消息的翻译方式。",
+  "Choose the language used by the interface.": "选择界面使用的语言。",
   Close: "关闭",
   "Close menu": "关闭菜单",
   "Close participants": "关闭参与者列表",
@@ -120,8 +122,6 @@ const simplifiedChinese: Record<string, string> = {
     "以英文显示菜单、按钮和设置。",
   "Show menus, buttons, and settings in Simplified Chinese.":
     "以简体中文显示菜单、按钮和设置。",
-  "Choose the language used by the interface and message translation.":
-    "选择界面和消息翻译使用的语言。",
   "Translate messages": "翻译消息",
   "Translate messages into": "将消息翻译为",
   "Take a Screenshot": "截取屏幕截图",

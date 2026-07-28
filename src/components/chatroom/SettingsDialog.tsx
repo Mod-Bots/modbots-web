@@ -245,6 +245,9 @@ export function SettingsDialog({
     null,
   );
   const [windowSize, setWindowSize] = useState<WindowSize | null>(null);
+  const [languagePage, setLanguagePage] = useState<"interface" | "messages">(
+    "interface",
+  );
   const dialogRef = useRef<HTMLDivElement>(null);
   const windowDrag = useRef<WindowDrag | null>(null);
   const windowResize = useRef<WindowResize | null>(null);
@@ -547,8 +550,29 @@ export function SettingsDialog({
                 label={t("Language")}
                 icon={<Languages className="h-4 w-4" />}
                 active={section === "language"}
-                onClick={() => onSectionChange("language")}
+                onClick={() => {
+                  setLanguagePage("interface");
+                  onSectionChange("language");
+                }}
               />
+              {section === "language" ? (
+                <div className="col-span-3 ml-9 border-l border-white/[0.08] pl-2 md:mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setLanguagePage("messages")}
+                    className={`relative flex w-full items-center rounded-md px-2.5 py-1.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                      languagePage === "messages"
+                        ? "bg-white/[0.08] text-white"
+                        : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200"
+                    }`}
+                  >
+                    {languagePage === "messages" ? (
+                      <span className="absolute -left-[11px] top-1/2 h-px w-2 bg-zinc-400" />
+                    ) : null}
+                    {t("Messages")}
+                  </button>
+                </div>
+              ) : null}
             </nav>
           </aside>
 
@@ -752,16 +776,14 @@ export function SettingsDialog({
                   />
                 </div>
               </div>
-            ) : (
+            ) : languagePage === "interface" ? (
               <div>
                 <section className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
                     {t("Language settings")}
                   </p>
                   <p className="mt-2 text-sm text-zinc-400">
-                    {t(
-                      "Choose the language used by the interface and message translation.",
-                    )}
+                    {t("Choose the language used by the interface.")}
                   </p>
                 </section>
 
@@ -788,6 +810,20 @@ export function SettingsDialog({
                         : t("Show menus, buttons, and settings in English.")}
                     </span>
                   </label>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <section className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                    {t("Messages")}
+                  </p>
+                  <p className="mt-2 text-sm text-zinc-400">
+                    {t("Choose how messages are translated.")}
+                  </p>
+                </section>
+
+                <div className="mt-4 space-y-3">
                   <ToggleRow
                     label={t("Translate messages")}
                     checked={translationEnabled}
