@@ -694,7 +694,7 @@ export function MenuBar({
 
       <div
         ref={menuBarRef}
-        className="relative z-30 flex h-11 shrink-0 items-center border-b border-white/[0.08] bg-[#101010] px-2 shadow-[0_1px_0_rgba(0,0,0,0.45)] lg:h-8 lg:bg-[#0a0a0a] lg:px-2.5 lg:shadow-none"
+        className="modbots-print-hidden relative z-30 flex h-11 shrink-0 items-center border-b border-white/[0.08] bg-[#101010] px-2 shadow-[0_1px_0_rgba(0,0,0,0.45)] lg:h-8 lg:bg-[#0a0a0a] lg:px-2.5 lg:shadow-none"
       >
         <button
           type="button"

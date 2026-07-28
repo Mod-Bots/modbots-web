@@ -50,3 +50,96 @@
     background-clip: padding-box;
   }
 }
+
+@media print {
+  @page {
+    margin: 16mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    color-scheme: light !important;
+  }
+
+  body {
+    color: #111 !important;
+    background: #fff !important;
+  }
+
+  .modbots-print-hidden,
+  .modbots-chatroom .fixed,
+  .modbots-chatroom aside,
+  .modbots-chatroom [role="separator"] {
+    display: none !important;
+  }
+
+  .modbots-chatroom,
+  .modbots-chatroom main,
+  .modbots-print-chat-layout,
+  .modbots-print-chat-column,
+  .modbots-print-chat-body,
+  .modbots-print-chat-section,
+  .modbots-print-conversation,
+  .modbots-print-timeline {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .modbots-chatroom {
+    color: #111 !important;
+    background: #fff !important;
+  }
+
+  .modbots-print-chat-header {
+    display: block !important;
+    height: auto !important;
+    padding: 0 0 12pt !important;
+    border-bottom: 1pt solid #aaa !important;
+    color: #111 !important;
+    background: #fff !important;
+  }
+
+  .modbots-print-chat-header > :not(h2) {
+    display: none !important;
+  }
+
+  .modbots-print-chat-header h2 {
+    color: #111 !important;
+    font-size: 16pt !important;
+  }
+
+  .modbots-print-timeline {
+    padding: 8pt 0 0 !important;
+  }
+
+  .modbots-print-conversation article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .modbots-print-conversation article > div:nth-child(2) {
+    padding-right: 0 !important;
+  }
+
+  .modbots-print-conversation p,
+  .modbots-print-conversation span,
+  .modbots-print-conversation time,
+  .modbots-print-conversation figcaption,
+  .modbots-print-conversation a {
+    color: #111 !important;
+  }
+
+  .modbots-print-conversation a {
+    text-decoration: underline;
+  }
+
+  .modbots-print-conversation img,
+  .modbots-print-conversation video {
+    max-width: 100% !important;
+  }
+}
