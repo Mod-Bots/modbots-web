@@ -1,123 +1,4 @@
 @import "tailwindcss/index.css";
-.modbots-fit {
-  --modbots-fit-scale: min(1, calc(100vw / 880px));
-  --modbots-fit-height: 100dvh;
-  zoom: var(--modbots-fit-scale);
-  height: calc(var(--modbots-fit-height) / var(--modbots-fit-scale));
-}
-
-.modbots-fit-with-menu {
-  --modbots-fit-height: calc(100dvh - 2.75rem);
-}
-
-@media (min-width: 640px) {
-  .modbots-fit-with-menu {
-    --modbots-fit-height: calc(100dvh - 2rem);
-  }
-  .modbots-settings-dialog {
-    height: min(760px, 100dvh - 3rem);
-  }
-}
-.modbots-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: #3f3f46 transparent;
-}
-.modbots-scroll::-webkit-scrollbar {
-  width: 10px;
-}
-.modbots-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-.modbots-scroll::-webkit-scrollbar-thumb {
-  background: #2f2f35;
-  border: 2px solid transparent;
-  border-radius: 999px;
-  background-clip: padding-box;
-}
-.modbots-scroll::-webkit-scrollbar-thumb:hover {
-  background: #44444d;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
-@media print {
-  @page {
-    margin: 16mm;
-  }
-  html,
-  body {
-    height: auto !important;
-    overflow: visible !important;
-    color-scheme: light !important;
-  }
-  body {
-    color: #111 !important;
-    background: #fff !important;
-  }
-  .modbots-print-hidden,
-  .modbots-chatroom .fixed,
-  .modbots-chatroom aside,
-  .modbots-chatroom [role="separator"] {
-    display: none !important;
-  }
-  .modbots-chatroom,
-  .modbots-chatroom main,
-  .modbots-print-chat-layout,
-  .modbots-print-chat-column,
-  .modbots-print-chat-body,
-  .modbots-print-chat-section,
-  .modbots-print-conversation,
-  .modbots-print-timeline {
-    display: block !important;
-    width: auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-  }
-  .modbots-chatroom {
-    color: #111 !important;
-    background: #fff !important;
-  }
-  .modbots-print-chat-header {
-    display: block !important;
-    height: auto !important;
-    padding: 0 0 12pt !important;
-    border-bottom: 1pt solid #aaa !important;
-    color: #111 !important;
-    background: #fff !important;
-  }
-  .modbots-print-chat-header > :not(h2) {
-    display: none !important;
-  }
-  .modbots-print-chat-header h2 {
-    color: #111 !important;
-    font-size: 16pt !important;
-  }
-  .modbots-print-timeline {
-    padding: 8pt 0 0 !important;
-  }
-  .modbots-print-conversation article {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-  .modbots-print-conversation article > div:nth-child(2) {
-    padding-right: 0 !important;
-  }
-  .modbots-print-conversation p,
-  .modbots-print-conversation span,
-  .modbots-print-conversation time,
-  .modbots-print-conversation figcaption,
-  .modbots-print-conversation a {
-    color: #111 !important;
-  }
-  .modbots-print-conversation a {
-    text-decoration: underline;
-  }
-  .modbots-print-conversation img,
-  .modbots-print-conversation video {
-    max-width: 100% !important;
-  }
-}
 :root {
   --modbots-interface-zoom: 1;
   --background: #0a0a0a;
@@ -375,4 +256,128 @@ button,
 input,
 textarea {
   font-family: inherit;
+}
+
+.modbots-fit {
+  --modbots-fit-scale: min(1, calc(100vw / 880px));
+  --modbots-fit-height: 100dvh;
+  zoom: var(--modbots-fit-scale);
+  height: calc(var(--modbots-fit-height) / var(--modbots-fit-scale));
+}
+
+.modbots-fit-with-menu {
+  --modbots-fit-height: calc(100dvh - 2.75rem);
+}
+
+@media (min-width: 640px) {
+  .modbots-fit-with-menu {
+    --modbots-fit-height: calc(100dvh - 2rem);
+  }
+  .modbots-settings-dialog {
+    height: min(760px, 100dvh - 3rem);
+  }
+}
+.modbots-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+.modbots-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modbots-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modbots-scroll::-webkit-scrollbar-thumb {
+  background: #2f2f35;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.modbots-scroll::-webkit-scrollbar-thumb:hover {
+  background: #44444d;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+@media print {
+  @page {
+    margin: 16mm;
+  }
+  html,
+  body {
+    height: auto;
+    overflow: visible;
+    color-scheme: light;
+  }
+  body {
+    color: #111;
+    background: #fff;
+  }
+  .modbots-print-hidden,
+  .modbots-chatroom .fixed,
+  .modbots-chatroom aside,
+  .modbots-chatroom [role="separator"] {
+    display: none;
+  }
+  .modbots-chatroom,
+  .modbots-chatroom main,
+  .modbots-print-chat-layout,
+  .modbots-print-chat-column,
+  .modbots-print-chat-body,
+  .modbots-print-chat-section,
+  .modbots-print-conversation,
+  .modbots-print-timeline {
+    display: block;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .modbots-chatroom {
+    color: #111;
+    background: #fff;
+  }
+  .modbots-print-chat-header {
+    display: block;
+    height: auto;
+    padding: 0 0 12pt;
+    border-bottom: 1pt solid #aaa;
+    color: #111;
+    background: #fff;
+  }
+  .modbots-print-chat-header > :not(h2) {
+    display: none;
+  }
+  .modbots-print-chat-header h2 {
+    color: #111;
+    font-size: 16pt;
+  }
+  .modbots-print-timeline {
+    padding: 8pt 0 0;
+  }
+  .modbots-print-conversation article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .modbots-print-conversation article > div:nth-child(2) {
+    padding-right: 0;
+  }
+  .modbots-print-conversation p,
+  .modbots-print-conversation span,
+  .modbots-print-conversation time,
+  .modbots-print-conversation figcaption,
+  .modbots-print-conversation a {
+    color: #111;
+  }
+  .modbots-print-conversation a {
+    text-decoration: underline;
+  }
+  .modbots-chatroom .modbots-print-conversation img,
+  .modbots-chatroom .modbots-print-conversation video {
+    max-width: 100%;
+  }
 }

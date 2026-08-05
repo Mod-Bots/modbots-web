@@ -1,4 +1,4 @@
-@use "./overrides";
+@use "sass:meta";
 
 // Sass would treat a bare `@import "tailwindcss"` as one of its own imports and
 // fail to resolve it. Pointing at the stylesheet the package actually ships
@@ -272,3 +272,5 @@ input,
 textarea {
   font-family: inherit;
 }
+
+@include meta.load-css("overrides");
