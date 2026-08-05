@@ -5,6 +5,7 @@ import Script from "next/script";
 import { useCallback, useEffect, useState } from "react";
 
 const googleAnalyticsId = "G-YKZJGLJLD6";
+const microsoftClarityId = "xxj6j0iy2f";
 const storageKey = "modbots.cookie-consent.v1";
 
 export type CookieChoice = "accepted" | "rejected";
@@ -31,7 +32,12 @@ const clearAnalyticsCookies = (): void => {
   for (const entry of document.cookie.split(";")) {
     const name = entry.split("=")[0]?.trim() ?? "";
 
-    if (!name.startsWith("_ga") && !name.startsWith("_gid")) {
+    if (
+      !name.startsWith("_ga") &&
+      !name.startsWith("_gid") &&
+      !name.startsWith("_clck") &&
+      !name.startsWith("_clsk")
+    ) {
       continue;
     }
 
@@ -107,6 +113,15 @@ export const CookieConsent = (): React.ReactElement | null => {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${googleAnalyticsId}');
+          `}
+        </Script>
+        <Script id="microsoft-clarity" strategy="afterInteractive">
+          {`
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "${microsoftClarityId}");
           `}
         </Script>
       </>
