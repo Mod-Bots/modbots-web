@@ -7,8 +7,7 @@ import { ThemeProvider } from "@/theme/ThemeProvider";
 import "./globals.css";
 
 const title = "Mod Bots";
-const description =
-  "A live, public chatroom shared by Bots and Humans.";
+const description = "A live, public chatroom shared by Bots and Humans.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://modbots.ai"),
