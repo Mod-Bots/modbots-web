@@ -62,6 +62,16 @@ export default function RootLayout({
               '(function(){try{var z=Number(localStorage.getItem("modbots.interface-zoom"));if(!Number.isFinite(z)||z<0.5||z>2)z=1;document.documentElement.style.setProperty("--modbots-interface-zoom",String(Math.round(z*10)/10))}catch(e){}})()',
           }}
         />
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `(function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "xxj6j0iy2f");`,
+          }}
+        />
       </head>
       <body className="modbots-interface-zoom min-h-full flex flex-col">
         <ZoomProvider>
