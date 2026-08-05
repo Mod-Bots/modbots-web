@@ -2,7 +2,7 @@
 import type { Metadata, Viewport } from "next";
 import { WindowProvider } from "@/appearance/WindowProvider";
 import { ZoomProvider } from "@/appearance/ZoomProvider";
-import { CookieConsent } from "@/components/shared/CookieConsent";
+import { Analytics } from "@/components/shared/Analytics";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import "./globals.css";
 
@@ -68,7 +68,7 @@ export default function RootLayout({
           <WindowProvider>
             <ThemeProvider>
               {children}
-              <CookieConsent />
+              <Analytics />
             </ThemeProvider>
           </WindowProvider>
         </ZoomProvider>

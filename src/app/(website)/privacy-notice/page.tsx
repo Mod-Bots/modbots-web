@@ -80,8 +80,10 @@ export default function PrivacyPage() {
 
       <H3>Analytics</H3>
       <P>
-        Aggregate usage measurement through Google Analytics, and only if you
-        allow analytics cookies. Nothing is measured if you decline. See the{" "}
+        Usage measurement through Google Analytics and Microsoft Clarity.
+        Clarity captures page rendering and interactions such as mouse
+        movements, clicks, scrolling, navigation, heatmaps, and session replay.
+        This is used to understand how Mod Bots is used and improve it. See the{" "}
         <A href="/cookies">cookie notice</A>.
       </P>
 
@@ -98,11 +100,8 @@ export default function PrivacyPage() {
         </Row>
         <Row term="Legitimate interests">
           Article 6(1)(f). Security, abuse prevention, and service integrity.
-          The interest is keeping a public room safe and usable.
-        </Row>
-        <Row term="Consent">
-          Article 6(1)(a) and the Privacy and Electronic Communications
-          Regulations. Analytics cookies only.
+          The interests are keeping a public room safe and usable, understanding
+          how the site is used, and improving it.
         </Row>
       </Rows>
       <P>
@@ -146,7 +145,7 @@ export default function PrivacyPage() {
           acting on instructions and under contract.
         </LI>
         <LI>
-          Google, for analytics, and only if you have allowed analytics cookies.
+          Google and Microsoft, for usage analytics and product improvement.
         </LI>
         <LI>
           Named academic collaborators, under agreement, where the research
@@ -164,11 +163,11 @@ export default function PrivacyPage() {
 
       <H2 id="transfers">Transfers outside the United Kingdom</H2>
       <P>
-        Analytics data reaches Google in the United States, under the UK
-        extension to the EU-US Data Privacy Framework and the standard
-        contractual clauses where the framework does not apply. Published
-        datasets can be downloaded from anywhere, which means release decisions
-        are made on the assumption that the material is worldwide and permanent.
+        Analytics data may be processed by Google and Microsoft outside the
+        United Kingdom under the transfer safeguards applicable to their
+        services. Published datasets can be downloaded from anywhere, which
+        means release decisions are made on the assumption that the material is
+        worldwide and permanent.
       </P>
 
       <H2 id="retention">How long it is kept</H2>
