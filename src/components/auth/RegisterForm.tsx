@@ -1,48 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { FormEvent } from "react";
-import {
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { saveStoredIdentity } from "@/data/identity";
 import type { BrowserLoginOutcome, BrowserLoginSession } from "@/data/oauth";
 import {
   accountBaseUrl,
   getBrowserLoginSession,
   markEnterAfterLogin,
-  openInBrowser,
-  resetBrowserLoginSession,
 } from "@/data/oauth";
 import { setSessionToken } from "@/data/platform";
 import { uidQuery, useLaunchUid } from "@/hooks/useAuthRoute";
 
-const browserLoginWaitMs = 90_000;
-
-const loginFailureMessage = (error: unknown, fallback: string): string => {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return typeof error === "string" && error.trim().length > 0
-    ? error
-    : fallback;
-};
-
 export function RegisterForm() {
   const router = useRouter();
-  const [session, setSession] = useState<BrowserLoginSession | null>(null);
   const [loginUrl, setLoginUrl] = useState<string | null>(null);
-  const [authCode, setAuthCode] = useState("");
-  const [codePending, setCodePending] = useState(false);
-  const [preparingSession, setPreparingSession] = useState(false);
-  const [waitingForBrowser, setWaitingForBrowser] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const boundBrowserSession = useRef<BrowserLoginSession | null>(null);
   const uid = useLaunchUid();
   const accountFormReady = uid !== null || loginUrl !== null;
@@ -62,7 +34,6 @@ export function RegisterForm() {
 
   const bindBrowserSession = useCallback(
     (prepared: BrowserLoginSession) => {
-      setSession(prepared);
       setLoginUrl(prepared.authorizeUrl);
 
       if (boundBrowserSession.current === prepared) {
@@ -76,16 +47,14 @@ export function RegisterForm() {
             onSignedIn(outcome);
           }
         },
-        (error: unknown) => {
+        () => {
           if (boundBrowserSession.current !== prepared) {
             return;
           }
 
           boundBrowserSession.current = null;
-          setSession((current) => (current === prepared ? null : current));
-          setWaitingForBrowser(false);
-          setLoginError(
-            loginFailureMessage(error, "The Browser log-in did not complete."),
+          setLoginUrl((current) =>
+            current === prepared.authorizeUrl ? null : current,
           );
         },
       );
@@ -95,24 +64,8 @@ export function RegisterForm() {
     [onSignedIn],
   );
 
-  const ensureBrowserSession = async (): Promise<BrowserLoginSession> => {
-    if (session !== null) {
-      return session;
-    }
-
-    setPreparingSession(true);
-
-    try {
-      return bindBrowserSession(await getBrowserLoginSession("register"));
-    } finally {
-      setPreparingSession(false);
-    }
-  };
-
   useEffect(() => {
     let cancelled = false;
-
-    setPreparingSession(true);
 
     void getBrowserLoginSession("register")
       .then((prepared) => {
@@ -122,108 +75,18 @@ export function RegisterForm() {
 
         bindBrowserSession(prepared);
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (cancelled) {
           return;
         }
 
-        setLoginError(
-          loginFailureMessage(error, "The log-in link could not be prepared."),
-        );
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setPreparingSession(false);
-        }
+        setLoginUrl(null);
       });
 
     return () => {
       cancelled = true;
     };
   }, [bindBrowserSession]);
-
-  const resetLoginFlow = useEffectEvent(async (message: string | null) => {
-    boundBrowserSession.current = null;
-    setAuthCode("");
-    setCodePending(false);
-    setPreparingSession(false);
-    setWaitingForBrowser(false);
-    setCopied(false);
-    setSession(null);
-    setLoginUrl(null);
-
-    await resetBrowserLoginSession();
-    setLoginError(message);
-  });
-
-  useEffect(() => {
-    if (!waitingForBrowser || loginError !== null) {
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      void resetLoginFlow(
-        "The Browser log-in took too long and was reset. Start again when you are ready.",
-      );
-    }, browserLoginWaitMs);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [loginError, resetLoginFlow, waitingForBrowser]);
-
-  const copyLoginUrl = async () => {
-    setLoginError(null);
-
-    try {
-      const url = loginUrl ?? (await ensureBrowserSession()).authorizeUrl;
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1_500);
-    } catch (error) {
-      setLoginError(
-        loginFailureMessage(error, "The log-in link could not be prepared."),
-      );
-    }
-  };
-
-  const continueInBrowser = async () => {
-    setLoginError(null);
-    setWaitingForBrowser(true);
-
-    try {
-      const prepared = await ensureBrowserSession();
-      await openInBrowser(prepared.authorizeUrl);
-    } catch (error) {
-      setWaitingForBrowser(false);
-      setLoginError(
-        loginFailureMessage(error, "The Browser log-in could not be started."),
-      );
-    }
-  };
-
-  const submitCode = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (codePending || authCode.trim().length === 0) {
-      return;
-    }
-
-    setLoginError(null);
-    setCodePending(true);
-
-    try {
-      const prepared = await ensureBrowserSession();
-      const outcome = await prepared.completeWithCode(authCode);
-      onSignedIn(outcome);
-    } catch (error) {
-      setLoginError(
-        loginFailureMessage(error, "The authorization code was not accepted."),
-      );
-    } finally {
-      setCodePending(false);
-    }
-  };
 
   return (
     <>

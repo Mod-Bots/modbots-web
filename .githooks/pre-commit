@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+repository_root="$(git rev-parse --show-toplevel)"
+cd "$repository_root"
+
+echo "Running Biome before commit..."
+if [ -f "./node_modules/.bin/biome.cmd" ]; then
+  biome_command="./node_modules/.bin/biome.cmd"
+else
+  biome_command="./node_modules/.bin/biome"
+fi
+
+if ! "$biome_command" check --error-on-warnings; then
+  echo ""
+  echo "Commit blocked: Biome checks failed."
+  echo "Run npm run lint, fix every reported issue, then commit again."
+  exit 1
+fi
+
+echo "Biome passed. Commit continuing."

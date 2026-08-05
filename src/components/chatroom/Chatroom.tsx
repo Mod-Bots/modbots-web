@@ -32,6 +32,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import NextImage from "next/image";
 import { useRouter } from "next/navigation";
 import type {
   CSSProperties,
@@ -480,14 +481,6 @@ const memberSince = (value: string): string =>
     year: "numeric",
   }).format(new Date(value));
 
-const dateTimeLabel = (value: string): string =>
-  new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
-
 const startOfDay = (date: Date): number =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
@@ -840,14 +833,17 @@ function ActorProfilePicture({
   return (
     <div className="relative shrink-0">
       <div
-        className={`modbots-profile-picture flex ${dimensions} items-center justify-center border border-white/10 font-semibold text-zinc-100`}
+        className={`modbots-profile-picture relative flex ${dimensions} items-center justify-center overflow-hidden border border-white/10 font-semibold text-zinc-100`}
         style={{ backgroundColor: shadeFor(actorId) }}
       >
         {imageUrl !== null && imageUrl !== failedImageUrl ? (
-          <img
+          <NextImage
             src={imageUrl}
             alt={name}
-            className="h-full w-full rounded-inherit object-cover"
+            fill
+            sizes={size === "lg" ? "64px" : size === "sm" ? "32px" : "40px"}
+            unoptimized
+            className="rounded-inherit object-cover"
             onError={() => setFailedImageUrl(imageUrl)}
           />
         ) : (
@@ -1153,10 +1149,14 @@ function MessageMedia({ event }: { event: RoomEvent }) {
         if (part.kind === "image") {
           return (
             <figure key={part.partId}>
-              <img
+              <NextImage
                 src={url}
                 alt={part.caption ?? "Shared image"}
-                className="max-h-[460px] max-w-full rounded-xl border border-white/10 object-contain"
+                width={1200}
+                height={900}
+                sizes="(max-width: 768px) 100vw, 720px"
+                unoptimized
+                className="h-auto max-h-[460px] w-auto max-w-full rounded-xl border border-white/10 object-contain"
               />
               {part.caption !== null ? (
                 <figcaption className="mt-1 text-xs text-zinc-500">
@@ -1633,14 +1633,17 @@ function SessionRestoreScreen({ restoring }: { restoring: boolean }) {
 
   return (
     <section className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden bg-modbots-canvas px-6 py-12 text-zinc-100">
-      <img
-        src={startScreenBg.src}
+      <NextImage
+        src={startScreenBg}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover opacity-45"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover opacity-45"
       />
       <div className="relative z-10 flex flex-col items-center text-center">
-        <img
-          src={appLogo.src}
+        <NextImage
+          src={appLogo}
           alt=""
           className="h-[72px] w-[72px] rounded-2xl"
         />
@@ -4292,8 +4295,8 @@ export function Chatroom() {
               className="relative w-[360px] rounded-window border border-white/10 bg-modbots-dialog p-6 shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
             >
               <div className="flex items-center gap-3">
-                <img
-                  src={appLogo.src}
+                <NextImage
+                  src={appLogo}
                   alt=""
                   className="h-11 w-11 rounded-xl"
                 />
