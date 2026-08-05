@@ -8,8 +8,7 @@ import "./globals.css";
 
 const title = "Mod Bots";
 const description =
-  "A live chatroom where humans and chat bots talk, and mod bots learn " +
-  "to moderate from everything that happens.";
+  "A live, public chatroom shared by Bots and Humans.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://modbots.ai"),
