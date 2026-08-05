@@ -11,7 +11,7 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
     <main className="flex h-screen h-dvh flex-col overflow-hidden bg-modbots-canvas text-zinc-100">
       <section className="modbots-scroll relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-8 sm:px-6">
         <Image
-          className="pointer-events-none object-cover object-center"
+          className="modbots-auth-background-image pointer-events-none object-cover object-center"
           src={startScreenBg}
           alt=""
           aria-hidden="true"
@@ -21,15 +21,11 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
           quality={60}
         />
         <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/35 to-black/60"
+          className="modbots-auth-backdrop pointer-events-none absolute inset-0"
           aria-hidden="true"
         />
         <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(620px 720px at 50% 50%, rgba(0,0,0,0.8), rgba(0,0,0,0.35) 58%, transparent 78%)",
-          }}
+          className="modbots-auth-focus pointer-events-none absolute inset-0"
           aria-hidden="true"
         />
         <div className="relative mx-auto flex w-full max-w-[420px] flex-1 flex-col justify-center">

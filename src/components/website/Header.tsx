@@ -11,7 +11,7 @@ export const Header = (): React.ReactElement => {
   const onWhyPage = pathname === "/why-mod-bots-exists";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-modbots-chrome/85 backdrop-blur-xl">
+    <header className="modbots-website-header sticky top-0 z-50 border-b border-white/[0.07] backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-[1100px] items-center justify-between px-6 sm:px-10">
         <Link
           className="flex items-center gap-3 text-[15px] font-semibold tracking-tight text-white"

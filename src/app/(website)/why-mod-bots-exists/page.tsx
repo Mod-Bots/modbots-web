@@ -55,11 +55,11 @@ export default function WhyPage() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center opacity-[0.28]"
+          className="modbots-website-hero-image object-cover object-center"
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/70 via-[#0a0a0a]/85 to-[#0a0a0a]"
+          className="modbots-website-hero-overlay absolute inset-0"
         />
         <div className="relative mx-auto w-full max-w-[1100px] px-6 pb-20 pt-24 sm:px-10 sm:pb-28 sm:pt-32">
           <div className="max-w-[820px]">

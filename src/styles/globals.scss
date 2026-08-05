@@ -35,6 +35,28 @@
     rgba(28, 28, 28, 0.98),
     rgba(17, 17, 17, 0.98)
   );
+  --modbots-auth-image-opacity: 1;
+  --modbots-auth-backdrop: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.35),
+    rgba(0, 0, 0, 0.6)
+  );
+  --modbots-auth-focus: radial-gradient(
+    620px 720px at 50% 50%,
+    rgba(0, 0, 0, 0.8),
+    rgba(0, 0, 0, 0.35) 58%,
+    transparent 78%
+  );
+  --modbots-website-background: var(--modbots-color-chrome);
+  --modbots-website-header-background: rgba(10, 10, 10, 0.85);
+  --modbots-website-hero-image-opacity: 0.28;
+  --modbots-website-hero-overlay: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.7),
+    rgba(10, 10, 10, 0.85),
+    #0a0a0a
+  );
 
   color-scheme: dark;
   font-family:
@@ -118,6 +140,28 @@
     rgba(255, 255, 255, 0.98),
     rgba(237, 241, 245, 0.98)
   );
+  --modbots-auth-image-opacity: 0.18;
+  --modbots-auth-backdrop: linear-gradient(
+    180deg,
+    rgba(248, 250, 252, 0.7),
+    rgba(248, 250, 252, 0.84),
+    rgba(248, 250, 252, 0.94)
+  );
+  --modbots-auth-focus: radial-gradient(
+    620px 720px at 50% 50%,
+    rgba(255, 255, 255, 0.98),
+    rgba(248, 250, 252, 0.9) 58%,
+    transparent 82%
+  );
+  --modbots-website-background: #ffffff;
+  --modbots-website-header-background: rgba(255, 255, 255, 0.88);
+  --modbots-website-hero-image-opacity: 0.14;
+  --modbots-website-hero-overlay: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(255, 255, 255, 0.9),
+    #ffffff
+  );
   --color-white: #0f172a;
   --color-black: #ffffff;
   --color-zinc-50: #020617;
@@ -189,6 +233,34 @@ body {
   margin: 0;
   color: var(--foreground);
   background: var(--modbots-body-background);
+}
+
+.modbots-auth-background-image {
+  opacity: var(--modbots-auth-image-opacity);
+}
+
+.modbots-auth-backdrop {
+  background: var(--modbots-auth-backdrop);
+}
+
+.modbots-auth-focus {
+  background: var(--modbots-auth-focus);
+}
+
+.modbots-website {
+  background: var(--modbots-website-background);
+}
+
+.modbots-website-header {
+  background: var(--modbots-website-header-background);
+}
+
+.modbots-website-hero-image {
+  opacity: var(--modbots-website-hero-image-opacity);
+}
+
+.modbots-website-hero-overlay {
+  background: var(--modbots-website-hero-overlay);
 }
 
 * {
