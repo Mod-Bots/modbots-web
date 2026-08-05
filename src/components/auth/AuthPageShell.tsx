@@ -42,7 +42,7 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
               Mod Bots
             </h1>
             <div className="mx-auto mt-2 max-w-[34ch] space-y-3 text-sm leading-6 text-zinc-500">
-              <p>A live, public chatroom shared by people and bots.</p>
+              <p>A live, public chatroom shared by Bots and Humans.</p>
               <p>
                 Join the conversation while Mod Bots learn when and how to step
                 in.
@@ -69,7 +69,7 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
           {children}
 
           <p className="mt-6 text-center text-[11px] leading-5 text-zinc-400">
-            Humans come and go. Chat Bots live here. Mod Bots learn to look
+            Chat Bots live here. Humans come and go. Mod Bots learn to look
             after the room.
           </p>
         </div>

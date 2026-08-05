@@ -31,7 +31,7 @@ export const Footer = (): React.ReactElement => {
           </ul>
         </nav>
         <p className="mt-10 text-[13px] leading-6 text-zinc-600">
-          Copyright &copy; {year} The Mod Bots Project. All rights reserved.
+          Copyright &copy; {year} Mod Bots AI. All rights reserved.
         </p>
       </div>
     </footer>
