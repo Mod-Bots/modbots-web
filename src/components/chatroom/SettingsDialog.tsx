@@ -1,5 +1,6 @@
 import {
   ArrowUpRight,
+  Bell,
   Camera,
   GripHorizontal,
   Languages,
@@ -17,8 +18,12 @@ import type {
 import { useEffect, useRef, useState } from "react";
 import type { ChatLanguage } from "@/data/contracts";
 import { type UiLanguage, useUiLanguage } from "@/i18n/UiLanguageProvider";
+import type {
+  NotificationCategory,
+  NotificationPreferences,
+} from "@/notifications/NotificationProvider";
 
-export type SettingsSection = "account" | "chat" | "language";
+export type SettingsSection = "account" | "notifications" | "chat" | "language";
 
 export interface AccountSettingsSummary {
   display: string;
@@ -123,16 +128,25 @@ function RegisteredMark({ className = "h-3.5 w-3.5" }: { className?: string }) {
 
 function ToggleRow({
   label,
+  description,
   checked,
   onChange,
 }: {
   label: string;
+  description?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) {
   return (
     <label className="flex items-center justify-between gap-4 rounded-lg border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-sm text-zinc-200 transition-colors hover:border-white/[0.12] hover:bg-white/[0.04]">
-      <span className="font-medium">{label}</span>
+      <span className="min-w-0">
+        <span className="block font-medium">{label}</span>
+        {description === undefined ? null : (
+          <span className="mt-1 block text-[11px] leading-4 text-zinc-500">
+            {description}
+          </span>
+        )}
+      </span>
       <input
         type="checkbox"
         checked={checked}
@@ -214,6 +228,8 @@ export function SettingsDialog({
   accountAvatar,
   sendWithEnter,
   onSendWithEnterChange,
+  notificationPreferences,
+  onNotificationPreferenceChange,
   translationEnabled,
   onTranslationEnabledChange,
   translationLanguage,
@@ -235,6 +251,11 @@ export function SettingsDialog({
   accountAvatar: ReactNode;
   sendWithEnter: boolean;
   onSendWithEnterChange: (checked: boolean) => void;
+  notificationPreferences: NotificationPreferences;
+  onNotificationPreferenceChange: (
+    category: NotificationCategory,
+    enabled: boolean,
+  ) => void;
   translationEnabled: boolean;
   onTranslationEnabledChange: (enabled: boolean) => void;
   translationLanguage: ChatLanguage;
@@ -599,12 +620,18 @@ export function SettingsDialog({
 
         <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] md:grid-cols-[200px_minmax(0,1fr)] md:grid-rows-1">
           <aside className="border-b border-white/[0.08] bg-modbots-panel p-3 md:border-b-0 md:border-r">
-            <nav className="grid grid-cols-3 gap-1.5 md:block md:space-y-1">
+            <nav className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:block md:space-y-1">
               <SectionButton
                 label={t("Account")}
                 icon={<UserRound className="h-4 w-4" />}
                 active={section === "account"}
                 onClick={() => onSectionChange("account")}
+              />
+              <SectionButton
+                label={t("Notifications")}
+                icon={<Bell className="h-4 w-4" />}
+                active={section === "notifications"}
+                onClick={() => onSectionChange("notifications")}
               />
               <SectionButton
                 label={t("Language")}
@@ -798,6 +825,92 @@ export function SettingsDialog({
                   </div>
                 </div>
               )
+            ) : section === "notifications" ? (
+              <div>
+                <section className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                    {t("Notification settings")}
+                  </p>
+                  <p className="mt-2 text-sm text-zinc-400">
+                    {t(
+                      "Choose what deserves your attention in this room. Ordinary bot conversation stays quiet.",
+                    )}
+                  </p>
+                </section>
+
+                <div className="mt-4 space-y-3">
+                  <ToggleRow
+                    label={t("Direct replies and mentions")}
+                    description={t(
+                      "When someone replies to you, mentions you, or answers your question.",
+                    )}
+                    checked={notificationPreferences.direct}
+                    onChange={(enabled) =>
+                      onNotificationPreferenceChange("direct", enabled)
+                    }
+                  />
+                  <ToggleRow
+                    label={t("Mod bot actions")}
+                    description={t(
+                      "Warnings, contact, or actions that directly affect you.",
+                    )}
+                    checked={notificationPreferences.moderation}
+                    onChange={(enabled) =>
+                      onNotificationPreferenceChange("moderation", enabled)
+                    }
+                  />
+                  <ToggleRow
+                    label={t("Important room events")}
+                    description={t(
+                      "Invitations, role changes, and changes to room settings or rules.",
+                    )}
+                    checked={notificationPreferences.room}
+                    onChange={(enabled) =>
+                      onNotificationPreferenceChange("room", enabled)
+                    }
+                  />
+                  <ToggleRow
+                    label={t("Conversation returns")}
+                    description={t(
+                      "When activity resumes after a meaningful silence in a conversation you joined.",
+                    )}
+                    checked={notificationPreferences.conversation}
+                    onChange={(enabled) =>
+                      onNotificationPreferenceChange("conversation", enabled)
+                    }
+                  />
+                  <ToggleRow
+                    label={t("Research answers")}
+                    description={t(
+                      "When a bot finishes retrieving an answer you requested.",
+                    )}
+                    checked={notificationPreferences.research}
+                    onChange={(enabled) =>
+                      onNotificationPreferenceChange("research", enabled)
+                    }
+                  />
+                  <ToggleRow
+                    label={t("System problems")}
+                    description={t(
+                      "Connection, message delivery, account, and security problems.",
+                    )}
+                    checked={notificationPreferences.system}
+                    onChange={(enabled) =>
+                      onNotificationPreferenceChange("system", enabled)
+                    }
+                  />
+                  <ToggleRow
+                    label={t("Research study events")}
+                    description={t(
+                      "Consent changes, session boundaries, and required participant actions.",
+                    )}
+                    checked={notificationPreferences.study}
+                    onChange={(enabled) =>
+                      onNotificationPreferenceChange("study", enabled)
+                    }
+                  />
+                </div>
+              </div>
             ) : section === "chat" ? (
               <div>
                 <section className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">

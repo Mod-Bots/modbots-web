@@ -58,9 +58,14 @@ import { useRoomActivity } from "@/hooks/useRoomActivity";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
 import {
   type AppNotification,
+  type NotificationCategory,
   type NotificationTone,
   useNotifications,
 } from "@/notifications/NotificationProvider";
+import {
+  classifyRoomEvent,
+  eventsAfterSequence,
+} from "@/notifications/room-notifications";
 import { releasedVersion } from "@/released-version";
 import { AutomaticUpdateChecker } from "./AutomaticUpdateChecker";
 import { MenuBar } from "./MenuBar";
@@ -874,6 +879,16 @@ const notificationToneIcon = (tone: NotificationTone) => {
   return Info;
 };
 
+const notificationCategoryLabels: Record<NotificationCategory, string> = {
+  direct: "Direct interaction",
+  moderation: "Mod bot action",
+  room: "Room event",
+  conversation: "Conversation return",
+  research: "Research answer",
+  system: "System",
+  study: "Research study",
+};
+
 function NotificationRow({
   notification,
   onDismiss,
@@ -888,6 +903,9 @@ function NotificationRow({
     <li className="flex items-start gap-2.5 border-t border-white/[0.07] px-3 py-2.5 first:border-t-0">
       <ToneIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-500" />
       <div className="min-w-0 flex-1">
+        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-zinc-600">
+          {t(notificationCategoryLabels[notification.category])}
+        </p>
         <p className="text-[12px] font-medium leading-4 text-zinc-200">
           {t(notification.title)}
         </p>
@@ -1671,7 +1689,15 @@ interface SaveFilePickerWindow extends Window {
 export function Chatroom() {
   const router = useRouter();
   const { language: uiLanguage, t } = useUiLanguage();
-  const { notify } = useNotifications();
+  const {
+    configureScope: configureNotificationScope,
+    lastRoomEventSequence,
+    notificationScope,
+    notify,
+    preferences: notificationPreferences,
+    recordRoomEventSequence,
+    setCategoryEnabled: setNotificationCategoryEnabled,
+  } = useNotifications();
   const {
     actors,
     apiHealth,
@@ -1802,6 +1828,65 @@ export function Chatroom() {
     setDraft(value);
     updateDraftHistoryAvailability();
   };
+
+  const expectedNotificationScope =
+    localActor === undefined ? null : `${roomId}:${localActor.id}`;
+
+  useEffect(() => {
+    configureNotificationScope(expectedNotificationScope);
+  }, [configureNotificationScope, expectedNotificationScope]);
+
+  useEffect(() => {
+    const roomEvents = events.data;
+
+    if (
+      !entered ||
+      localActor === undefined ||
+      roomEvents === undefined ||
+      notificationScope !== expectedNotificationScope
+    ) {
+      return;
+    }
+
+    const latestSequence = roomEvents.at(-1)?.sequence;
+
+    if (latestSequence === undefined) {
+      return;
+    }
+
+    if (lastRoomEventSequence === null) {
+      recordRoomEventSequence(latestSequence);
+      return;
+    }
+
+    for (const event of eventsAfterSequence(
+      roomEvents,
+      lastRoomEventSequence,
+    )) {
+      const roomNotification = classifyRoomEvent(
+        event,
+        roomEvents,
+        actors,
+        localActor.id,
+      );
+
+      if (roomNotification !== null) {
+        notify(roomNotification);
+      }
+    }
+
+    recordRoomEventSequence(latestSequence);
+  }, [
+    actors,
+    entered,
+    events.data,
+    expectedNotificationScope,
+    lastRoomEventSequence,
+    localActor,
+    notificationScope,
+    notify,
+    recordRoomEventSequence,
+  ]);
   const resetDraft = (value: string) => {
     draftValueRef.current = value;
     draftUndoRef.current = [];
@@ -2871,7 +2956,29 @@ export function Chatroom() {
           ? "Reconnecting"
           : "Connecting";
   const previousConnectionLabel = useRef<string | null>(null);
+  const previousSendError = useRef<string | null>(null);
   const hasConnected = useRef(false);
+
+  useEffect(() => {
+    const message =
+      sendError instanceof Error
+        ? sendError.message
+        : sendError === null || sendError === undefined
+          ? null
+          : "The message could not be delivered.";
+
+    if (message !== null && message !== previousSendError.current) {
+      notify({
+        category: "system",
+        dedupeKey: `message-delivery:${message}`,
+        title: "Message could not be sent",
+        message,
+        tone: "error",
+      });
+    }
+
+    previousSendError.current = message;
+  }, [notify, sendError]);
 
   useEffect(() => {
     const previous = previousConnectionLabel.current;
@@ -2879,7 +2986,11 @@ export function Chatroom() {
 
     if (connectionLabel === "Connected") {
       if (hasConnected.current && previous !== "Connected") {
-        notify({ title: "Connection restored", tone: "success" });
+        notify({
+          category: "system",
+          title: "Connection restored",
+          tone: "success",
+        });
       }
 
       hasConnected.current = true;
@@ -2888,6 +2999,7 @@ export function Chatroom() {
 
     if (hasConnected.current && previous === "Connected") {
       notify({
+        category: "system",
         title: "Connection interrupted",
         message: "Trying to reconnect...",
         tone: "warning",
@@ -4237,6 +4349,8 @@ export function Chatroom() {
             }
             sendWithEnter={sendWithEnter}
             onSendWithEnterChange={setSendWithEnter}
+            notificationPreferences={notificationPreferences}
+            onNotificationPreferenceChange={setNotificationCategoryEnabled}
             translationEnabled={translationEnabled}
             onTranslationEnabledChange={changeTranslationEnabled}
             translationLanguage={translationLanguage}

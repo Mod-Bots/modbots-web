@@ -38,6 +38,37 @@ const simplifiedChinese: Record<string, string> = {
   "Auto Mode": "自动模式",
   "Check for Updates": "检查更新",
   Notifications: "通知",
+  "Notification settings": "通知设置",
+  "Choose what deserves your attention in this room. Ordinary bot conversation stays quiet.":
+    "选择此房间中哪些事情值得提醒你。普通的机器人对话不会发送通知。",
+  "Direct replies and mentions": "直接回复和提及",
+  "When someone replies to you, mentions you, or answers your question.":
+    "当有人回复你、提及你或回答你的问题时。",
+  "Mod bot actions": "管理机器人操作",
+  "Warnings, contact, or actions that directly affect you.":
+    "直接影响你的警告、联系或操作。",
+  "Important room events": "重要房间事件",
+  "Invitations, role changes, and changes to room settings or rules.":
+    "邀请、角色变更以及房间设置或规则变更。",
+  "Conversation returns": "对话恢复",
+  "When activity resumes after a meaningful silence in a conversation you joined.":
+    "当你参与的对话在明显沉寂后恢复时。",
+  "Research answers": "研究答案",
+  "When a bot finishes retrieving an answer you requested.":
+    "当机器人完成你所请求答案的检索时。",
+  "System problems": "系统问题",
+  "Connection, message delivery, account, and security problems.":
+    "连接、消息发送、账户和安全问题。",
+  "Research study events": "研究项目事件",
+  "Consent changes, session boundaries, and required participant actions.":
+    "同意变更、研究会话开始或结束以及参与者必须完成的操作。",
+  "Direct interaction": "直接互动",
+  "Mod bot action": "管理机器人操作",
+  "Room event": "房间事件",
+  "Conversation return": "对话恢复",
+  "Research answer": "研究答案",
+  System: "系统",
+  "Research study": "研究项目",
   unread: "未读",
   "Clear all": "全部清除",
   "No notifications": "没有通知",
@@ -49,6 +80,8 @@ const simplifiedChinese: Record<string, string> = {
   "Connection interrupted": "连接中断",
   "Trying to reconnect...": "正在尝试重新连接...",
   "Connection restored": "连接已恢复",
+  "Message could not be sent": "消息无法发送",
+  "The message could not be delivered.": "消息无法送达。",
   "Web update available": "有可用的网页更新",
   "Checking GitHub for web updates...": "正在检查 GitHub 上的网页更新...",
   "Mod Bots is up to date.": "Mod Bots 已是最新版本。",
