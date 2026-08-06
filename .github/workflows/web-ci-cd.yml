@@ -25,8 +25,6 @@ jobs:
   verify:
     name: Verify web app
     runs-on: ubuntu-latest
-    outputs:
-      released_version: ${{ steps.release-version.outputs.version }}
     env:
       NEXT_PUBLIC_MODBOTS_API_URL: ${{ vars.NEXT_PUBLIC_MODBOTS_API_URL }}
       NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL: ${{ vars.NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL }}
@@ -37,34 +35,13 @@ jobs:
       - name: Check out web repo
         uses: actions/checkout@v6
 
-      - name: Determine released app version
-        id: release-version
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
-            released_tag="$GITHUB_REF_NAME"
-          else
-            released_tag="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '[.[] | select(.draft == false)][0].tag_name')"
-          fi
-
-          released_version="${released_tag#v}"
-          if [[ ! "$released_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "GitHub did not return a valid released app version."
-            exit 1
-          fi
-
-          echo "NEXT_PUBLIC_MODBOTS_RELEASE_VERSION=$released_version" >> "$GITHUB_ENV"
-          echo "version=$released_version" >> "$GITHUB_OUTPUT"
-
       - name: Validate production configuration
         run: |
           for variable in \
             NEXT_PUBLIC_MODBOTS_API_URL \
             NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL \
             NEXT_PUBLIC_MODBOTS_REALTIME_HEALTH_URL \
-            NEXT_PUBLIC_MODBOTS_ACCOUNT_URL \
-            NEXT_PUBLIC_MODBOTS_RELEASE_VERSION; do
+            NEXT_PUBLIC_MODBOTS_ACCOUNT_URL; do
             if [ -z "$(printenv "$variable")" ]; then
               echo "Missing repository variable: $variable"
               exit 1
@@ -105,7 +82,6 @@ jobs:
       NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL: ${{ vars.NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL }}
       NEXT_PUBLIC_MODBOTS_REALTIME_HEALTH_URL: ${{ vars.NEXT_PUBLIC_MODBOTS_REALTIME_HEALTH_URL }}
       NEXT_PUBLIC_MODBOTS_ACCOUNT_URL: ${{ vars.NEXT_PUBLIC_MODBOTS_ACCOUNT_URL }}
-      NEXT_PUBLIC_MODBOTS_RELEASE_VERSION: ${{ needs.verify.outputs.released_version }}
       MODBOTS_GITHUB_ISSUES_TOKEN: ${{ secrets.MODBOTS_GITHUB_ISSUES_TOKEN }}
       PRODUCTION_HOST: 217.154.40.130
       PRODUCTION_ROOT: /var/www/modbots-web
@@ -134,7 +110,7 @@ jobs:
 
       - name: Build and restart production
         run: |
-          ssh -i ~/.ssh/modbots-web-production "$PRODUCTION_SSH_USER@$PRODUCTION_HOST" "cd '$PRODUCTION_ROOT' && NEXT_PUBLIC_MODBOTS_API_URL='$NEXT_PUBLIC_MODBOTS_API_URL' NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL='$NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL' NEXT_PUBLIC_MODBOTS_REALTIME_HEALTH_URL='$NEXT_PUBLIC_MODBOTS_REALTIME_HEALTH_URL' NEXT_PUBLIC_MODBOTS_ACCOUNT_URL='$NEXT_PUBLIC_MODBOTS_ACCOUNT_URL' NEXT_PUBLIC_MODBOTS_RELEASE_VERSION='$NEXT_PUBLIC_MODBOTS_RELEASE_VERSION' MODBOTS_GITHUB_ISSUES_TOKEN='$MODBOTS_GITHUB_ISSUES_TOKEN' MODBOTS_DEPLOY_SOURCE=github-actions bash ./scripts/deploy-production.sh"
+          ssh -i ~/.ssh/modbots-web-production "$PRODUCTION_SSH_USER@$PRODUCTION_HOST" "cd '$PRODUCTION_ROOT' && NEXT_PUBLIC_MODBOTS_API_URL='$NEXT_PUBLIC_MODBOTS_API_URL' NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL='$NEXT_PUBLIC_MODBOTS_REALTIME_CONFIG_URL' NEXT_PUBLIC_MODBOTS_REALTIME_HEALTH_URL='$NEXT_PUBLIC_MODBOTS_REALTIME_HEALTH_URL' NEXT_PUBLIC_MODBOTS_ACCOUNT_URL='$NEXT_PUBLIC_MODBOTS_ACCOUNT_URL' MODBOTS_GITHUB_ISSUES_TOKEN='$MODBOTS_GITHUB_ISSUES_TOKEN' MODBOTS_DEPLOY_SOURCE=github-actions bash ./scripts/deploy-production.sh"
 
       - name: Verify production process
         run: |

@@ -76,8 +76,7 @@ const roomId = "global-lobby";
 const roomName = "Room";
 const roomAbout =
   "A live chatroom where humans and chat bots talk, and mod bots learn to moderate from everything that happens.";
-const appVersion =
-  process.env.NEXT_PUBLIC_MODBOTS_RELEASE_VERSION ?? releasedVersion;
+const appVersion = releasedVersion;
 
 const groupWindowMs = 45 * 1000;
 const participantActiveWindowMs = 5 * 60 * 1000;
