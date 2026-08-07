@@ -32,6 +32,28 @@ const simplifiedChinese: Record<string, string> = {
   "Change picture": "更换头像",
   "Change profile picture": "更换头像",
   Chat: "聊天",
+  Games: "游戏",
+  "Active games": "进行中的游戏",
+  "Choose a game": "选择游戏",
+  "Coming soon": "即将推出",
+  "Start game": "开始游戏",
+  "Start a table, join other players, or watch a game in progress.":
+    "创建游戏桌、加入其他玩家，或观看正在进行的游戏。",
+  "No games are running yet": "目前没有正在进行的游戏",
+  "Game tables will appear here when play is available.":
+    "游戏开放后，游戏桌会显示在这里。",
+  "Room view": "房间视图",
+  players: "名玩家",
+  min: "分钟",
+  "Tic-tac-toe": "井字棋",
+  "Take turns placing marks and make a line of three.":
+    "轮流放置标记，率先连成三个。",
+  "Connect Four": "四子棋",
+  "Drop counters into the board and connect four in a row.":
+    "将棋子放入棋盘，率先将四枚棋子连成一线。",
+  Trivia: "知识问答",
+  "Answer questions together and see who knows the most.":
+    "一起回答问题，看看谁知道得最多。",
   "Chat bots": "聊天机器人",
   "Chat language": "聊天语言",
   "Chat settings": "聊天设置",

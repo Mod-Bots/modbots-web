@@ -84,6 +84,7 @@ import { ComposerAttachmentMenu } from "./ComposerAttachmentMenu";
 import { ComposerEmojiPicker } from "./ComposerEmojiPicker";
 import { DesktopContextMenu } from "./DesktopContextMenu";
 import { emojiOnlyGraphemes } from "./emoji-data";
+import { GameLobby } from "./GameLobby";
 import { MenuBar } from "./MenuBar";
 import { ReportProblemDialog } from "./ReportProblemDialog";
 import { RequestFeatureDialog } from "./RequestFeatureDialog";
@@ -95,6 +96,8 @@ import {
 
 const defaultRoomId = "global-lobby";
 const appVersion = releasedVersion;
+
+type RoomView = "chat" | "games";
 
 const groupWindowMs = 45 * 1000;
 const participantActiveWindowMs = 5 * 60 * 1000;
@@ -2456,6 +2459,9 @@ export function Chatroom() {
   const roomDirectory = rooms.data?.rooms ?? [];
   const selectedRoom: RoomSummary | undefined =
     roomDirectory.find((room) => room.id === roomId) ?? overview.data?.room;
+  const gameLobbyAvailable =
+    selectedRoom?.capabilities.includes("games") ?? false;
+  const [roomView, setRoomView] = useState<RoomView>("chat");
   const [draft, setDraft] = useState("");
   const [draftHistoryAvailability, setDraftHistoryAvailability] = useState({
     canUndo: false,
@@ -2731,13 +2737,15 @@ export function Chatroom() {
   ).length;
 
   const openSearch = useCallback(() => {
+    setRoomView("chat");
+
     if (window.matchMedia("(max-width: 1023px)").matches) {
       setMobilePanel(null);
       setMobileSearchOpen(true);
       return;
     }
 
-    searchInput.current?.focus();
+    requestAnimationFrame(() => searchInput.current?.focus());
   }, []);
 
   useEffect(() => {
@@ -4229,6 +4237,7 @@ export function Chatroom() {
       setUserMenuOpen(false);
       setMobilePanel(null);
       setMobileSearchOpen(false);
+      setRoomView("chat");
       setRoomId(nextRoomId);
     } catch (error) {
       setDeliveryError(
@@ -4236,6 +4245,20 @@ export function Chatroom() {
       );
     } finally {
       setSwitchingRoomId(null);
+    }
+  };
+
+  const selectRoomView = (view: RoomView): void => {
+    if (view === "games" && !gameLobbyAvailable) {
+      return;
+    }
+
+    setRoomView(view);
+    setMobileSearchOpen(false);
+    setComposerMenu(null);
+
+    if (view === "games") {
+      setSearchQuery("");
     }
   };
 
@@ -4721,39 +4744,67 @@ export function Chatroom() {
                       <h2 className="min-w-0 flex-1 truncate text-[14px] font-semibold text-white lg:flex-none">
                         {selectedRoom?.name ?? t("Chat")}
                       </h2>
+                      {gameLobbyAvailable ? (
+                        <div
+                          className="flex shrink-0 rounded-lg border border-white/[0.08] bg-modbots-inset p-0.5"
+                          role="tablist"
+                          aria-label={t("Room view")}
+                        >
+                          {(["chat", "games"] as const).map((view) => (
+                            <button
+                              key={view}
+                              type="button"
+                              role="tab"
+                              aria-selected={roomView === view}
+                              onClick={() => selectRoomView(view)}
+                              className={`rounded-md px-2 py-1.5 text-[11px] font-medium transition sm:px-3 ${
+                                roomView === view
+                                  ? "bg-white/[0.09] text-zinc-100"
+                                  : "text-zinc-500 hover:text-zinc-300"
+                              }`}
+                            >
+                              {t(view === "chat" ? "Chat" : "Games")}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
                       <div className="hidden flex-1 lg:block" />
-                      <div className="hidden h-9 w-[min(32vw,380px)] items-center gap-2 rounded-lg border border-white/10 bg-modbots-popover px-3 lg:flex">
-                        <Search className="h-4 w-4 shrink-0 text-zinc-500" />
-                        <input
-                          ref={searchInput}
-                          value={searchQuery}
-                          onChange={(event) =>
-                            setSearchQuery(event.currentTarget.value)
-                          }
-                          placeholder={t("Search the chat")}
-                          className="min-w-0 flex-1 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
-                        />
-                        {searchQuery.length > 0 ? (
-                          <button
-                            type="button"
-                            onClick={() => setSearchQuery("")}
-                            className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                            aria-label={t("Clear search")}
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        ) : null}
-                      </div>
+                      {roomView === "chat" ? (
+                        <div className="hidden h-9 w-[min(32vw,380px)] items-center gap-2 rounded-lg border border-white/10 bg-modbots-popover px-3 lg:flex">
+                          <Search className="h-4 w-4 shrink-0 text-zinc-500" />
+                          <input
+                            ref={searchInput}
+                            value={searchQuery}
+                            onChange={(event) =>
+                              setSearchQuery(event.currentTarget.value)
+                            }
+                            placeholder={t("Search the chat")}
+                            className="min-w-0 flex-1 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+                          />
+                          {searchQuery.length > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => setSearchQuery("")}
+                              className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                              aria-label={t("Clear search")}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          ) : null}
+                        </div>
+                      ) : null}
                       <div className="hidden flex-1 lg:block" />
                       <div className="ml-auto flex items-center gap-1 lg:hidden">
-                        <button
-                          type="button"
-                          onClick={openSearch}
-                          className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
-                          aria-label={t("Search the chat")}
-                        >
-                          <Search className="h-[18px] w-[18px]" />
-                        </button>
+                        {roomView === "chat" ? (
+                          <button
+                            type="button"
+                            onClick={openSearch}
+                            className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+                            aria-label={t("Search the chat")}
+                          >
+                            <Search className="h-[18px] w-[18px]" />
+                          </button>
+                        ) : null}
                         <button
                           type="button"
                           onClick={() => {
@@ -4808,7 +4859,16 @@ export function Chatroom() {
                 ) : null}
 
                 <div className="modbots-print-chat-body relative flex min-h-0 flex-1">
-                  <section className="modbots-print-chat-section flex min-w-0 flex-1 flex-col">
+                  {roomView === "games" && gameLobbyAvailable ? (
+                    <GameLobby />
+                  ) : null}
+                  <section
+                    className={`modbots-print-chat-section min-w-0 flex-1 flex-col ${
+                      roomView === "games" && gameLobbyAvailable
+                        ? "hidden"
+                        : "flex"
+                    }`}
+                  >
                     <div
                       ref={conversationViewport}
                       onScroll={handleConversationScroll}
