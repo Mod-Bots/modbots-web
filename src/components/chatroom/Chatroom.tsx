@@ -1125,40 +1125,42 @@ function StatusBar({
         ) : null}
       </div>
 
-      <div className="flex min-w-0 flex-1 items-center justify-center px-2">
-        {latestNotification !== undefined && LatestToneIcon !== null ? (
-          <div
-            role={
-              latestNotification.tone === "error" ||
-              latestNotification.tone === "warning"
-                ? "alert"
-                : "status"
-            }
-            className="flex min-w-0 max-w-full items-center gap-1.5 text-zinc-400"
-          >
-            <LatestToneIcon className="h-3 w-3 shrink-0" />
-            <span className="truncate">
-              <span className="font-medium text-zinc-300">
-                {t(latestNotification.title)}
-              </span>
-              {latestNotification.message !== undefined
-                ? ` · ${t(latestNotification.message)}`
-                : ""}
-            </span>
-            <button
-              type="button"
-              onClick={() => dismissNotification(latestNotification.id)}
-              className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-zinc-600 hover:bg-white/[0.07] hover:text-zinc-300"
-              aria-label={t("Dismiss notification")}
-              title={t("Dismiss notification")}
-            >
-              <X className="h-2.5 w-2.5" />
-            </button>
+      {!notificationsOpen &&
+      latestNotification !== undefined &&
+      LatestToneIcon !== null ? (
+        <div
+          role={
+            latestNotification.tone === "error" ||
+            latestNotification.tone === "warning"
+              ? "alert"
+              : "status"
+          }
+          className="absolute bottom-[calc(100%+8px)] right-3 z-40 flex w-[min(360px,calc(100vw-24px))] items-start gap-2.5 rounded-window border border-white/10 bg-modbots-popover px-3 py-2.5 text-zinc-400 shadow-[0_16px_50px_rgba(0,0,0,0.55)]"
+        >
+          <LatestToneIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="text-[12px] font-medium leading-4 text-zinc-200">
+              {t(latestNotification.title)}
+            </p>
+            {latestNotification.message !== undefined ? (
+              <p className="mt-0.5 truncate text-[11px] leading-4 text-zinc-500">
+                {t(latestNotification.message)}
+              </p>
+            ) : null}
           </div>
-        ) : null}
-      </div>
+          <button
+            type="button"
+            onClick={() => dismissNotification(latestNotification.id)}
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-zinc-600 hover:bg-white/[0.07] hover:text-zinc-300"
+            aria-label={t("Dismiss notification")}
+            title={t("Dismiss notification")}
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </div>
+      ) : null}
 
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="ml-auto flex shrink-0 items-center gap-3">
         {searchMatches !== null ? (
           <span className="tabular-nums">
             {searchMatches} {searchMatches === 1 ? "match" : "matches"}
