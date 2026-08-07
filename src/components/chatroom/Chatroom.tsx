@@ -66,6 +66,7 @@ import type {
 } from "@/data/contracts";
 import { accountBaseUrl, consumeEnterAfterLogin } from "@/data/oauth";
 import { isMutedError, mediaAssetDataUrl } from "@/data/platform";
+import { supportsMediaStatus } from "@/data/room-capabilities";
 import { actorLabel, actorRole } from "@/data/room-state";
 import { useRoomActivity } from "@/hooks/useRoomActivity";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
@@ -2150,11 +2151,13 @@ function ProfileDetailRow({
 
 function ProfileStatusControl({
   actor,
+  mediaStatusAvailable,
   saving,
   error,
   onSave,
 }: {
   actor: Actor;
+  mediaStatusAvailable: boolean;
   saving: boolean;
   error: string | null;
   onSave: (status: {
@@ -2203,7 +2206,7 @@ function ProfileStatusControl({
     : actor.statusMode === "preset" &&
         (actor.statusText === "Available" || actor.statusText === "Away")
       ? actor.statusText
-      : actor.statusMode === "media"
+      : actor.statusMode === "media" && mediaStatusAvailable
         ? "media"
         : "";
   const selectedStatusLabel =
@@ -2245,6 +2248,9 @@ function ProfileStatusControl({
 
     setCustomSelected(false);
     if (value === "media") {
+      if (!mediaStatusAvailable) {
+        return;
+      }
       void saveStatus({ statusMode: "media", statusText: null });
       return;
     }
@@ -2271,12 +2277,16 @@ function ProfileStatusControl({
       icon: Pencil,
       tone: "text-sky-400",
     },
-    {
-      value: "media",
-      label: t("Share the media I play"),
-      icon: Film,
-      tone: "text-sky-400",
-    },
+    ...(mediaStatusAvailable
+      ? [
+          {
+            value: "media" as const,
+            label: t("Share the media I play"),
+            icon: Film,
+            tone: "text-sky-400",
+          },
+        ]
+      : []),
   ] as const;
 
   return (
@@ -2627,10 +2637,12 @@ export function Chatroom() {
     roomDirectory.find((room) => room.id === roomId) ?? overview.data?.room;
   const gameLobbyAvailable =
     selectedRoom?.capabilities.includes("games") ?? false;
+  const mediaStatusAvailable = supportsMediaStatus(selectedRoom);
   const [roomView, setRoomView] = useState<RoomView>("chat");
   const playingMediaAssetIds = useRef<string[]>([]);
   const synchronizedMediaAssetId = useRef<string | null | undefined>(undefined);
   const mediaStatusQueue = useRef<Promise<void>>(Promise.resolve());
+  const unsupportedMediaStatusClear = useRef<string | null>(null);
   const [draft, setDraft] = useState("");
   const [draftHistoryAvailability, setDraftHistoryAvailability] = useState({
     canUndo: false,
@@ -2771,9 +2783,10 @@ export function Chatroom() {
   };
 
   const setMediaPlaybackAsync = setMediaPlayback.mutateAsync;
+  const updateStatusAsync = updateStatus.mutateAsync;
   const synchronizeMediaStatus = useCallback(
     (mediaAssetId: string | null) => {
-      if (localActor?.statusMode !== "media") {
+      if (!mediaStatusAvailable || localActor?.statusMode !== "media") {
         synchronizedMediaAssetId.current = undefined;
         return;
       }
@@ -2794,7 +2807,7 @@ export function Chatroom() {
           }
         });
     },
-    [localActor?.statusMode, setMediaPlaybackAsync],
+    [localActor?.statusMode, mediaStatusAvailable, setMediaPlaybackAsync],
   );
   const handleMediaPlaybackChange = useCallback(
     (mediaAssetId: string, playing: boolean) => {
@@ -2820,12 +2833,42 @@ export function Chatroom() {
   }, [roomId]);
 
   useEffect(() => {
-    if (localActor?.statusMode === "media") {
+    if (mediaStatusAvailable && localActor?.statusMode === "media") {
       synchronizeMediaStatus(playingMediaAssetIds.current.at(-1) ?? null);
     } else {
       synchronizedMediaAssetId.current = undefined;
     }
-  }, [localActor?.statusMode, synchronizeMediaStatus]);
+  }, [localActor?.statusMode, mediaStatusAvailable, synchronizeMediaStatus]);
+
+  useEffect(() => {
+    if (
+      selectedRoom === undefined ||
+      mediaStatusAvailable ||
+      localActor?.statusMode !== "media"
+    ) {
+      unsupportedMediaStatusClear.current = null;
+      return;
+    }
+
+    const clearKey = `${roomId}:${localActor.id}`;
+    if (unsupportedMediaStatusClear.current === clearKey) {
+      return;
+    }
+
+    unsupportedMediaStatusClear.current = clearKey;
+    void updateStatusAsync({ statusMode: null, statusText: null }).catch(() => {
+      if (unsupportedMediaStatusClear.current === clearKey) {
+        unsupportedMediaStatusClear.current = null;
+      }
+    });
+  }, [
+    localActor?.id,
+    localActor?.statusMode,
+    mediaStatusAvailable,
+    roomId,
+    selectedRoom,
+    updateStatusAsync,
+  ]);
 
   useEffect(() => {
     if (voiceRecordingStatus !== "recording") {
@@ -4812,6 +4855,7 @@ export function Chatroom() {
                         <div className="border-b border-white/[0.08] px-4 py-3">
                           <ProfileStatusControl
                             actor={localActor}
+                            mediaStatusAvailable={mediaStatusAvailable}
                             saving={updateStatus.isPending}
                             error={
                               updateStatus.error instanceof Error

@@ -13,6 +13,7 @@
     "test:composer": "node --experimental-strip-types --test src/components/chatroom/emoji-data.test.mjs src/components/chatroom/media-player-data.test.mjs src/data/content-lifecycle.test.mjs",
     "test:notifications": "node --experimental-strip-types --test src/notifications/room-notifications.test.mjs",
     "test:forms": "node --experimental-strip-types --test src/app/api/github-issue-routes.test.mjs",
+    "test:rooms": "node --experimental-strip-types --test src/data/room-capabilities.test.mjs",
     "format": "biome format --write"
   },
   "dependencies": {
