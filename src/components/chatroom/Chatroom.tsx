@@ -2005,7 +2005,10 @@ function ParticipantRow({
   const currentStatus = participantStatusStyles[status];
 
   return (
-    <div className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-white/[0.04]">
+    <div
+      data-participant-actor-id={actor.id}
+      className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-white/[0.04]"
+    >
       <div className="relative">
         <ActorProfilePicture
           actor={actor}
@@ -2054,6 +2057,148 @@ function ProfileDetailRow({
           {value}
         </div>
       </div>
+    </div>
+  );
+}
+
+const participantRoleLabel = (actor: Actor): string => {
+  if (actor.type === "chat_bot") {
+    return "Chat bot";
+  }
+
+  if (actor.type === "mod_bot") {
+    return "Mod bot";
+  }
+
+  return "Human";
+};
+
+function ParticipantProfileDialog({
+  actor,
+  onClose,
+}: {
+  actor: Actor;
+  onClose: () => void;
+}) {
+  const { t } = useUiLanguage();
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const provided = (value: string | null): string =>
+    value === null || value.trim().length === 0 ? t("Not provided") : value;
+
+  useEffect(() => {
+    requestAnimationFrame(() => closeButton.current?.focus());
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[230] flex items-center justify-center p-4">
+      <button
+        type="button"
+        aria-label={t("Close profile")}
+        onClick={onClose}
+        className="absolute inset-0 cursor-default bg-black/70 backdrop-blur-sm"
+      />
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-label={t(`${actor.display}'s profile`)}
+        className="relative z-10 flex max-h-[min(720px,calc(100vh-32px))] w-full max-w-md flex-col overflow-hidden rounded-window border border-white/10 bg-[image:var(--modbots-profile-background)] shadow-[0_28px_100px_rgba(0,0,0,0.72)]"
+      >
+        <header className="flex items-start gap-4 border-b border-white/[0.08] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.09),transparent_48%)] p-5">
+          <ActorProfilePicture
+            actor={actor}
+            actorId={actor.id}
+            name={actor.display}
+            size="lg"
+          />
+          <div className="min-w-0 flex-1 pt-1">
+            <h2 className="truncate text-lg font-semibold text-zinc-50">
+              {actor.display}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              {t(participantRoleLabel(actor))}
+            </p>
+          </div>
+          <button
+            ref={closeButton}
+            type="button"
+            onClick={onClose}
+            className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            aria-label={t("Close profile")}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </header>
+
+        <div className="modbots-scroll min-h-0 overflow-y-auto px-5 py-4">
+          <div className="space-y-1">
+            <ProfileDetailRow
+              icon={<Users className="h-4 w-4" />}
+              label={t("Role")}
+              value={t(participantRoleLabel(actor))}
+            />
+            <ProfileDetailRow
+              icon={<AtSign className="h-4 w-4" />}
+              label={t("Username")}
+              value={
+                actor.handle === null ? t("Not provided") : `@${actor.handle}`
+              }
+            />
+            <ProfileDetailRow
+              icon={<CalendarDays className="h-4 w-4" />}
+              label={
+                actor.registered ? t("Member since") : t("Identity created")
+              }
+              value={memberSince(actor.createdAt)}
+            />
+            <ProfileDetailRow
+              icon={<FileText className="h-4 w-4" />}
+              label={t("About")}
+              value={provided(actor.bio)}
+            />
+            <ProfileDetailRow
+              icon={<AtSign className="h-4 w-4" />}
+              label={t("Pronouns")}
+              value={provided(actor.pronouns)}
+            />
+            <ProfileDetailRow
+              icon={<MapPin className="h-4 w-4" />}
+              label={t("Location")}
+              value={provided(actor.location)}
+            />
+            <ProfileDetailRow
+              icon={<LinkIcon className="h-4 w-4" />}
+              label={t("Links")}
+              value={
+                actor.links.length === 0 ? (
+                  t("Not provided")
+                ) : (
+                  <div className="flex flex-col items-start gap-1">
+                    {actor.links.map((link) => (
+                      <a
+                        key={link}
+                        href={link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="max-w-full truncate underline decoration-zinc-600 underline-offset-2 hover:text-white"
+                      >
+                        {link}
+                      </a>
+                    ))}
+                  </div>
+                )
+              }
+            />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -2212,10 +2357,17 @@ export function Chatroom() {
   const [contextEditSequence, setContextEditSequence] = useState<string | null>(
     null,
   );
+  const [profileActorId, setProfileActorId] = useState<string | null>(null);
   const clearContextEditRequest = useCallback(
     () => setContextEditSequence(null),
     [],
   );
+  const closeParticipantProfile = useCallback(
+    () => setProfileActorId(null),
+    [],
+  );
+  const viewedProfileActor =
+    profileActorId === null ? undefined : actors.get(profileActorId);
   const selectReplyTarget = useCallback(
     (event: RoomEvent) => setReplyTarget(event),
     [],
@@ -4014,7 +4166,14 @@ export function Chatroom() {
             onDeleteMessage={deleteContextMessage}
             onEditMessage={editContextMessage}
             onReplyToMessage={replyToContextMessage}
+            onViewProfile={setProfileActorId}
           />
+          {viewedProfileActor === undefined ? null : (
+            <ParticipantProfileDialog
+              actor={viewedProfileActor}
+              onClose={closeParticipantProfile}
+            />
+          )}
         </>
       ) : null}
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">

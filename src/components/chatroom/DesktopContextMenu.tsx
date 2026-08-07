@@ -10,6 +10,7 @@ import {
   Scissors,
   TextSelect,
   Trash2,
+  UserRound,
 } from "lucide-react";
 import type { KeyboardEvent as ReactKeyboardEvent, RefObject } from "react";
 import {
@@ -29,6 +30,7 @@ interface ContextTarget {
   messageSequence: string | null;
   messageText: string | null;
   ownMessage: boolean;
+  participantActorId: string | null;
   target: HTMLElement;
   x: number;
   y: number;
@@ -81,12 +83,14 @@ export function DesktopContextMenu({
   onDeleteMessage,
   onEditMessage,
   onReplyToMessage,
+  onViewProfile,
 }: {
   enabled: boolean;
   rootRef: RefObject<HTMLElement | null>;
   onDeleteMessage: (sequence: string) => Promise<void>;
   onEditMessage: (sequence: string) => void;
   onReplyToMessage: (sequence: string) => void;
+  onViewProfile: (actorId: string) => void;
 }) {
   const { t } = useUiLanguage();
   const [context, setContext] = useState<ContextTarget | null>(null);
@@ -124,6 +128,9 @@ export function DesktopContextMenu({
       const message = element.closest<HTMLElement>(
         "[data-room-message-sequence]",
       );
+      const participant = element.closest<HTMLElement>(
+        "[data-participant-actor-id]",
+      );
       const ownMessage = message?.dataset.roomMessageOwned === "true";
 
       setContext({
@@ -134,6 +141,7 @@ export function DesktopContextMenu({
         messageSequence: message?.dataset.roomMessageSequence ?? null,
         messageText: message?.dataset.roomMessageCopyText ?? null,
         ownMessage,
+        participantActorId: participant?.dataset.participantActorId ?? null,
         target: element,
         x,
         y,
@@ -241,6 +249,18 @@ export function DesktopContextMenu({
     }
 
     const editItems: ContextMenuItem[] = [];
+    const participantActorId = context.participantActorId;
+
+    if (participantActorId !== null) {
+      return [
+        {
+          icon: UserRound,
+          id: "view-profile",
+          label: t("View profile"),
+          onSelect: () => onViewProfile(participantActorId),
+        },
+      ];
+    }
 
     const messageSequence = context.messageSequence;
 
@@ -347,6 +367,7 @@ export function DesktopContextMenu({
     onDeleteMessage,
     onEditMessage,
     onReplyToMessage,
+    onViewProfile,
     runEditCommand,
     t,
   ]);
