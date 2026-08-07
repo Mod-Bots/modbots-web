@@ -28,6 +28,7 @@ import {
   MoreHorizontal,
   Paperclip,
   Pencil,
+  Quote,
   Reply,
   Search,
   Send,
@@ -1216,12 +1217,14 @@ function MessageActions({
   onDeleteMessage,
   onEdit,
   onReply,
+  quote,
 }: {
   attachments: AttachmentMessageAction[];
   onDeleteAttachment?: (partId: string) => Promise<void>;
   onDeleteMessage?: () => Promise<void>;
   onEdit?: () => void;
   onReply?: () => void;
+  quote: boolean;
 }) {
   const { t } = useUiLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -1271,10 +1274,14 @@ function MessageActions({
         onClick={onReply}
         disabled={onReply === undefined}
         className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-zinc-500"
-        aria-label={t("Reply to message")}
-        title={t("Reply")}
+        aria-label={t(quote ? "Quote message" : "Reply to message")}
+        title={t(quote ? "Quote" : "Reply")}
       >
-        <Reply className="h-3.5 w-3.5" />
+        {quote ? (
+          <Quote className="h-3.5 w-3.5" />
+        ) : (
+          <Reply className="h-3.5 w-3.5" />
+        )}
       </button>
       <button
         type="button"
@@ -1706,6 +1713,7 @@ function ChatMessage({
           : undefined
       }
       onReply={onReply}
+      quote={ownMessage}
     />
   );
 
@@ -1782,7 +1790,9 @@ function ChatMessage({
                 <>
                   <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-500">
                     <CornerUpLeft className="h-3 w-3 shrink-0 text-zinc-500" />
-                    Replying to
+                    {event.actorId === repliedEvent.actorId
+                      ? "Quoted"
+                      : "Replying to"}
                   </p>
                   <p className="mt-0.5 truncate text-[11px] font-medium text-zinc-300">
                     {actorLabel(repliedEvent.actorId, actors)}
@@ -4552,10 +4562,18 @@ export function Chatroom() {
                           <div className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2 text-xs">
                             <CornerUpLeft className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
                             <span className="shrink-0 text-zinc-400">
-                              Replying to{" "}
-                              <span className="font-medium text-zinc-200">
-                                {actorLabel(replyTarget.actorId, actors)}
-                              </span>
+                              {replyTarget.actorId === localActor?.id ? (
+                                <span className="font-medium text-zinc-200">
+                                  Quoting your message
+                                </span>
+                              ) : (
+                                <>
+                                  Replying to{" "}
+                                  <span className="font-medium text-zinc-200">
+                                    {actorLabel(replyTarget.actorId, actors)}
+                                  </span>
+                                </>
+                              )}
                             </span>
                             <span className="min-w-0 flex-1 truncate text-zinc-600">
                               {displayedEventText(
@@ -4568,7 +4586,11 @@ export function Chatroom() {
                               type="button"
                               onClick={() => setReplyTarget(null)}
                               className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
-                              aria-label={t("Cancel reply")}
+                              aria-label={t(
+                                replyTarget.actorId === localActor?.id
+                                  ? "Cancel quote"
+                                  : "Cancel reply",
+                              )}
                             >
                               <X className="h-3.5 w-3.5" />
                             </button>

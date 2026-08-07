@@ -5,6 +5,7 @@ import {
   ClipboardPaste,
   Copy,
   Pencil,
+  Quote,
   Reply,
   Scissors,
   TextSelect,
@@ -246,6 +247,12 @@ export function DesktopContextMenu({
     if (messageSequence !== null) {
       if (context.ownMessage) {
         return [
+          {
+            icon: Quote,
+            id: "quote-message",
+            label: t("Quote"),
+            onSelect: () => onReplyToMessage(messageSequence),
+          },
           ...(context.editableMessage
             ? [
                 {
