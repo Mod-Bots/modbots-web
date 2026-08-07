@@ -105,7 +105,6 @@ const appVersion = releasedVersion;
 
 type RoomView = "chat" | "games";
 
-const groupWindowMs = 45 * 1000;
 const participantActiveWindowMs = 5 * 60 * 1000;
 const conversationPageSize = 100;
 const preferredVoiceMimeTypes = [
@@ -790,12 +789,11 @@ const moderationEventText = (
 
 type TimelineItem =
   | { kind: "day"; key: string; label: string }
-  | { kind: "message"; key: string; event: RoomEvent; grouped: boolean }
+  | { kind: "message"; key: string; event: RoomEvent }
   | { kind: "moderation"; key: string; event: RoomEvent };
 
 const buildTimeline = (events: RoomEvent[]): TimelineItem[] => {
   const items: TimelineItem[] = [];
-  let previousMessage: RoomEvent | null = null;
   let previousDayKey: string | null = null;
 
   for (const event of events) {
@@ -809,26 +807,14 @@ const buildTimeline = (events: RoomEvent[]): TimelineItem[] => {
         label: dayLabel(occurredAt),
       });
       previousDayKey = dayKey;
-      previousMessage = null;
     }
 
     if (event.type === "moderation_action_applied") {
       items.push({ kind: "moderation", key: event.sequence, event });
-      previousMessage = null;
       continue;
     }
 
-    // A reply always shows its author and its reference, so it never folds
-    // into the previous author's group.
-    const grouped =
-      previousMessage !== null &&
-      previousMessage.actorId === event.actorId &&
-      payloadReply(event) === null &&
-      occurredAt.getTime() - new Date(previousMessage.occurredAt).getTime() <
-        groupWindowMs;
-
-    items.push({ kind: "message", key: event.sequence, event, grouped });
-    previousMessage = event;
+    items.push({ kind: "message", key: event.sequence, event });
   }
 
   return items;
@@ -1645,7 +1631,6 @@ function MessageMedia({
 function ChatMessage({
   actors,
   event,
-  grouped,
   roomId,
   localActorId,
   mentionLabels,
@@ -1663,7 +1648,6 @@ function ChatMessage({
 }: {
   actors: Map<string, Actor>;
   event: RoomEvent;
-  grouped: boolean;
   roomId: string;
   localActorId: string | undefined;
   mentionLabels: MentionLabel[];
@@ -1838,35 +1822,6 @@ function ChatMessage({
       quote={ownMessage}
     />
   );
-
-  if (grouped) {
-    return (
-      <article
-        data-room-message-sequence={event.sequence}
-        data-room-message-owned={canManage}
-        data-room-message-editable={canManage && hasText}
-        data-room-message-copy-text={
-          content.length > 0 ? content : eventContent(event)
-        }
-        className={`group relative flex gap-3 px-4 py-1 transition-colors sm:px-6 ${messageRowClass}`}
-      >
-        <div className="flex w-8 shrink-0 justify-center">
-          <time className="mt-1 hidden text-[10px] tabular-nums text-zinc-600 group-hover:block">
-            {formatTime(event.occurredAt)}
-          </time>
-        </div>
-        <div className="min-w-0 flex-1 pr-20">
-          {messageBody}
-          <MessageMedia
-            event={event}
-            roomId={roomId}
-            onPlaybackChange={onPlaybackChange}
-          />
-        </div>
-        {actions}
-      </article>
-    );
-  }
 
   return (
     <article
@@ -2073,7 +2028,6 @@ const ConversationTimeline = memo(function ConversationTimeline({
         key={item.key}
         actors={actors}
         event={item.event}
-        grouped={item.grouped}
         roomId={roomId}
         localActorId={localActorId}
         mentionLabels={mentionLabels}
