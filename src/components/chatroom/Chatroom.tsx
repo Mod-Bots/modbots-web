@@ -1530,8 +1530,10 @@ function ChatMessage({
   displayText,
   originalText,
   repliedDisplayText,
+  editRequested,
   onDeleteAttachment,
   onDeleteMessage,
+  onEditRequestHandled,
   onEditMessage,
   onReply,
 }: {
@@ -1544,8 +1546,10 @@ function ChatMessage({
   displayText: string;
   originalText: string;
   repliedDisplayText: string | null;
+  editRequested: boolean;
   onDeleteAttachment: (event: RoomEvent, partId: string) => Promise<void>;
   onDeleteMessage: (event: RoomEvent) => Promise<void>;
+  onEditRequestHandled: () => void;
   onEditMessage: (event: RoomEvent, text: string) => Promise<void>;
   onReply?: () => void;
 }) {
@@ -1600,6 +1604,17 @@ function ChatMessage({
     setEditError(null);
     setEditing(true);
   };
+  useEffect(() => {
+    if (!editRequested) {
+      return;
+    }
+
+    const source = eventSource(event);
+    setEditDraft(source?.text ?? eventText(event));
+    setEditError(null);
+    setEditing(true);
+    onEditRequestHandled();
+  }, [editRequested, event, onEditRequestHandled]);
   const saveEdit = async () => {
     const nextText = editDraft.trim();
 
@@ -1698,6 +1713,8 @@ function ChatMessage({
     return (
       <article
         data-room-message-sequence={event.sequence}
+        data-room-message-owned={canManage}
+        data-room-message-editable={canManage && hasText}
         className="group relative flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6"
       >
         <div className="flex w-8 shrink-0 justify-center">
@@ -1717,6 +1734,8 @@ function ChatMessage({
   return (
     <article
       data-room-message-sequence={event.sequence}
+      data-room-message-owned={canManage}
+      data-room-message-editable={canManage && hasText}
       className="group relative mt-5 flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6"
     >
       <div className="w-8 shrink-0">
@@ -1825,8 +1844,10 @@ const ConversationTimeline = memo(function ConversationTimeline({
   messagesByContentItem,
   chatLanguage,
   translatedEventText,
+  contextEditSequence,
   onDeleteAttachment,
   onDeleteMessage,
+  onEditRequestHandled,
   onEditMessage,
   onReply,
   ruleTitles,
@@ -1838,8 +1859,10 @@ const ConversationTimeline = memo(function ConversationTimeline({
   messagesByContentItem: Map<string, RoomEvent>;
   chatLanguage: ChatLanguage;
   translatedEventText: ReadonlyMap<string, string>;
+  contextEditSequence: string | null;
   onDeleteAttachment: (event: RoomEvent, partId: string) => Promise<void>;
   onDeleteMessage: (event: RoomEvent) => Promise<void>;
+  onEditRequestHandled: () => void;
   onEditMessage: (event: RoomEvent, text: string) => Promise<void>;
   onReply: (event: RoomEvent) => void;
   ruleTitles: Map<string, string>;
@@ -1891,8 +1914,10 @@ const ConversationTimeline = memo(function ConversationTimeline({
         displayText={displayText}
         originalText={originalText}
         repliedDisplayText={repliedDisplayText}
+        editRequested={contextEditSequence === item.event.sequence}
         onDeleteAttachment={onDeleteAttachment}
         onDeleteMessage={onDeleteMessage}
+        onEditRequestHandled={onEditRequestHandled}
         onEditMessage={onEditMessage}
         onReply={canReply ? () => onReply(item.event) : undefined}
       />
@@ -2168,6 +2193,13 @@ export function Chatroom() {
   const [visibleEventCount, setVisibleEventCount] =
     useState(conversationPageSize);
   const [replyTarget, setReplyTarget] = useState<RoomEvent | null>(null);
+  const [contextEditSequence, setContextEditSequence] = useState<string | null>(
+    null,
+  );
+  const clearContextEditRequest = useCallback(
+    () => setContextEditSequence(null),
+    [],
+  );
   const selectReplyTarget = useCallback(
     (event: RoomEvent) => setReplyTarget(event),
     [],
@@ -2839,6 +2871,23 @@ export function Chatroom() {
       await editContent.mutateAsync({ contentItemId, parts: remainingParts });
     },
     [editContent, removeContent],
+  );
+  const editContextMessage = useCallback((sequence: string) => {
+    setContextEditSequence(sequence);
+  }, []);
+  const deleteContextMessage = useCallback(
+    async (sequence: string): Promise<void> => {
+      const event = projectedEvents.find(
+        (candidate) => candidate.sequence === sequence,
+      );
+
+      if (event === undefined || event.actorId !== localActor?.id) {
+        throw new Error("This message cannot be deleted.");
+      }
+
+      await deleteMessage(event);
+    },
+    [deleteMessage, localActor?.id, projectedEvents],
   );
   // The dictionary the message renderer matches `@mentions` against.
   const mentionLabels = useMemo(() => buildMentionLabels(actors), [actors]);
@@ -3947,7 +3996,8 @@ export function Chatroom() {
             enabled={entered}
             rootRef={chatroomRoot}
             onOpenSearch={openSearch}
-            onOpenSettings={() => openSettings("account")}
+            onDeleteMessage={deleteContextMessage}
+            onEditMessage={editContextMessage}
             onReplyToMessage={replyToContextMessage}
             onTakeScreenshot={() => void takeScreenshot()}
           />
@@ -4367,8 +4417,10 @@ export function Chatroom() {
                             messagesByContentItem={messagesByContentItem}
                             chatLanguage={chatLanguage}
                             translatedEventText={translatedEventText}
+                            contextEditSequence={contextEditSequence}
                             onDeleteAttachment={deleteAttachment}
                             onDeleteMessage={deleteMessage}
+                            onEditRequestHandled={clearContextEditRequest}
                             onEditMessage={editMessage}
                             onReply={selectReplyTarget}
                             ruleTitles={ruleTitles}

@@ -5,12 +5,12 @@ import {
   Camera,
   ClipboardPaste,
   Copy,
-  RefreshCw,
+  Pencil,
   Reply,
   Scissors,
   Search,
-  Settings2,
   TextSelect,
+  Trash2,
 } from "lucide-react";
 import type { KeyboardEvent as ReactKeyboardEvent, RefObject } from "react";
 import {
@@ -26,7 +26,9 @@ import { useUiLanguage } from "@/i18n/UiLanguageProvider";
 interface ContextTarget {
   editable: HTMLInputElement | HTMLTextAreaElement | null;
   hasSelection: boolean;
+  editableMessage: boolean;
   messageSequence: string | null;
+  ownMessage: boolean;
   target: HTMLElement;
   x: number;
   y: number;
@@ -37,7 +39,8 @@ interface ContextMenuAction {
   icon: LucideIcon;
   id: string;
   label: string;
-  onSelect: () => void;
+  onSelect: () => void | Promise<void>;
+  requiresConfirmation?: boolean;
   shortcut?: string;
 }
 
@@ -76,22 +79,32 @@ export function DesktopContextMenu({
   enabled,
   rootRef,
   onOpenSearch,
-  onOpenSettings,
+  onDeleteMessage,
+  onEditMessage,
   onReplyToMessage,
   onTakeScreenshot,
 }: {
   enabled: boolean;
   rootRef: RefObject<HTMLElement | null>;
   onOpenSearch: () => void;
-  onOpenSettings: () => void;
+  onDeleteMessage: (sequence: string) => Promise<void>;
+  onEditMessage: (sequence: string) => void;
   onReplyToMessage: (sequence: string) => void;
   onTakeScreenshot: () => void;
 }) {
   const { t } = useUiLanguage();
   const [context, setContext] = useState<ContextTarget | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const close = useCallback(() => setContext(null), []);
+  const close = useCallback(() => {
+    setContext(null);
+    setConfirmingDelete(false);
+    setDeletePending(false);
+    setDeleteError(null);
+  }, []);
 
   const open = useCallback(
     (target: EventTarget | null, x: number, y: number): boolean => {
@@ -115,15 +128,22 @@ export function DesktopContextMenu({
       const message = element.closest<HTMLElement>(
         "[data-room-message-sequence]",
       );
+      const ownMessage = message?.dataset.roomMessageOwned === "true";
 
       setContext({
         editable,
+        editableMessage:
+          ownMessage && message?.dataset.roomMessageEditable === "true",
         hasSelection: targetHasSelection(editable),
         messageSequence: message?.dataset.roomMessageSequence ?? null,
+        ownMessage,
         target: element,
         x,
         y,
       });
+      setConfirmingDelete(false);
+      setDeletePending(false);
+      setDeleteError(null);
       return true;
     },
     [enabled, rootRef],
@@ -227,6 +247,25 @@ export function DesktopContextMenu({
         label: t("Reply"),
         onSelect: () => onReplyToMessage(messageSequence),
       });
+
+      if (context.editableMessage) {
+        editItems.push({
+          icon: Pencil,
+          id: "edit-message",
+          label: t("Edit message"),
+          onSelect: () => onEditMessage(messageSequence),
+        });
+      }
+
+      if (context.ownMessage) {
+        editItems.push({
+          icon: Trash2,
+          id: "delete-message",
+          label: t("Delete message"),
+          onSelect: () => onDeleteMessage(messageSequence),
+          requiresConfirmation: true,
+        });
+      }
     }
 
     if (context.editable !== null) {
@@ -290,25 +329,12 @@ export function DesktopContextMenu({
         label: t("Take a Screenshot"),
         onSelect: onTakeScreenshot,
       },
-      {
-        icon: Settings2,
-        id: "settings",
-        label: t("Settings"),
-        onSelect: onOpenSettings,
-        shortcut: "Ctrl+,",
-      },
-      { id: "app-refresh", separator: true },
-      {
-        icon: RefreshCw,
-        id: "refresh",
-        label: t("Refresh the Chatroom"),
-        onSelect: () => window.location.reload(),
-      },
     ];
   }, [
     context,
+    onDeleteMessage,
+    onEditMessage,
     onOpenSearch,
-    onOpenSettings,
     onReplyToMessage,
     onTakeScreenshot,
     runEditCommand,
@@ -319,9 +345,26 @@ export function DesktopContextMenu({
     return null;
   }
 
-  const selectAction = (action: () => void) => {
+  const selectAction = (action: () => void | Promise<void>) => {
     close();
-    action();
+    void action();
+  };
+
+  const confirmDelete = async () => {
+    if (context?.messageSequence === null || context === null) {
+      return;
+    }
+
+    setDeletePending(true);
+    setDeleteError(null);
+
+    try {
+      await onDeleteMessage(context.messageSequence);
+      close();
+    } catch {
+      setDeleteError(t("The message could not be deleted."));
+      setDeletePending(false);
+    }
   };
 
   const handleMenuKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
@@ -380,37 +423,76 @@ export function DesktopContextMenu({
         className="fixed z-[201] hidden min-w-[238px] rounded-window border border-white/10 bg-modbots-menu p-1.5 shadow-[0_18px_60px_rgba(0,0,0,0.58)] lg:block"
         style={{ left: context.x, top: context.y }}
       >
-        {items.map((item) => {
-          if ("separator" in item) {
-            return (
-              <hr
-                key={item.id}
-                className="my-1 border-0 border-t border-white/[0.08]"
-              />
-            );
-          }
+        {confirmingDelete ? (
+          <div className="w-60 p-2">
+            <p className="text-[13px] font-medium text-zinc-100">
+              {t("Delete this message?")}
+            </p>
+            <p className="mt-1 text-[11px] leading-4 text-zinc-500">
+              {t("It will be removed from the chatroom.")}
+            </p>
+            {deleteError === null ? null : (
+              <p className="mt-2 text-[11px] text-red-300">{deleteError}</p>
+            )}
+            <div className="mt-3 flex justify-end gap-1.5">
+              <button
+                type="button"
+                disabled={deletePending}
+                onClick={() => setConfirmingDelete(false)}
+                className="rounded-lg px-2.5 py-1.5 text-[11px] text-zinc-400 hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
+              >
+                {t("Cancel")}
+              </button>
+              <button
+                type="button"
+                disabled={deletePending}
+                onClick={() => void confirmDelete()}
+                className="rounded-lg bg-red-500/15 px-2.5 py-1.5 text-[11px] font-medium text-red-200 hover:bg-red-500/25 disabled:opacity-50"
+              >
+                {deletePending ? t("Deleting...") : t("Delete")}
+              </button>
+            </div>
+          </div>
+        ) : (
+          items.map((item) => {
+            if ("separator" in item) {
+              return (
+                <hr
+                  key={item.id}
+                  className="my-1 border-0 border-t border-white/[0.08]"
+                />
+              );
+            }
 
-          const ItemIcon = item.icon;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              role="menuitem"
-              disabled={item.disabled}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => selectAction(item.onSelect)}
-              className="group flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] text-zinc-300 hover:bg-white/[0.07] hover:text-white focus-visible:bg-white/[0.07] focus-visible:text-white focus-visible:outline-none disabled:cursor-default disabled:text-zinc-600 disabled:hover:bg-transparent"
-            >
-              <ItemIcon className="h-3.5 w-3.5 shrink-0 text-zinc-500 group-hover:text-zinc-300 group-disabled:text-zinc-700" />
-              <span className="flex-1 whitespace-nowrap">{item.label}</span>
-              {item.shortcut !== undefined ? (
-                <span className="ml-5 shrink-0 text-[11px] tabular-nums text-zinc-600">
-                  {item.shortcut}
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
+            const ItemIcon = item.icon;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="menuitem"
+                disabled={item.disabled}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  if (item.requiresConfirmation) {
+                    setConfirmingDelete(true);
+                    return;
+                  }
+
+                  selectAction(item.onSelect);
+                }}
+                className="group flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] text-zinc-300 hover:bg-white/[0.07] hover:text-white focus-visible:bg-white/[0.07] focus-visible:text-white focus-visible:outline-none disabled:cursor-default disabled:text-zinc-600 disabled:hover:bg-transparent"
+              >
+                <ItemIcon className="h-3.5 w-3.5 shrink-0 text-zinc-500 group-hover:text-zinc-300 group-disabled:text-zinc-700" />
+                <span className="flex-1 whitespace-nowrap">{item.label}</span>
+                {item.shortcut !== undefined ? (
+                  <span className="ml-5 shrink-0 text-[11px] tabular-nums text-zinc-600">
+                    {item.shortcut}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })
+        )}
       </div>
     </>
   );
