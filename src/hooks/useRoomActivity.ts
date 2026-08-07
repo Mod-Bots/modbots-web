@@ -38,6 +38,8 @@ import {
   postRoomMessage,
   removeActorProfilePicture,
   removeRoomContent,
+  renderHumanMeme,
+  renderHumanReactionGif,
   setRoomPresence,
   setSessionToken,
   translateTexts,
@@ -342,11 +344,33 @@ export const useRoomActivity = (roomId: string) => {
       void queryClient.invalidateQueries({ queryKey: overviewKey });
     },
   });
+  const createMeme = useMutation({
+    mutationFn: async (request: Parameters<typeof renderHumanMeme>[1]) => {
+      if (localActor === undefined) {
+        throw new Error("Join the room before creating a meme.");
+      }
+
+      return renderHumanMeme(localActor.id, request);
+    },
+  });
+  const createReactionGif = useMutation({
+    mutationFn: async (
+      request: Parameters<typeof renderHumanReactionGif>[1],
+    ) => {
+      if (localActor === undefined) {
+        throw new Error("Join the room before creating a reaction GIF.");
+      }
+
+      return renderHumanReactionGif(localActor.id, request);
+    },
+  });
   const sendContent = useMutation({
     mutationFn: async (message: {
       content: string;
       source?: { text: string; language: string };
       file: File;
+      caption?: string;
+      altText?: string;
       replyTo?: { contentItemId: string };
       addressedTo?: ContentAddress[];
     }) => {
@@ -359,7 +383,7 @@ export const useRoomActivity = (roomId: string) => {
         localActor.id,
         message.file,
       );
-      const parts = [
+      const parts: ContentPartInput[] = [
         ...(message.content.length === 0
           ? []
           : [
@@ -378,7 +402,10 @@ export const useRoomActivity = (roomId: string) => {
         {
           kind: asset.mediaKind,
           mediaAssetId: asset.mediaAssetId,
-          caption: message.file.name,
+          caption: message.caption ?? message.file.name,
+          ...(asset.mediaKind === "image" && message.altText !== undefined
+            ? { altText: message.altText }
+            : {}),
         },
       ];
 
@@ -501,6 +528,8 @@ export const useRoomActivity = (roomId: string) => {
     setSessionToken(null);
     setIdentity(null);
     join.reset();
+    createMeme.reset();
+    createReactionGif.reset();
     sendMessage.reset();
     sendContent.reset();
     editContent.reset();
@@ -768,6 +797,8 @@ export const useRoomActivity = (roomId: string) => {
     rules,
     realtimeStatus,
     refresh,
+    createMeme,
+    createReactionGif,
     editContent,
     removeContent,
     sendMessage,

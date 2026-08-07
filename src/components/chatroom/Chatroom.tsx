@@ -66,6 +66,7 @@ import type {
   RoomSummary,
 } from "@/data/contracts";
 import { accountBaseUrl, consumeEnterAfterLogin } from "@/data/oauth";
+import type { GeneratedVisualExpression } from "@/data/platform";
 import { isMutedError, mediaAssetDataUrl } from "@/data/platform";
 import { supportsMediaStatus } from "@/data/room-capabilities";
 import { actorLabel, actorRole } from "@/data/room-state";
@@ -86,6 +87,7 @@ import { AutomaticUpdateChecker } from "./AutomaticUpdateChecker";
 import { ChatAudioPlayer } from "./ChatAudioPlayer";
 import { ComposerAttachmentMenu } from "./ComposerAttachmentMenu";
 import { ComposerEmojiPicker } from "./ComposerEmojiPicker";
+import { ComposerVisualPicker } from "./ComposerVisualPicker";
 import { DesktopContextMenu } from "./DesktopContextMenu";
 import { emojiOnlyGraphemes } from "./emoji-data";
 import { GameLobby } from "./GameLobby";
@@ -115,6 +117,17 @@ const preferredVoiceMimeTypes = [
 const participantsPanel = { min: 200, max: 360, initial: 260 };
 const aboutPanel = { min: 230, max: 400, initial: 280 };
 const panelResizeStep = 16;
+
+const generatedVisualFile = (visual: GeneratedVisualExpression): File => {
+  const binary = window.atob(visual.data);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return new File([bytes], visual.filename, { type: visual.mediaType });
+};
 
 const clampWidth = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
@@ -2685,6 +2698,8 @@ export function Chatroom() {
     realtimeStatus,
     rules,
     refresh,
+    createMeme,
+    createReactionGif,
     editContent,
     removeContent,
     sendContent,
@@ -2714,14 +2729,34 @@ export function Chatroom() {
     canRedo: false,
   });
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [attachmentPresentation, setAttachmentPresentation] = useState<{
+    caption: string;
+    altText: string;
+  } | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
   const [recordedVoiceDuration, setRecordedVoiceDuration] = useState<
     number | null
   >(null);
   const [composerMenu, setComposerMenu] = useState<
-    "attachment" | "emoji" | null
+    "attachment" | "emoji" | "visual" | null
   >(null);
+  const attachmentPreviewUrl = useMemo(
+    () =>
+      attachment?.type.startsWith("image/")
+        ? URL.createObjectURL(attachment)
+        : null,
+    [attachment],
+  );
+
+  useEffect(
+    () => () => {
+      if (attachmentPreviewUrl !== null) {
+        URL.revokeObjectURL(attachmentPreviewUrl);
+      }
+    },
+    [attachmentPreviewUrl],
+  );
   const [voiceRecordingStatus, setVoiceRecordingStatus] = useState<
     "idle" | "requesting" | "recording"
   >("idle");
@@ -4198,6 +4233,7 @@ export function Chatroom() {
           .toISOString()
           .replace(/[:.]/g, "-")}.${recordingExtension(recordedType)}`;
         setAttachment(new File([blob], filename, { type: recordedType }));
+        setAttachmentPresentation(null);
         setRecordedVoiceDuration(recordedDuration);
         setAttachmentError(null);
       };
@@ -4563,6 +4599,7 @@ export function Chatroom() {
       await leaveRoom();
       resetDraft("");
       setAttachment(null);
+      setAttachmentPresentation(null);
       setAttachmentError(null);
       setRecordedVoiceDuration(null);
       setReplyTarget(null);
@@ -4655,9 +4692,11 @@ export function Chatroom() {
           content: chatroomContent,
           source,
           file: attachment,
+          ...(attachmentPresentation === null ? {} : attachmentPresentation),
           ...addressing,
         });
         setAttachment(null);
+        setAttachmentPresentation(null);
         setRecordedVoiceDuration(null);
       }
       setReplyTarget(null);
@@ -5449,20 +5488,35 @@ export function Chatroom() {
                         ) : null}
                         {attachment !== null ? (
                           <div className="mx-3 mt-2 flex w-fit max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-2 pr-1 text-xs text-zinc-300">
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black/20 text-zinc-400">
-                              {attachment.type.startsWith("audio/") ? (
-                                <FileAudio className="h-4 w-4" />
-                              ) : (
-                                <Paperclip className="h-4 w-4" />
-                              )}
-                            </span>
+                            {attachmentPreviewUrl === null ? (
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black/20 text-zinc-400">
+                                {attachment.type.startsWith("audio/") ? (
+                                  <FileAudio className="h-4 w-4" />
+                                ) : (
+                                  <Paperclip className="h-4 w-4" />
+                                )}
+                              </span>
+                            ) : (
+                              <NextImage
+                                src={attachmentPreviewUrl}
+                                alt={
+                                  attachmentPresentation?.altText ??
+                                  "Image preview"
+                                }
+                                width={48}
+                                height={48}
+                                unoptimized
+                                className="h-12 w-12 shrink-0 rounded-lg object-cover"
+                              />
+                            )}
                             <span className="min-w-0 max-w-72">
                               <span
                                 className="block truncate font-medium text-zinc-200"
                                 title={attachment.name}
                               >
                                 {recordedVoiceDuration === null
-                                  ? attachment.name
+                                  ? (attachmentPresentation?.caption ??
+                                    attachment.name)
                                   : t("Voice message")}
                               </span>
                               <span className="mt-0.5 block text-[11px] text-zinc-500">
@@ -5476,6 +5530,7 @@ export function Chatroom() {
                               type="button"
                               onClick={() => {
                                 setAttachment(null);
+                                setAttachmentPresentation(null);
                                 setRecordedVoiceDuration(null);
                                 setDeliveryError(null);
                               }}
@@ -5498,12 +5553,14 @@ export function Chatroom() {
                               file.size > 100 * 1024 * 1024
                             ) {
                               setAttachment(null);
+                              setAttachmentPresentation(null);
                               setRecordedVoiceDuration(null);
                               setAttachmentError(
                                 "Attachments cannot exceed 100 MB.",
                               );
                             } else {
                               setAttachment(file);
+                              setAttachmentPresentation(null);
                               setRecordedVoiceDuration(null);
                               setAttachmentError(null);
                               setDeliveryError(null);
@@ -5567,6 +5624,33 @@ export function Chatroom() {
                                 setComposerMenu(open ? "emoji" : null)
                               }
                               onSelect={insertEmoji}
+                            />
+                            <ComposerVisualPicker
+                              disabled={
+                                !apiConnected ||
+                                localActor === undefined ||
+                                voiceRecordingStatus !== "idle"
+                              }
+                              open={composerMenu === "visual"}
+                              onOpenChange={(open) =>
+                                setComposerMenu(open ? "visual" : null)
+                              }
+                              onCreateMeme={(request) =>
+                                createMeme.mutateAsync(request)
+                              }
+                              onCreateReactionGif={(request) =>
+                                createReactionGif.mutateAsync(request)
+                              }
+                              onGenerated={(visual) => {
+                                setAttachment(generatedVisualFile(visual));
+                                setAttachmentPresentation({
+                                  caption: visual.caption,
+                                  altText: visual.altText,
+                                });
+                                setRecordedVoiceDuration(null);
+                                setAttachmentError(null);
+                                setDeliveryError(null);
+                              }}
                             />
                           </div>
 

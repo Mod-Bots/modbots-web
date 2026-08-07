@@ -322,6 +322,47 @@ export const postRoomMessage = (
     }),
   });
 
+export type MemeTemplate = "reaction" | "contrast" | "announcement";
+export type ReactionGifTemplate =
+  | "celebrate"
+  | "laugh"
+  | "side_eye"
+  | "facepalm";
+
+export interface GeneratedVisualExpression {
+  data: string;
+  mediaType: "image/svg+xml" | "image/gif";
+  width: number;
+  height: number;
+  filename: string;
+  caption: string;
+  altText: string;
+}
+
+export const renderHumanMeme = (
+  actorId: string,
+  request: {
+    template: MemeTemplate;
+    topText: string;
+    bottomText: string;
+  },
+): Promise<GeneratedVisualExpression> =>
+  requestJson(apiUrl("/api/expressions/memes"), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ actorId, ...request }),
+  });
+
+export const renderHumanReactionGif = (
+  actorId: string,
+  request: { template: ReactionGifTemplate; text: string },
+): Promise<GeneratedVisualExpression> =>
+  requestJson(apiUrl("/api/expressions/reaction-gifs"), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ actorId, ...request }),
+  });
+
 const base64 = (data: ArrayBuffer): string => {
   const bytes = new Uint8Array(data);
   const chunkSize = 32_768;
