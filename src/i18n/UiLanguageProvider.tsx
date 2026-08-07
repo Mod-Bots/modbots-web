@@ -55,7 +55,7 @@ const simplifiedChinese: Record<string, string> = {
   "Answer questions together and see who knows the most.":
     "一起回答问题，看看谁知道得最多。",
   "A player": "一名玩家",
-  "Cancel game": "取消游戏",
+  "Stop game": "停止游戏",
   "Empty cell": "空格",
   "Game lobby": "游戏大厅",
   "in cell": "位于格子",

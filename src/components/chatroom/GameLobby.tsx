@@ -184,7 +184,7 @@ function TicTacToeGame({
               className="rounded-lg border border-white/10 px-4 py-2.5 text-[12px] font-semibold text-zinc-300 hover:bg-white/[0.05] disabled:opacity-50"
             >
               {game.state === "waiting" && isPlayer
-                ? t("Cancel game")
+                ? t("Stop game")
                 : isSpectator
                   ? t("Stop watching")
                   : t("Resign")}
