@@ -1003,6 +1003,8 @@ const notificationCategoryLabels: Record<NotificationCategory, string> = {
   study: "Research study",
 };
 
+const notificationToastDuration = 6000;
+
 function NotificationRow({
   notification,
   onDismiss,
@@ -1062,12 +1064,40 @@ function StatusBar({
     unreadCount,
   } = useNotifications();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [visibleToastId, setVisibleToastId] = useState<string | null>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const latestNotification = notifications.at(-1);
+  const latestNotificationId = latestNotification?.id ?? null;
+  const latestNotificationCreatedAt = latestNotification?.createdAt ?? null;
+  const toastNotification =
+    latestNotification?.id === visibleToastId ? latestNotification : undefined;
   const LatestToneIcon =
-    latestNotification === undefined
+    toastNotification === undefined
       ? null
-      : notificationToneIcon(latestNotification.tone);
+      : notificationToneIcon(toastNotification.tone);
+
+  useEffect(() => {
+    if (latestNotificationId === null || latestNotificationCreatedAt === null) {
+      setVisibleToastId(null);
+      return;
+    }
+
+    const remainingDuration =
+      notificationToastDuration - (Date.now() - latestNotificationCreatedAt);
+    if (remainingDuration <= 0) {
+      setVisibleToastId(null);
+      return;
+    }
+
+    setVisibleToastId(latestNotificationId);
+    const timeout = window.setTimeout(() => {
+      setVisibleToastId((current) =>
+        current === latestNotificationId ? null : current,
+      );
+    }, remainingDuration);
+
+    return () => window.clearTimeout(timeout);
+  }, [latestNotificationCreatedAt, latestNotificationId]);
 
   useEffect(() => {
     if (!notificationsOpen) {
@@ -1126,12 +1156,12 @@ function StatusBar({
       </div>
 
       {!notificationsOpen &&
-      latestNotification !== undefined &&
+      toastNotification !== undefined &&
       LatestToneIcon !== null ? (
         <div
           role={
-            latestNotification.tone === "error" ||
-            latestNotification.tone === "warning"
+            toastNotification.tone === "error" ||
+            toastNotification.tone === "warning"
               ? "alert"
               : "status"
           }
@@ -1140,20 +1170,20 @@ function StatusBar({
           <LatestToneIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="text-[12px] font-medium leading-4 text-zinc-200">
-              {t(latestNotification.title)}
+              {t(toastNotification.title)}
             </p>
-            {latestNotification.message !== undefined ? (
+            {toastNotification.message !== undefined ? (
               <p className="mt-0.5 truncate text-[11px] leading-4 text-zinc-500">
-                {t(latestNotification.message)}
+                {t(toastNotification.message)}
               </p>
             ) : null}
           </div>
           <button
             type="button"
-            onClick={() => dismissNotification(latestNotification.id)}
+            onClick={() => setVisibleToastId(null)}
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-zinc-600 hover:bg-white/[0.07] hover:text-zinc-300"
-            aria-label={t("Dismiss notification")}
-            title={t("Dismiss notification")}
+            aria-label={t("Dismiss notification banner")}
+            title={t("Dismiss notification banner")}
           >
             <X className="h-3 w-3" />
           </button>
@@ -1170,7 +1200,10 @@ function StatusBar({
         <div ref={notificationsRef} className="relative">
           <button
             type="button"
-            onClick={() => setNotificationsOpen((current) => !current)}
+            onClick={() => {
+              setVisibleToastId(null);
+              setNotificationsOpen((current) => !current);
+            }}
             className="relative flex h-6 w-6 items-center justify-center rounded text-zinc-500 hover:bg-white/[0.07] hover:text-zinc-200"
             aria-label={`${t("Notifications")}${
               unreadCount > 0 ? `, ${unreadCount} ${t("unread")}` : ""
