@@ -632,6 +632,25 @@ const participantStatusStyles: Record<
   },
 };
 
+const participantStatusDot = (
+  actor: Actor,
+  presence: ParticipantStatus,
+): string => {
+  if (presence === "offline" || !actor.statusText?.trim()) {
+    return participantStatusStyles[presence].dot;
+  }
+
+  if (actor.statusMode === "preset" && actor.statusText === "Available") {
+    return "bg-emerald-400";
+  }
+
+  if (actor.statusMode === "preset" && actor.statusText === "Away") {
+    return "bg-amber-400";
+  }
+
+  return "bg-sky-400";
+};
+
 const activityScopes: Array<{ id: ActivityScope; label: string }> = [
   { id: "7d", label: "7d" },
   { id: "30d", label: "30d" },
@@ -2065,6 +2084,7 @@ function ParticipantRow({
   const currentStatus = participantStatusStyles[status];
   const displayedStatus = actor.statusText?.trim() || t(currentStatus.label);
   const hasProfileStatus = (actor.statusText?.trim().length ?? 0) > 0;
+  const statusDot = participantStatusDot(actor, status);
 
   return (
     <div
@@ -2079,8 +2099,8 @@ function ParticipantRow({
           size="sm"
         />
         <span
-          className={`modbots-profile-status-dot absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full border-2 border-modbots-panel ${currentStatus.dot}`}
-          title={t(currentStatus.label)}
+          className={`modbots-profile-status-dot absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full border-2 border-modbots-panel ${statusDot}`}
+          title={displayedStatus}
         />
       </div>
       <div className="min-w-0 flex-1">
@@ -3179,6 +3199,12 @@ export function Chatroom() {
         "offline");
   const localParticipantStatusStyle =
     participantStatusStyles[localParticipantStatus];
+  const localParticipantStatusDot =
+    localActor === undefined
+      ? localParticipantStatusStyle.dot
+      : participantStatusDot(localActor, localParticipantStatus);
+  const localParticipantStatusLabel =
+    localActor?.statusText?.trim() || t(localParticipantStatusStyle.label);
   const projectedEvents = useMemo(
     () => projectContentLifecycle(events.data ?? []),
     [events.data],
@@ -4883,9 +4909,9 @@ export function Chatroom() {
                           {localActor !== undefined ? (
                             <span
                               role="img"
-                              className={`modbots-profile-status-dot absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-modbots-panel ${localParticipantStatusStyle.dot}`}
-                              aria-label={t(localParticipantStatusStyle.label)}
-                              title={t(localParticipantStatusStyle.label)}
+                              className={`modbots-profile-status-dot absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full border-2 border-modbots-panel ${localParticipantStatusDot}`}
+                              aria-label={localParticipantStatusLabel}
+                              title={localParticipantStatusLabel}
                             />
                           ) : null}
                         </div>
