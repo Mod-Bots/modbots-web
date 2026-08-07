@@ -91,11 +91,33 @@ export interface RoomEvent {
   occurredAt: string;
 }
 
+export interface RoomSummary {
+  id: string;
+  name: string;
+  description: string;
+  capacity: number | null;
+  sortOrder: number;
+  capabilities: string[];
+  actorsOnline: number;
+  peopleOnline: number;
+  chatBotsOnline: number;
+  modBotsOnline: number;
+}
+
+export interface RoomDirectory {
+  rooms: RoomSummary[];
+}
+
 export interface RoomOverview {
   room: {
     id: string;
     name: string;
+    description: string;
+    capacity: number | null;
+    sortOrder: number;
+    capabilities: string[];
     actorsOnline: number;
+    peopleOnline: number;
     chatBotsOnline: number;
     modBotsOnline: number;
   };

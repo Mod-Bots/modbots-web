@@ -60,6 +60,7 @@ import type {
   ContentAddress,
   ContentPartInput,
   RoomEvent,
+  RoomSummary,
 } from "@/data/contracts";
 import { accountBaseUrl, consumeEnterAfterLogin } from "@/data/oauth";
 import { isMutedError, mediaAssetDataUrl } from "@/data/platform";
@@ -92,10 +93,7 @@ import {
   type SettingsSection,
 } from "./SettingsDialog";
 
-const roomId = "global-lobby";
-const roomName = "Room";
-const roomAbout =
-  "A live chatroom where humans and chat bots talk, and mod bots learn to moderate from everything that happens.";
+const defaultRoomId = "global-lobby";
 const appVersion = releasedVersion;
 
 const groupWindowMs = 45 * 1000;
@@ -1412,7 +1410,7 @@ function MessageActions({
   );
 }
 
-function MessageMedia({ event }: { event: RoomEvent }) {
+function MessageMedia({ event, roomId }: { event: RoomEvent; roomId: string }) {
   const { t } = useUiLanguage();
   const parts = contentParts(event).filter(
     (part): part is EventAssetPart => part.kind !== "text",
@@ -1537,6 +1535,7 @@ function ChatMessage({
   actors,
   event,
   grouped,
+  roomId,
   localActorId,
   mentionLabels,
   repliedEvent,
@@ -1553,6 +1552,7 @@ function ChatMessage({
   actors: Map<string, Actor>;
   event: RoomEvent;
   grouped: boolean;
+  roomId: string;
   localActorId: string | undefined;
   mentionLabels: MentionLabel[];
   repliedEvent: RoomEvent | null;
@@ -1741,7 +1741,7 @@ function ChatMessage({
         </div>
         <div className="min-w-0 flex-1 pr-20">
           {messageBody}
-          <MessageMedia event={event} />
+          <MessageMedia event={event} roomId={roomId} />
         </div>
         {actions}
       </article>
@@ -1812,7 +1812,7 @@ function ChatMessage({
           </div>
         ) : null}
         <div className="mt-1.5">{messageBody}</div>
-        <MessageMedia event={event} />
+        <MessageMedia event={event} roomId={roomId} />
       </div>
 
       {actions}
@@ -1861,6 +1861,7 @@ function ModerationEvent({
 const ConversationTimeline = memo(function ConversationTimeline({
   actors,
   items,
+  roomId,
   localActorId,
   mentionLabels,
   messagesByContentItem,
@@ -1876,6 +1877,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
 }: {
   actors: Map<string, Actor>;
   items: TimelineItem[];
+  roomId: string;
   localActorId: string | undefined;
   mentionLabels: MentionLabel[];
   messagesByContentItem: Map<string, RoomEvent>;
@@ -1930,6 +1932,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
         actors={actors}
         event={item.event}
         grouped={item.grouped}
+        roomId={roomId}
         localActorId={localActorId}
         mentionLabels={mentionLabels}
         repliedEvent={repliedEvent}
@@ -2413,6 +2416,7 @@ interface SaveFilePickerWindow extends Window {
 export function Chatroom() {
   const router = useRouter();
   const { language: uiLanguage, t } = useUiLanguage();
+  const [roomId, setRoomId] = useState(defaultRoomId);
   const {
     configureScope: configureNotificationScope,
     lastRoomEventSequence,
@@ -2431,8 +2435,10 @@ export function Chatroom() {
     hasIdentity,
     identityRestored,
     localActor,
+    leaveRoom,
     onlineActorIds,
     overview,
+    rooms,
     realtimeStatus,
     rules,
     refresh,
@@ -2447,6 +2453,9 @@ export function Chatroom() {
     updateProfile,
     updateStatus,
   } = useRoomActivity(roomId);
+  const roomDirectory = rooms.data?.rooms ?? [];
+  const selectedRoom: RoomSummary | undefined =
+    roomDirectory.find((room) => room.id === roomId) ?? overview.data?.room;
   const [draft, setDraft] = useState("");
   const [draftHistoryAvailability, setDraftHistoryAvailability] = useState({
     canUndo: false,
@@ -2543,6 +2552,7 @@ export function Chatroom() {
   // Entering the room is an explicit act every launch: nothing inside the
   // room renders until the person finishes the browser-side sign-in flow.
   const [entered, setEntered] = useState(false);
+  const [switchingRoomId, setSwitchingRoomId] = useState<string | null>(null);
   const presenceJoinedAs = useRef<string | null>(null);
   const chatroomRoot = useRef<HTMLDivElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
@@ -3976,7 +3986,11 @@ export function Chatroom() {
     !sendContent.isPending &&
     !translatingSubmission;
   const error =
-    apiHealth.error ?? desktopSession.error ?? overview.error ?? events.error;
+    apiHealth.error ??
+    rooms.error ??
+    desktopSession.error ??
+    overview.error ??
+    events.error;
   const historyUnavailable = events.isError;
   const realtimeConnected = realtimeStatus.state === "connected";
   const connectionProblem = !apiConnected || !realtimeConnected;
@@ -4179,12 +4193,51 @@ export function Chatroom() {
     if (
       entered &&
       localActor !== undefined &&
-      presenceJoinedAs.current !== localActor.id
+      presenceJoinedAs.current !== `${roomId}:${localActor.id}`
     ) {
-      presenceJoinedAs.current = localActor.id;
+      presenceJoinedAs.current = `${roomId}:${localActor.id}`;
       void enterRoom();
     }
-  }, [entered, localActor, enterRoom]);
+  }, [entered, localActor, enterRoom, roomId]);
+
+  const switchRoom = async (nextRoomId: string): Promise<void> => {
+    if (
+      nextRoomId === roomId ||
+      switchingRoomId !== null ||
+      voiceRecordingStatus !== "idle"
+    ) {
+      return;
+    }
+
+    setSwitchingRoomId(nextRoomId);
+    setDeliveryError(null);
+
+    try {
+      await leaveRoom();
+      resetDraft("");
+      setAttachment(null);
+      setAttachmentError(null);
+      setRecordedVoiceDuration(null);
+      setReplyTarget(null);
+      setMention(null);
+      setComposerMenu(null);
+      setSearchQuery("");
+      setTranslatedEventText(new Map());
+      setVisibleEventCount(conversationPageSize);
+      setContextEditSequence(null);
+      setProfileActorId(null);
+      setUserMenuOpen(false);
+      setMobilePanel(null);
+      setMobileSearchOpen(false);
+      setRoomId(nextRoomId);
+    } catch (error) {
+      setDeliveryError(
+        error instanceof Error ? error.message : "Could not change rooms.",
+      );
+    } finally {
+      setSwitchingRoomId(null);
+    }
+  };
 
   const submitMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -4355,7 +4408,7 @@ export function Chatroom() {
                 >
                   <div className="flex h-[68px] shrink-0 items-center border-b border-white/[0.08] px-5">
                     <h1 className="truncate text-[15px] font-semibold text-white">
-                      {t(roomName)}
+                      {t("Rooms")}
                     </h1>
                     <button
                       type="button"
@@ -4369,6 +4422,58 @@ export function Chatroom() {
                       <X className="h-4 w-4" />
                     </button>
                   </div>
+                  <nav
+                    aria-label={t("Rooms")}
+                    className="shrink-0 border-b border-white/[0.06] p-2.5"
+                  >
+                    {rooms.isLoading ? (
+                      <div className="flex h-10 items-center justify-center text-zinc-600">
+                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                      </div>
+                    ) : (
+                      <div className="space-y-0.5">
+                        {roomDirectory.map((room) => {
+                          const selected = room.id === roomId;
+                          const switching = room.id === switchingRoomId;
+
+                          return (
+                            <button
+                              key={room.id}
+                              type="button"
+                              onClick={() => void switchRoom(room.id)}
+                              disabled={
+                                selected ||
+                                switchingRoomId !== null ||
+                                voiceRecordingStatus !== "idle"
+                              }
+                              aria-current={selected ? "page" : undefined}
+                              className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-default ${
+                                selected
+                                  ? "bg-white/[0.08] text-white"
+                                  : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100 disabled:opacity-60"
+                              }`}
+                            >
+                              <span
+                                className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                                  selected ? "bg-emerald-400" : "bg-zinc-700"
+                                }`}
+                              />
+                              <span className="min-w-0 flex-1 truncate text-[12px] font-medium">
+                                {room.name}
+                              </span>
+                              {switching ? (
+                                <LoaderCircle className="h-3.5 w-3.5 shrink-0 animate-spin text-zinc-500" />
+                              ) : (
+                                <span className="text-[10px] tabular-nums text-zinc-600">
+                                  {room.peopleOnline}
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </nav>
                   <div className="flex shrink-0 items-center gap-2 border-b border-white/[0.06] px-5 py-2 text-zinc-400">
                     <Users className="h-3.5 w-3.5 shrink-0" />
                     <span className="text-xs font-semibold uppercase tracking-[0.08em]">
@@ -4614,7 +4719,7 @@ export function Chatroom() {
                   ) : (
                     <>
                       <h2 className="min-w-0 flex-1 truncate text-[14px] font-semibold text-white lg:flex-none">
-                        {t("Chat")}
+                        {selectedRoom?.name ?? t("Chat")}
                       </h2>
                       <div className="hidden flex-1 lg:block" />
                       <div className="hidden h-9 w-[min(32vw,380px)] items-center gap-2 rounded-lg border border-white/10 bg-modbots-popover px-3 lg:flex">
@@ -4742,6 +4847,7 @@ export function Chatroom() {
                           <ConversationTimeline
                             actors={actors}
                             items={timeline}
+                            roomId={roomId}
                             localActorId={localActor?.id}
                             mentionLabels={mentionLabels}
                             messagesByContentItem={messagesByContentItem}
@@ -5166,10 +5272,10 @@ export function Chatroom() {
                   </div>
                   <div className="modbots-scroll min-h-0 flex-1 overflow-y-auto p-5">
                     <p className="text-[13px] font-semibold text-zinc-100">
-                      Mod Bots
+                      {selectedRoom?.name ?? t("Room information")}
                     </p>
                     <p className="mt-1 text-[13px] leading-5 text-zinc-400">
-                      {t(roomAbout)}
+                      {selectedRoom?.description ?? ""}
                     </p>
 
                     <div className="mt-4 space-y-2.5 text-[13px] text-zinc-400">

@@ -6,6 +6,7 @@ import type {
   MediaAsset,
   MediaKind,
   RealtimeConfig,
+  RoomDirectory,
   RoomEvent,
   RoomOverview,
   RoomRoster,
@@ -116,6 +117,9 @@ export const getRealtimeHealth = (): Promise<ServiceHealth> =>
 
 export const getRealtimeConfig = (): Promise<RealtimeConfig> =>
   requestJson(realtimeConfigUrl);
+
+export const getRooms = (): Promise<RoomDirectory> =>
+  requestJson(apiUrl("/api/rooms"));
 
 export const getRoomOverview = (roomId: string): Promise<RoomOverview> =>
   requestJson(apiUrl(`/api/rooms/${encodeURIComponent(roomId)}/overview`));

@@ -30,6 +30,7 @@ import {
   getRoomOverview,
   getRoomRoster,
   getRoomRules,
+  getRooms,
   joinAsGuest,
   PlatformRequestError,
   postRoomContent,
@@ -114,6 +115,11 @@ export const useRoomActivity = (roomId: string) => {
     queryKey: ["api-health"],
     queryFn: getApiHealth,
     refetchInterval: 5_000,
+    retry: 1,
+  });
+  const rooms = useQuery({
+    queryKey: ["rooms"],
+    queryFn: getRooms,
     retry: 1,
   });
   const realtimeHealth = useQuery({
@@ -445,6 +451,18 @@ export const useRoomActivity = (roomId: string) => {
     if (localActor !== undefined) {
       await setRoomPresence(roomId, localActor.id, "joined");
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["rooms"] }),
+        queryClient.invalidateQueries({ queryKey: overviewKey }),
+        queryClient.invalidateQueries({ queryKey: rosterKey }),
+      ]);
+    }
+  };
+
+  const leaveRoom = async (): Promise<void> => {
+    if (localActor !== undefined) {
+      await setRoomPresence(roomId, localActor.id, "left");
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["rooms"] }),
         queryClient.invalidateQueries({ queryKey: overviewKey }),
         queryClient.invalidateQueries({ queryKey: rosterKey }),
       ]);
@@ -458,6 +476,7 @@ export const useRoomActivity = (roomId: string) => {
       try {
         await setRoomPresence(roomId, actorId, "left");
         await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["rooms"] }),
           queryClient.invalidateQueries({ queryKey: overviewKey }),
           queryClient.invalidateQueries({ queryKey: rosterKey }),
         ]);
@@ -724,8 +743,10 @@ export const useRoomActivity = (roomId: string) => {
     identityRestored,
     join,
     localActor,
+    leaveRoom,
     onlineActorIds: currentOnlineActorIds,
     overview,
+    rooms,
     realtimeHealth,
     rules,
     realtimeStatus,
