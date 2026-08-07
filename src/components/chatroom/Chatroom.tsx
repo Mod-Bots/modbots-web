@@ -1715,6 +1715,9 @@ function ChatMessage({
         data-room-message-sequence={event.sequence}
         data-room-message-owned={canManage}
         data-room-message-editable={canManage && hasText}
+        data-room-message-copy-text={
+          content.length > 0 ? content : eventContent(event)
+        }
         className="group relative flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6"
       >
         <div className="flex w-8 shrink-0 justify-center">
@@ -1736,6 +1739,9 @@ function ChatMessage({
       data-room-message-sequence={event.sequence}
       data-room-message-owned={canManage}
       data-room-message-editable={canManage && hasText}
+      data-room-message-copy-text={
+        content.length > 0 ? content : eventContent(event)
+      }
       className="group relative mt-5 flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6"
     >
       <div className="w-8 shrink-0">
@@ -3995,11 +4001,9 @@ export function Chatroom() {
           <DesktopContextMenu
             enabled={entered}
             rootRef={chatroomRoot}
-            onOpenSearch={openSearch}
             onDeleteMessage={deleteContextMessage}
             onEditMessage={editContextMessage}
             onReplyToMessage={replyToContextMessage}
-            onTakeScreenshot={() => void takeScreenshot()}
           />
         </>
       ) : null}

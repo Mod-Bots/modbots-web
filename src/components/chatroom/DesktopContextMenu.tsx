@@ -2,13 +2,11 @@
 
 import type { LucideIcon } from "lucide-react";
 import {
-  Camera,
   ClipboardPaste,
   Copy,
   Pencil,
   Reply,
   Scissors,
-  Search,
   TextSelect,
   Trash2,
 } from "lucide-react";
@@ -28,6 +26,7 @@ interface ContextTarget {
   hasSelection: boolean;
   editableMessage: boolean;
   messageSequence: string | null;
+  messageText: string | null;
   ownMessage: boolean;
   target: HTMLElement;
   x: number;
@@ -78,19 +77,15 @@ const targetHasSelection = (
 export function DesktopContextMenu({
   enabled,
   rootRef,
-  onOpenSearch,
   onDeleteMessage,
   onEditMessage,
   onReplyToMessage,
-  onTakeScreenshot,
 }: {
   enabled: boolean;
   rootRef: RefObject<HTMLElement | null>;
-  onOpenSearch: () => void;
   onDeleteMessage: (sequence: string) => Promise<void>;
   onEditMessage: (sequence: string) => void;
   onReplyToMessage: (sequence: string) => void;
-  onTakeScreenshot: () => void;
 }) {
   const { t } = useUiLanguage();
   const [context, setContext] = useState<ContextTarget | null>(null);
@@ -136,6 +131,7 @@ export function DesktopContextMenu({
           ownMessage && message?.dataset.roomMessageEditable === "true",
         hasSelection: targetHasSelection(editable),
         messageSequence: message?.dataset.roomMessageSequence ?? null,
+        messageText: message?.dataset.roomMessageCopyText ?? null,
         ownMessage,
         target: element,
         x,
@@ -230,6 +226,13 @@ export function DesktopContextMenu({
     },
     [context],
   );
+  const copyMessage = useCallback(async (): Promise<void> => {
+    if (context?.messageText === null || context?.messageText === undefined) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(context.messageText);
+  }, [context]);
 
   const items = useMemo<ContextMenuItem[]>(() => {
     if (context === null) {
@@ -254,6 +257,13 @@ export function DesktopContextMenu({
               ]
             : []),
           {
+            icon: Copy,
+            id: "copy-message",
+            label: t("Copy"),
+            onSelect: copyMessage,
+            shortcut: "Ctrl+C",
+          },
+          {
             icon: Trash2,
             id: "delete-message",
             label: t("Delete"),
@@ -269,6 +279,13 @@ export function DesktopContextMenu({
           id: "reply",
           label: t("Reply"),
           onSelect: () => onReplyToMessage(messageSequence),
+        },
+        {
+          icon: Copy,
+          id: "copy-message",
+          label: t("Copy"),
+          onSelect: copyMessage,
+          shortcut: "Ctrl+C",
         },
       ];
     }
@@ -316,37 +333,18 @@ export function DesktopContextMenu({
       });
     }
 
-    return [
-      ...editItems,
-      ...(editItems.length > 0
-        ? [{ id: "edit-tools", separator: true } as const]
-        : []),
-      {
-        icon: Search,
-        id: "search",
-        label: t("Search the chat"),
-        onSelect: onOpenSearch,
-        shortcut: "Ctrl+F",
-      },
-      {
-        icon: Camera,
-        id: "screenshot",
-        label: t("Take a Screenshot"),
-        onSelect: onTakeScreenshot,
-      },
-    ];
+    return editItems;
   }, [
     context,
+    copyMessage,
     onDeleteMessage,
     onEditMessage,
-    onOpenSearch,
     onReplyToMessage,
-    onTakeScreenshot,
     runEditCommand,
     t,
   ]);
 
-  if (context === null) {
+  if (context === null || items.length === 0) {
     return null;
   }
 
