@@ -1589,7 +1589,6 @@ function ChatMessage({
       label: part.caption ?? t(`${part.kind} attachment`),
     }));
   const canManage = ownMessage && itemId !== null;
-  const edited = payloadString(event, "editedAt") !== null;
   useEffect(() => {
     if (editing) {
       requestAnimationFrame(() => editInput.current?.focus());
@@ -1708,9 +1707,6 @@ function ChatMessage({
         </div>
         <div className="min-w-0 flex-1 pr-20">
           {messageBody}
-          {edited ? (
-            <span className="text-[10px] text-zinc-600">{t("Edited")}</span>
-          ) : null}
           <MessageMedia event={event} />
         </div>
         {actions}
@@ -1748,9 +1744,6 @@ function ChatMessage({
           <time className="text-[10px] tabular-nums text-zinc-500">
             {formatTime(event.occurredAt)}
           </time>
-          {edited ? (
-            <span className="text-[10px] text-zinc-600">{t("Edited")}</span>
-          ) : null}
         </div>
         {isReply ? (
           <div className="mt-2 flex min-w-0 max-w-[64ch] items-stretch overflow-hidden rounded-xl border border-white/[0.08] bg-modbots-panel-raised shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
