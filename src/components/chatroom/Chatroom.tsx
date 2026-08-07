@@ -1414,7 +1414,54 @@ function MessageActions({
   );
 }
 
-function MessageMedia({ event, roomId }: { event: RoomEvent; roomId: string }) {
+function ChatVideoPlayer({
+  assetId,
+  caption,
+  src,
+  onPlaybackChange,
+}: {
+  assetId: string;
+  caption: string | null;
+  src: string;
+  onPlaybackChange: (assetId: string, playing: boolean) => void;
+}) {
+  useEffect(
+    () => () => {
+      onPlaybackChange(assetId, false);
+    },
+    [assetId, onPlaybackChange],
+  );
+
+  return (
+    <video
+      controls
+      preload="metadata"
+      src={src}
+      className="h-full w-full object-contain"
+      onPlay={() => onPlaybackChange(assetId, true)}
+      onPause={() => onPlaybackChange(assetId, false)}
+      onEnded={() => onPlaybackChange(assetId, false)}
+    >
+      <track
+        default
+        kind="captions"
+        src={mediaCaptionTrackUrl(caption)}
+        srcLang="und"
+        label="Message caption"
+      />
+    </video>
+  );
+}
+
+function MessageMedia({
+  event,
+  roomId,
+  onPlaybackChange,
+}: {
+  event: RoomEvent;
+  roomId: string;
+  onPlaybackChange: (assetId: string, playing: boolean) => void;
+}) {
   const { t } = useUiLanguage();
   const parts = contentParts(event).filter(
     (part): part is EventAssetPart => part.kind !== "text",
@@ -1474,20 +1521,12 @@ function MessageMedia({ event, roomId }: { event: RoomEvent; roomId: string }) {
               className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] shadow-[0_10px_30px_rgba(0,0,0,0.18)]"
             >
               <div className="aspect-[16/10] bg-black/25">
-                <video
-                  controls
-                  preload="metadata"
+                <ChatVideoPlayer
+                  assetId={part.mediaAssetId}
+                  caption={part.caption}
                   src={url}
-                  className="h-full w-full object-contain"
-                >
-                  <track
-                    default
-                    kind="captions"
-                    src={mediaCaptionTrackUrl(part.caption)}
-                    srcLang="und"
-                    label="Message caption"
-                  />
-                </video>
+                  onPlaybackChange={onPlaybackChange}
+                />
               </div>
               <figcaption
                 className="flex items-center gap-2 border-t border-white/[0.07] px-3 py-2 text-[11px] text-zinc-500"
@@ -1510,6 +1549,7 @@ function MessageMedia({ event, roomId }: { event: RoomEvent; roomId: string }) {
               caption={part.caption}
               captionTrackUrl={mediaCaptionTrackUrl(part.caption)}
               src={url}
+              onPlaybackChange={onPlaybackChange}
             />
           );
         }
@@ -1552,6 +1592,7 @@ function ChatMessage({
   onEditRequestHandled,
   onEditMessage,
   onReply,
+  onPlaybackChange,
 }: {
   actors: Map<string, Actor>;
   event: RoomEvent;
@@ -1569,6 +1610,7 @@ function ChatMessage({
   onEditRequestHandled: () => void;
   onEditMessage: (event: RoomEvent, text: string) => Promise<void>;
   onReply?: () => void;
+  onPlaybackChange: (assetId: string, playing: boolean) => void;
 }) {
   const { t } = useUiLanguage();
   const actor = event.actorId === null ? undefined : actors.get(event.actorId);
@@ -1745,7 +1787,11 @@ function ChatMessage({
         </div>
         <div className="min-w-0 flex-1 pr-20">
           {messageBody}
-          <MessageMedia event={event} roomId={roomId} />
+          <MessageMedia
+            event={event}
+            roomId={roomId}
+            onPlaybackChange={onPlaybackChange}
+          />
         </div>
         {actions}
       </article>
@@ -1816,7 +1862,11 @@ function ChatMessage({
           </div>
         ) : null}
         <div className="mt-1.5">{messageBody}</div>
-        <MessageMedia event={event} roomId={roomId} />
+        <MessageMedia
+          event={event}
+          roomId={roomId}
+          onPlaybackChange={onPlaybackChange}
+        />
       </div>
 
       {actions}
@@ -1877,6 +1927,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
   onEditRequestHandled,
   onEditMessage,
   onReply,
+  onPlaybackChange,
   ruleTitles,
 }: {
   actors: Map<string, Actor>;
@@ -1893,6 +1944,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
   onEditRequestHandled: () => void;
   onEditMessage: (event: RoomEvent, text: string) => Promise<void>;
   onReply: (event: RoomEvent) => void;
+  onPlaybackChange: (assetId: string, playing: boolean) => void;
   ruleTitles: Map<string, string>;
 }) {
   return items.map((item) => {
@@ -1949,6 +2001,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
         onEditRequestHandled={onEditRequestHandled}
         onEditMessage={onEditMessage}
         onReply={canReply ? () => onReply(item.event) : undefined}
+        onPlaybackChange={onPlaybackChange}
       />
     );
   });
@@ -2084,7 +2137,7 @@ function ProfileStatusControl({
   saving: boolean;
   error: string | null;
   onSave: (status: {
-    statusMode: "preset" | "custom" | null;
+    statusMode: "preset" | "custom" | "media" | null;
     statusText: string | null;
   }) => Promise<Actor>;
 }) {
@@ -2103,7 +2156,7 @@ function ProfileStatusControl({
   }, [actor.statusMode, actor.statusText]);
 
   const saveStatus = async (status: {
-    statusMode: "preset" | "custom" | null;
+    statusMode: "preset" | "custom" | "media" | null;
     statusText: string | null;
   }) => {
     try {
@@ -2149,6 +2202,10 @@ function ProfileStatusControl({
             }
 
             setCustomSelected(false);
+            if (value === "media") {
+              void saveStatus({ statusMode: "media", statusText: null });
+              return;
+            }
             if (value === "") {
               void saveStatus({ statusMode: null, statusText: null });
               return;
@@ -2169,9 +2226,7 @@ function ProfileStatusControl({
               ? actor.statusText
               : t("Custom...")}
           </option>
-          <option value="media" disabled>
-            {t("Media title (Unavailable in web app)")}
-          </option>
+          <option value="media">{t("Share the media I play")}</option>
           {actor.statusMode === "game" && actor.statusText !== null ? (
             <option value="game">{actor.statusText}</option>
           ) : null}
@@ -2463,6 +2518,7 @@ export function Chatroom() {
     translate,
     updateProfile,
     updateStatus,
+    setMediaPlayback,
   } = useRoomActivity(roomId);
   const roomDirectory = rooms.data?.rooms ?? [];
   const selectedRoom: RoomSummary | undefined =
@@ -2470,6 +2526,9 @@ export function Chatroom() {
   const gameLobbyAvailable =
     selectedRoom?.capabilities.includes("games") ?? false;
   const [roomView, setRoomView] = useState<RoomView>("chat");
+  const playingMediaAssetIds = useRef<string[]>([]);
+  const synchronizedMediaAssetId = useRef<string | null | undefined>(undefined);
+  const mediaStatusQueue = useRef<Promise<void>>(Promise.resolve());
   const [draft, setDraft] = useState("");
   const [draftHistoryAvailability, setDraftHistoryAvailability] = useState({
     canUndo: false,
@@ -2608,6 +2667,63 @@ export function Chatroom() {
     setDraft(value);
     updateDraftHistoryAvailability();
   };
+
+  const setMediaPlaybackAsync = setMediaPlayback.mutateAsync;
+  const synchronizeMediaStatus = useCallback(
+    (mediaAssetId: string | null) => {
+      if (localActor?.statusMode !== "media") {
+        synchronizedMediaAssetId.current = undefined;
+        return;
+      }
+      if (synchronizedMediaAssetId.current === mediaAssetId) {
+        return;
+      }
+
+      synchronizedMediaAssetId.current = mediaAssetId;
+      mediaStatusQueue.current = mediaStatusQueue.current
+        .catch(() => undefined)
+        .then(async () => {
+          try {
+            await setMediaPlaybackAsync(mediaAssetId);
+          } catch {
+            if (synchronizedMediaAssetId.current === mediaAssetId) {
+              synchronizedMediaAssetId.current = undefined;
+            }
+          }
+        });
+    },
+    [localActor?.statusMode, setMediaPlaybackAsync],
+  );
+  const handleMediaPlaybackChange = useCallback(
+    (mediaAssetId: string, playing: boolean) => {
+      const previous = playingMediaAssetIds.current;
+      const previousTarget = previous.at(-1) ?? null;
+      const withoutAsset = previous.filter((id) => id !== mediaAssetId);
+      const next = playing ? [...withoutAsset, mediaAssetId] : withoutAsset;
+      const nextTarget = next.at(-1) ?? null;
+      playingMediaAssetIds.current = next;
+
+      if (previousTarget !== nextTarget) {
+        synchronizeMediaStatus(nextTarget);
+      }
+    },
+    [synchronizeMediaStatus],
+  );
+
+  // Playback belongs to the room that owns the media asset.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: roomId intentionally resets room-scoped playback state.
+  useEffect(() => {
+    playingMediaAssetIds.current = [];
+    synchronizedMediaAssetId.current = undefined;
+  }, [roomId]);
+
+  useEffect(() => {
+    if (localActor?.statusMode === "media") {
+      synchronizeMediaStatus(playingMediaAssetIds.current.at(-1) ?? null);
+    } else {
+      synchronizedMediaAssetId.current = undefined;
+    }
+  }, [localActor?.statusMode, synchronizeMediaStatus]);
 
   useEffect(() => {
     if (voiceRecordingStatus !== "recording") {
@@ -4931,6 +5047,7 @@ export function Chatroom() {
                             onEditRequestHandled={clearContextEditRequest}
                             onEditMessage={editMessage}
                             onReply={selectReplyTarget}
+                            onPlaybackChange={handleMediaPlaybackChange}
                             ruleTitles={ruleTitles}
                           />
                         )}

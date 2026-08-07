@@ -43,6 +43,7 @@ import {
   translateTexts,
   updateActorProfile,
   updateActorStatus,
+  updateMediaPlayback,
   uploadActorProfilePicture,
 } from "../data/platform";
 import { runWebSocket, runWebTransport } from "../data/realtime";
@@ -258,7 +259,7 @@ export const useRoomActivity = (roomId: string) => {
   });
   const updateStatus = useMutation({
     mutationFn: async (status: {
-      statusMode: "preset" | "custom" | null;
+      statusMode: "preset" | "custom" | "media" | null;
       statusText: string | null;
     }) => {
       if (localActor === undefined) {
@@ -266,6 +267,15 @@ export const useRoomActivity = (roomId: string) => {
       }
 
       return updateActorStatus(roomId, localActor.id, status);
+    },
+    onSuccess: cacheActor,
+  });
+  const setMediaPlayback = useMutation({
+    mutationFn: async (mediaAssetId: string | null) => {
+      if (localActor === undefined) {
+        throw new Error("Join the room before sharing media activity.");
+      }
+      return updateMediaPlayback(roomId, localActor.id, mediaAssetId);
     },
     onSuccess: cacheActor,
   });
@@ -767,6 +777,7 @@ export const useRoomActivity = (roomId: string) => {
     removeProfilePicture,
     updateProfile,
     updateStatus,
+    setMediaPlayback,
     translate,
   };
 };

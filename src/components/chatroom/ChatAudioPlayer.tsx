@@ -2,7 +2,7 @@
 
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import type { CSSProperties } from "react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
 import { formatMediaDuration, waveformBars } from "./media-player-data";
 
@@ -11,6 +11,7 @@ interface ChatAudioPlayerProps {
   caption: string | null;
   captionTrackUrl: string;
   src: string;
+  onPlaybackChange: (assetId: string, playing: boolean) => void;
 }
 
 export function ChatAudioPlayer({
@@ -18,6 +19,7 @@ export function ChatAudioPlayer({
   caption,
   captionTrackUrl,
   src,
+  onPlaybackChange,
 }: ChatAudioPlayerProps) {
   const { t } = useUiLanguage();
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -31,6 +33,13 @@ export function ChatAudioPlayer({
   const title = /^voice-message-/i.test(filename)
     ? t("Voice message")
     : filename;
+
+  useEffect(
+    () => () => {
+      onPlaybackChange(assetId, false);
+    },
+    [assetId, onPlaybackChange],
+  );
 
   const syncDuration = () => {
     const audio = audioRef.current;
@@ -92,9 +101,18 @@ export function ChatAudioPlayer({
         onTimeUpdate={(event) =>
           setCurrentTime(event.currentTarget.currentTime)
         }
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onEnded={() => setPlaying(false)}
+        onPlay={() => {
+          setPlaying(true);
+          onPlaybackChange(assetId, true);
+        }}
+        onPause={() => {
+          setPlaying(false);
+          onPlaybackChange(assetId, false);
+        }}
+        onEnded={() => {
+          setPlaying(false);
+          onPlaybackChange(assetId, false);
+        }}
         onVolumeChange={(event) => setMuted(event.currentTarget.muted)}
       >
         <track

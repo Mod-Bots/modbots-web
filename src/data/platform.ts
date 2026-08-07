@@ -213,7 +213,7 @@ export const updateActorStatus = (
   roomId: string,
   actorId: string,
   status: {
-    statusMode: "preset" | "custom" | null;
+    statusMode: "preset" | "custom" | "media" | null;
     statusText: string | null;
   },
 ): Promise<Actor> =>
@@ -225,6 +225,22 @@ export const updateActorStatus = (
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(status),
+    },
+  );
+
+export const updateMediaPlayback = (
+  roomId: string,
+  actorId: string,
+  mediaAssetId: string | null,
+): Promise<Actor> =>
+  requestJson(
+    apiUrl(
+      `/api/rooms/${encodeURIComponent(roomId)}/actors/${encodeURIComponent(actorId)}/media-playback`,
+    ),
+    {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mediaAssetId }),
     },
   );
 
