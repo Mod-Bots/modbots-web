@@ -5,6 +5,7 @@ export interface RoomGameDefinition {
   minimumPlayers: number;
   maximumPlayers: number;
   estimatedMinutes: number;
+  playable: boolean;
 }
 
 export const roomGameCatalog: readonly RoomGameDefinition[] = [
@@ -15,6 +16,7 @@ export const roomGameCatalog: readonly RoomGameDefinition[] = [
     minimumPlayers: 2,
     maximumPlayers: 2,
     estimatedMinutes: 5,
+    playable: true,
   },
   {
     id: "connect-four",
@@ -23,6 +25,7 @@ export const roomGameCatalog: readonly RoomGameDefinition[] = [
     minimumPlayers: 2,
     maximumPlayers: 2,
     estimatedMinutes: 10,
+    playable: false,
   },
   {
     id: "trivia",
@@ -31,5 +34,6 @@ export const roomGameCatalog: readonly RoomGameDefinition[] = [
     minimumPlayers: 2,
     maximumPlayers: 8,
     estimatedMinutes: 15,
+    playable: false,
   },
 ];

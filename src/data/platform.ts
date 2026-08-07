@@ -3,6 +3,8 @@ import type {
   ActorSession,
   ContentAddress,
   ContentPartInput,
+  GameDirectory,
+  GameSession,
   MediaAsset,
   MediaKind,
   RealtimeConfig,
@@ -126,6 +128,68 @@ export const getRoomOverview = (roomId: string): Promise<RoomOverview> =>
 
 export const getRoomRoster = (roomId: string): Promise<RoomRoster> =>
   requestJson(apiUrl(`/api/rooms/${encodeURIComponent(roomId)}/roster`));
+
+export const getRoomGames = (roomId: string): Promise<GameDirectory> =>
+  requestJson(apiUrl(`/api/rooms/${encodeURIComponent(roomId)}/games`));
+
+const gameAction = (
+  roomId: string,
+  gameId: string,
+  action: "join" | "watch" | "leave" | "rematch",
+  actorId: string,
+): Promise<{ session: GameSession }> =>
+  requestJson(
+    apiUrl(
+      `/api/rooms/${encodeURIComponent(roomId)}/games/${encodeURIComponent(gameId)}/${action}`,
+    ),
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ actorId }),
+    },
+  );
+
+export const createTicTacToe = (
+  roomId: string,
+  actorId: string,
+): Promise<{ session: GameSession }> =>
+  requestJson(
+    apiUrl(`/api/rooms/${encodeURIComponent(roomId)}/games/tic-tac-toe`),
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ actorId }),
+    },
+  );
+
+export const joinGame = (roomId: string, gameId: string, actorId: string) =>
+  gameAction(roomId, gameId, "join", actorId);
+export const watchGame = (roomId: string, gameId: string, actorId: string) =>
+  gameAction(roomId, gameId, "watch", actorId);
+export const leaveGame = (roomId: string, gameId: string, actorId: string) =>
+  gameAction(roomId, gameId, "leave", actorId);
+export const requestGameRematch = (
+  roomId: string,
+  gameId: string,
+  actorId: string,
+) => gameAction(roomId, gameId, "rematch", actorId);
+
+export const playGameMove = (
+  roomId: string,
+  gameId: string,
+  actorId: string,
+  cell: number,
+): Promise<{ session: GameSession }> =>
+  requestJson(
+    apiUrl(
+      `/api/rooms/${encodeURIComponent(roomId)}/games/${encodeURIComponent(gameId)}/moves`,
+    ),
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ actorId, cell }),
+    },
+  );
 
 export const getActor = (actorId: string): Promise<Actor> =>
   requestJson(apiUrl(`/api/actors/${encodeURIComponent(actorId)}`));

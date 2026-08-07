@@ -63,7 +63,8 @@ const isActorStatusMode = (value: unknown): value is Actor["statusMode"] =>
   value === null ||
   value === "preset" ||
   value === "custom" ||
-  value === "media";
+  value === "media" ||
+  value === "game";
 
 const roomHistoryRetryDelay = (attempt: number): number =>
   Math.min(
@@ -566,6 +567,12 @@ export const useRoomActivity = (roomId: string) => {
       queryClient.setQueryData<RoomEvent[]>(eventsKey, (existing) =>
         mergeEvents(existing, [event]),
       );
+
+      if (event.type.startsWith("game_")) {
+        void queryClient.invalidateQueries({
+          queryKey: ["room-games", roomId],
+        });
+      }
 
       if (event.type === "actor_status_changed" && event.actorId !== null) {
         const statusMode = event.payload.statusMode;

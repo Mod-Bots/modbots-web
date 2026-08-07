@@ -15,6 +15,7 @@ import {
   FileAudio,
   FileText,
   Film,
+  Gamepad2,
   Image,
   Info,
   Link as LinkIcon,
@@ -2127,7 +2128,7 @@ function ProfileStatusControl({
         <MessageSquare className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
         <select
           aria-label={t("Status")}
-          disabled={saving}
+          disabled={saving || actor.statusMode === "game"}
           value={
             customSelected
               ? "custom"
@@ -2135,7 +2136,9 @@ function ProfileStatusControl({
                 ? (actor.statusText ?? "")
                 : actor.statusMode === "media"
                   ? "media"
-                  : ""
+                  : actor.statusMode === "game"
+                    ? "game"
+                    : ""
           }
           onChange={(event) => {
             const value = event.currentTarget.value;
@@ -2169,6 +2172,9 @@ function ProfileStatusControl({
           <option value="media" disabled>
             {t("Media title (Unavailable in web app)")}
           </option>
+          {actor.statusMode === "game" && actor.statusText !== null ? (
+            <option value="game">{actor.statusText}</option>
+          ) : null}
         </select>
         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
       </div>
@@ -2266,6 +2272,8 @@ function ParticipantProfileDialog({
               <p className="mt-2 flex items-start gap-2 text-[13px] leading-5 text-zinc-200">
                 {actor.statusMode === "media" ? (
                   <Film className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-500" />
+                ) : actor.statusMode === "game" ? (
+                  <Gamepad2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-500" />
                 ) : (
                   <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-500" />
                 )}
@@ -4860,7 +4868,11 @@ export function Chatroom() {
 
                 <div className="modbots-print-chat-body relative flex min-h-0 flex-1">
                   {roomView === "games" && gameLobbyAvailable ? (
-                    <GameLobby />
+                    <GameLobby
+                      roomId={roomId}
+                      actorId={localActor?.id}
+                      actors={actors}
+                    />
                   ) : null}
                   <section
                     className={`modbots-print-chat-section min-w-0 flex-1 flex-col ${

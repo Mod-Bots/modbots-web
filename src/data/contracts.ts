@@ -1,5 +1,5 @@
 export type ActorType = "human" | "chat_bot" | "mod_bot";
-export type ActorStatusMode = "preset" | "custom" | "media";
+export type ActorStatusMode = "preset" | "custom" | "media" | "game";
 
 export type ChatLanguage = "en" | "zh-CN";
 
@@ -89,6 +89,34 @@ export interface RoomEvent {
   actorId: string | null;
   payload: Record<string, unknown>;
   occurredAt: string;
+}
+
+export type GameState = "waiting" | "active" | "won" | "draw" | "cancelled";
+export type TicTacToeMark = "X" | "O";
+
+export interface GameSession {
+  id: string;
+  roomId: string;
+  gameType: "tic_tac_toe";
+  state: GameState;
+  playerXActorId: string;
+  playerOActorId: string | null;
+  board: Array<TicTacToeMark | null>;
+  nextMark: TicTacToeMark | null;
+  winnerActorId: string | null;
+  winningLine: number[] | null;
+  spectatorActorIds: string[];
+  rematchRequestedBy: string[];
+  rematchOfSessionId: string | null;
+  rematchSessionId: string | null;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+}
+
+export interface GameDirectory {
+  sessions: GameSession[];
 }
 
 export interface RoomSummary {
