@@ -1,4 +1,5 @@
 export type ActorType = "human" | "chat_bot" | "mod_bot";
+export type ActorStatusMode = "preset" | "custom" | "media";
 
 export type ChatLanguage = "en" | "zh-CN";
 
@@ -15,6 +16,8 @@ export interface Actor {
   pronouns: string | null;
   location: string | null;
   links: string[];
+  statusMode: ActorStatusMode | null;
+  statusText: string | null;
   type: ActorType;
   policyVersionAccepted: string | null;
   policyAcceptedAt: string | null;

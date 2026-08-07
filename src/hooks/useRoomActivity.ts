@@ -41,6 +41,7 @@ import {
   setSessionToken,
   translateTexts,
   updateActorProfile,
+  updateActorStatus,
   uploadActorProfilePicture,
 } from "../data/platform";
 import { runWebSocket, runWebTransport } from "../data/realtime";
@@ -56,6 +57,12 @@ const reconnectDelayMilliseconds = 1_000;
 const roomHistoryRetryDelayMilliseconds = 2_000;
 const maximumRoomHistoryRetries = 7;
 const maximumRoomHistoryRetryDelayMilliseconds = 59_000;
+
+const isActorStatusMode = (value: unknown): value is Actor["statusMode"] =>
+  value === null ||
+  value === "preset" ||
+  value === "custom" ||
+  value === "media";
 
 const roomHistoryRetryDelay = (attempt: number): number =>
   Math.min(
@@ -239,6 +246,19 @@ export const useRoomActivity = (roomId: string) => {
       }
 
       return updateActorProfile(localActor.id, profile);
+    },
+    onSuccess: cacheActor,
+  });
+  const updateStatus = useMutation({
+    mutationFn: async (status: {
+      statusMode: "preset" | "custom" | null;
+      statusText: string | null;
+    }) => {
+      if (localActor === undefined) {
+        throw new Error("Join the room before updating your status.");
+      }
+
+      return updateActorStatus(roomId, localActor.id, status);
     },
     onSuccess: cacheActor,
   });
@@ -527,6 +547,42 @@ export const useRoomActivity = (roomId: string) => {
       queryClient.setQueryData<RoomEvent[]>(eventsKey, (existing) =>
         mergeEvents(existing, [event]),
       );
+
+      if (event.type === "actor_status_changed" && event.actorId !== null) {
+        const statusMode = event.payload.statusMode;
+        const statusText = event.payload.statusText;
+
+        if (
+          isActorStatusMode(statusMode) &&
+          (statusText === null || typeof statusText === "string")
+        ) {
+          const updateCachedActor = (actor: Actor | undefined) =>
+            actor === undefined ? actor : { ...actor, statusMode, statusText };
+
+          queryClient.setQueryData<Actor | undefined>(
+            ["actor", event.actorId],
+            updateCachedActor,
+          );
+          queryClient.setQueryData<Actor | undefined>(
+            ["desktop-session", roomId, event.actorId],
+            updateCachedActor,
+          );
+          queryClient.setQueryData<RoomRoster | undefined>(
+            rosterKey,
+            (current) =>
+              current === undefined
+                ? current
+                : {
+                    actors: current.actors.map((actor) =>
+                      actor.id === event.actorId
+                        ? { ...actor, statusMode, statusText }
+                        : actor,
+                    ),
+                  },
+          );
+        }
+      }
+
       invalidateOverviewSoon();
     };
 
@@ -635,7 +691,14 @@ export const useRoomActivity = (roomId: string) => {
         window.clearTimeout(overviewInvalidation);
       }
     };
-  }, [eventsKey, fetchPersistedEvents, overviewKey, queryClient, roomId]);
+  }, [
+    eventsKey,
+    fetchPersistedEvents,
+    overviewKey,
+    queryClient,
+    roomId,
+    rosterKey,
+  ]);
 
   const refresh = async () => {
     await Promise.all([
@@ -675,6 +738,7 @@ export const useRoomActivity = (roomId: string) => {
     uploadProfilePicture,
     removeProfilePicture,
     updateProfile,
+    updateStatus,
     translate,
   };
 };

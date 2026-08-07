@@ -107,6 +107,12 @@ const preferredVoiceMimeTypes = [
   "audio/mp4",
   "audio/ogg;codecs=opus",
 ];
+const profileStatusPresets = [
+  "Available",
+  "Away",
+  "Busy",
+  "Do not disturb",
+] as const;
 
 const participantsPanel = { min: 200, max: 360, initial: 260 };
 const aboutPanel = { min: 230, max: 400, initial: 280 };
@@ -2061,6 +2067,131 @@ function ProfileDetailRow({
   );
 }
 
+function ProfileStatusControl({
+  actor,
+  saving,
+  error,
+  onSave,
+}: {
+  actor: Actor;
+  saving: boolean;
+  error: string | null;
+  onSave: (status: {
+    statusMode: "preset" | "custom" | null;
+    statusText: string | null;
+  }) => Promise<Actor>;
+}) {
+  const { t } = useUiLanguage();
+  const [customSelected, setCustomSelected] = useState(
+    actor.statusMode === "custom",
+  );
+  const [customStatus, setCustomStatus] = useState(
+    actor.statusMode === "custom" ? (actor.statusText ?? "") : "",
+  );
+
+  useEffect(() => {
+    if (actor.statusMode === "custom") {
+      setCustomStatus(actor.statusText ?? "");
+    }
+  }, [actor.statusMode, actor.statusText]);
+
+  const saveStatus = async (status: {
+    statusMode: "preset" | "custom" | null;
+    statusText: string | null;
+  }) => {
+    try {
+      await onSave(status);
+    } catch {
+      // The mutation error is rendered below the controls.
+    }
+  };
+
+  const submitCustomStatus = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const statusText = customStatus.trim();
+
+    if (statusText.length > 0) {
+      void saveStatus({ statusMode: "custom", statusText });
+    }
+  };
+
+  return (
+    <div>
+      <div className="relative">
+        <MessageSquare className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+        <select
+          aria-label={t("Status")}
+          disabled={saving}
+          value={
+            customSelected
+              ? "custom"
+              : actor.statusMode === "preset"
+                ? (actor.statusText ?? "")
+                : actor.statusMode === "media"
+                  ? "media"
+                  : ""
+          }
+          onChange={(event) => {
+            const value = event.currentTarget.value;
+
+            if (value === "custom") {
+              setCustomSelected(true);
+              return;
+            }
+
+            setCustomSelected(false);
+            if (value === "") {
+              void saveStatus({ statusMode: null, statusText: null });
+              return;
+            }
+
+            void saveStatus({ statusMode: "preset", statusText: value });
+          }}
+          className="h-10 w-full appearance-none rounded-xl border border-white/[0.08] bg-white/[0.025] pl-10 pr-9 text-[13px] text-zinc-200 outline-none transition-colors hover:border-white/[0.14] hover:bg-white/[0.05] focus:border-white/20 disabled:cursor-wait disabled:opacity-60"
+        >
+          <option value="">{t("Set a status")}</option>
+          {profileStatusPresets.map((preset) => (
+            <option key={preset} value={preset}>
+              {t(preset)}
+            </option>
+          ))}
+          <option value="custom">
+            {actor.statusMode === "custom" && actor.statusText !== null
+              ? actor.statusText
+              : t("Custom...")}
+          </option>
+          <option value="media" disabled>
+            {t("Media title (Unavailable in web app)")}
+          </option>
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
+      </div>
+
+      {customSelected ? (
+        <form onSubmit={submitCustomStatus} className="mt-2 flex gap-1.5">
+          <input
+            value={customStatus}
+            onChange={(event) => setCustomStatus(event.currentTarget.value)}
+            maxLength={80}
+            placeholder={t("Write a custom status")}
+            className="min-w-0 flex-1 rounded-lg border border-white/[0.08] bg-black/20 px-2.5 py-2 text-[12px] text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-white/20"
+          />
+          <button
+            type="submit"
+            disabled={saving || customStatus.trim().length === 0}
+            className="rounded-lg border border-white/[0.1] bg-white/[0.08] px-3 text-[12px] font-medium text-zinc-100 hover:bg-white/[0.12] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {t("Save")}
+          </button>
+        </form>
+      ) : null}
+      {error === null ? null : (
+        <p className="mt-2 px-1 text-[11px] leading-4 text-red-300">{error}</p>
+      )}
+    </div>
+  );
+}
+
 const participantRoleLabel = (actor: Actor): string => {
   if (actor.type === "chat_bot") {
     return "Chat bot";
@@ -2125,6 +2256,16 @@ function ParticipantProfileDialog({
             <p className="mt-1 text-sm text-zinc-400">
               {t(participantRoleLabel(actor))}
             </p>
+            {actor.statusText === null ? null : (
+              <p className="mt-2 flex items-start gap-2 text-[13px] leading-5 text-zinc-200">
+                {actor.statusMode === "media" ? (
+                  <Film className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-500" />
+                ) : (
+                  <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-500" />
+                )}
+                <span>{actor.statusText}</span>
+              </p>
+            )}
           </div>
           <button
             ref={closeButton}
@@ -2304,6 +2445,7 @@ export function Chatroom() {
     removeProfilePicture,
     translate,
     updateProfile,
+    updateStatus,
   } = useRoomActivity(roomId);
   const [draft, setDraft] = useState("");
   const [draftHistoryAvailability, setDraftHistoryAvailability] = useState({
@@ -4305,6 +4447,21 @@ export function Chatroom() {
                               </div>
                             </div>
                           </div>
+                        </div>
+
+                        <div className="border-b border-white/[0.08] px-4 py-3">
+                          <ProfileStatusControl
+                            actor={localActor}
+                            saving={updateStatus.isPending}
+                            error={
+                              updateStatus.error instanceof Error
+                                ? updateStatus.error.message
+                                : null
+                            }
+                            onSave={(status) =>
+                              updateStatus.mutateAsync(status)
+                            }
+                          />
                         </div>
 
                         <div className="space-y-1 px-4 py-3">

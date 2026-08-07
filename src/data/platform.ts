@@ -141,6 +141,25 @@ export const updateActorProfile = (
     body: JSON.stringify(profile),
   });
 
+export const updateActorStatus = (
+  roomId: string,
+  actorId: string,
+  status: {
+    statusMode: "preset" | "custom" | null;
+    statusText: string | null;
+  },
+): Promise<Actor> =>
+  requestJson(
+    apiUrl(
+      `/api/rooms/${encodeURIComponent(roomId)}/actors/${encodeURIComponent(actorId)}/status`,
+    ),
+    {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(status),
+    },
+  );
+
 export const getRoomRules = (): Promise<RoomRules> =>
   requestJson(apiUrl("/api/rules"));
 
