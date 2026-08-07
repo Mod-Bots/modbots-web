@@ -14,12 +14,14 @@ import {
   DoorOpen,
   FileAudio,
   FileText,
+  Film,
   Image,
   Info,
   Link as LinkIcon,
   LoaderCircle,
   LogOut,
   MapPin,
+  Maximize2,
   MessageSquare,
   Mic,
   MicOff,
@@ -71,6 +73,7 @@ import {
 } from "@/notifications/room-notifications";
 import { releasedVersion } from "@/released-version";
 import { AutomaticUpdateChecker } from "./AutomaticUpdateChecker";
+import { ChatAudioPlayer } from "./ChatAudioPlayer";
 import { ComposerAttachmentMenu } from "./ComposerAttachmentMenu";
 import { ComposerEmojiPicker } from "./ComposerEmojiPicker";
 import { DesktopContextMenu } from "./DesktopContextMenu";
@@ -1180,6 +1183,7 @@ function MessageActions({ onReply }: { onReply?: () => void }) {
 }
 
 function MessageMedia({ event }: { event: RoomEvent }) {
+  const { t } = useUiLanguage();
   const parts = contentParts(event).filter(
     (part): part is EventAssetPart => part.kind !== "text",
   );
@@ -1189,80 +1193,92 @@ function MessageMedia({ event }: { event: RoomEvent }) {
   }
 
   return (
-    <div className="mt-2 flex max-w-[720px] flex-col gap-2">
+    <div className="mt-2 flex w-full max-w-[400px] flex-col gap-2">
       {parts.map((part) => {
         const url = mediaAssetDataUrl(roomId, part.mediaAssetId);
 
         if (part.kind === "image") {
           return (
-            <figure key={part.partId}>
-              <NextImage
-                src={url}
-                alt={part.caption ?? "Shared image"}
-                width={1200}
-                height={900}
-                sizes="(max-width: 768px) 100vw, 720px"
-                unoptimized
-                className="h-auto max-h-[460px] w-auto max-w-full rounded-xl border border-white/10 object-contain"
-              />
-              {part.caption !== null ? (
-                <figcaption className="mt-1 text-xs text-zinc-500">
-                  {part.caption}
-                </figcaption>
-              ) : null}
+            <figure
+              key={part.partId}
+              className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] shadow-[0_10px_30px_rgba(0,0,0,0.18)]"
+            >
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="group/media relative block aspect-[16/10] bg-black/25"
+                aria-label={t("Open full-size image")}
+              >
+                <NextImage
+                  src={url}
+                  alt={part.caption ?? "Shared image"}
+                  fill
+                  sizes="(max-width: 480px) 100vw, 400px"
+                  unoptimized
+                  className="object-contain"
+                />
+                <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-black/55 text-zinc-300 opacity-0 backdrop-blur-sm transition group-hover/media:opacity-100 group-focus-visible/media:opacity-100">
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </span>
+              </a>
+              <figcaption
+                className="flex items-center gap-2 border-t border-white/[0.07] px-3 py-2 text-[11px] text-zinc-500"
+                title={part.caption ?? undefined}
+              >
+                <Image className="h-3.5 w-3.5 shrink-0" />
+                <span className="min-w-0 truncate">
+                  {part.caption ?? t("Image attachment")}
+                </span>
+              </figcaption>
             </figure>
           );
         }
 
         if (part.kind === "video") {
           return (
-            <figure key={part.partId}>
-              <video
-                controls
-                preload="metadata"
-                src={url}
-                className="max-h-[460px] max-w-full rounded-xl border border-white/10"
+            <figure
+              key={part.partId}
+              className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] shadow-[0_10px_30px_rgba(0,0,0,0.18)]"
+            >
+              <div className="aspect-[16/10] bg-black/25">
+                <video
+                  controls
+                  preload="metadata"
+                  src={url}
+                  className="h-full w-full object-contain"
+                >
+                  <track
+                    default
+                    kind="captions"
+                    src={mediaCaptionTrackUrl(part.caption)}
+                    srcLang="und"
+                    label="Message caption"
+                  />
+                </video>
+              </div>
+              <figcaption
+                className="flex items-center gap-2 border-t border-white/[0.07] px-3 py-2 text-[11px] text-zinc-500"
+                title={part.caption ?? undefined}
               >
-                <track
-                  default
-                  kind="captions"
-                  src={mediaCaptionTrackUrl(part.caption)}
-                  srcLang="und"
-                  label="Message caption"
-                />
-              </video>
-              {part.caption !== null ? (
-                <figcaption className="mt-1 text-xs text-zinc-500">
-                  {part.caption}
-                </figcaption>
-              ) : null}
+                <Film className="h-3.5 w-3.5 shrink-0" />
+                <span className="min-w-0 truncate">
+                  {part.caption ?? t("Video attachment")}
+                </span>
+              </figcaption>
             </figure>
           );
         }
 
         if (part.kind === "audio") {
           return (
-            <figure key={part.partId}>
-              <audio
-                controls
-                preload="metadata"
-                src={url}
-                className="w-full max-w-xl"
-              >
-                <track
-                  default
-                  kind="captions"
-                  src={mediaCaptionTrackUrl(part.caption)}
-                  srcLang="und"
-                  label="Message caption"
-                />
-              </audio>
-              {part.caption !== null ? (
-                <figcaption className="mt-1 text-xs text-zinc-500">
-                  {part.caption}
-                </figcaption>
-              ) : null}
-            </figure>
+            <ChatAudioPlayer
+              key={part.partId}
+              assetId={part.mediaAssetId}
+              caption={part.caption}
+              captionTrackUrl={mediaCaptionTrackUrl(part.caption)}
+              src={url}
+            />
           );
         }
 
@@ -1272,10 +1288,14 @@ function MessageMedia({ event }: { event: RoomEvent }) {
             href={url}
             target="_blank"
             rel="noreferrer"
-            className="flex max-w-xl items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-zinc-300 hover:bg-white/[0.07] hover:text-white"
+            className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] p-3 text-sm text-zinc-300 shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition hover:bg-white/[0.07] hover:text-white"
           >
-            <Paperclip className="h-4 w-4" />
-            <span>{part.caption ?? "Open shared file"}</span>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-black/20 text-zinc-400">
+              <FileText className="h-4 w-4" />
+            </span>
+            <span className="min-w-0 flex-1 truncate">
+              {part.caption ?? t("Open shared file")}
+            </span>
           </a>
         );
       })}

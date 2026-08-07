@@ -315,6 +315,30 @@ textarea {
   }
 }
 
+@keyframes modbots-audio-wave {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scaleY(0.68);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.08);
+  }
+}
+
+.modbots-audio-wave-bar {
+  transform-origin: center;
+  transition:
+    height 180ms ease,
+    background-color 180ms ease,
+    opacity 180ms ease;
+}
+
+.modbots-audio-wave-bar-playing {
+  animation: modbots-audio-wave 860ms ease-in-out infinite;
+}
+
 .modbots-recording-control {
   animation: modbots-recording-breathe 1.6s ease-in-out infinite;
 }
@@ -333,6 +357,7 @@ textarea {
 
 @media (prefers-reduced-motion: reduce) {
   .modbots-animated-emoji,
+  .modbots-audio-wave-bar-playing,
   .modbots-recording-control {
     animation: none;
   }
