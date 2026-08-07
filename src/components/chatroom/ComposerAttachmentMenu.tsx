@@ -67,7 +67,7 @@ export function ComposerAttachmentMenu({
         aria-label={t("Add files or media")}
         title={t("Add files or media")}
         onClick={() => onOpenChange(!open)}
-        className={`rounded-lg p-2.5 transition-colors disabled:cursor-default ${
+        className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors disabled:cursor-default lg:h-auto lg:w-auto lg:p-2.5 ${
           open
             ? "bg-white/[0.09] text-zinc-100"
             : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
@@ -87,7 +87,7 @@ export function ComposerAttachmentMenu({
           <div
             role="menu"
             aria-label={t("Choose attachment type")}
-            className="absolute bottom-full left-0 z-50 mb-2 w-[272px] rounded-window border border-white/10 bg-modbots-popover p-1.5 shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
+            className="fixed bottom-3 left-3 right-3 z-50 max-h-[calc(100dvh-1.5rem)] w-auto overflow-y-auto rounded-window border border-white/10 bg-modbots-popover p-1.5 shadow-[0_18px_60px_rgba(0,0,0,0.55)] lg:absolute lg:bottom-full lg:left-0 lg:right-auto lg:mb-2 lg:max-h-none lg:w-[272px] lg:overflow-visible"
           >
             <p className="px-2.5 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-500">
               {t("Add to your message")}

@@ -124,7 +124,7 @@ export function ComposerVisualPicker({
         aria-label={t("Create meme or GIF")}
         title={t("Create meme or GIF")}
         onClick={() => onOpenChange(!open)}
-        className={`rounded-lg p-2.5 transition-colors disabled:cursor-default ${
+        className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors disabled:cursor-default lg:h-auto lg:w-auto lg:p-2.5 ${
           open
             ? "bg-white/[0.09] text-zinc-100"
             : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
@@ -144,7 +144,7 @@ export function ComposerVisualPicker({
           <div
             role="dialog"
             aria-label={t("Create meme or GIF")}
-            className="absolute bottom-full left-0 z-50 mb-2 w-[min(390px,calc(100vw-32px))] overflow-hidden rounded-window border border-white/10 bg-modbots-popover shadow-[0_18px_60px_rgba(0,0,0,0.58)]"
+            className="fixed inset-3 z-50 flex w-auto flex-col overflow-hidden rounded-window border border-white/10 bg-modbots-popover shadow-[0_18px_60px_rgba(0,0,0,0.58)] lg:absolute lg:inset-auto lg:bottom-full lg:left-0 lg:mb-2 lg:block lg:w-[min(390px,calc(100vw-32px))]"
           >
             <div className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3">
               <div>
@@ -186,7 +186,7 @@ export function ComposerVisualPicker({
               </button>
             </div>
 
-            <div className="space-y-3 p-4">
+            <div className="modbots-scroll min-h-0 flex-1 space-y-3 overflow-y-auto p-4 lg:overflow-visible">
               {mode === "meme" ? (
                 <>
                   <label className="block text-xs text-zinc-400">

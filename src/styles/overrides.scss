@@ -19,7 +19,9 @@
   .modbots-fit-with-menu {
     --modbots-fit-height: calc(100dvh - 2rem);
   }
+}
 
+@media (min-width: 1024px) {
   .modbots-settings-dialog {
     height: min(760px, calc(100dvh - 3rem));
   }

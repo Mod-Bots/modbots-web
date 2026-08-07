@@ -100,7 +100,7 @@ export function ComposerEmojiPicker({
         aria-label={t("Add emoji")}
         title={t("Add emoji")}
         onClick={() => onOpenChange(!open)}
-        className={`rounded-lg p-2.5 transition-colors disabled:cursor-default ${
+        className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors disabled:cursor-default lg:h-auto lg:w-auto lg:p-2.5 ${
           open
             ? "bg-white/[0.09] text-zinc-100"
             : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
@@ -120,7 +120,7 @@ export function ComposerEmojiPicker({
           <div
             role="dialog"
             aria-label={t("Emoji picker")}
-            className="absolute bottom-full left-0 z-50 mb-2 flex h-[420px] w-[min(370px,calc(100vw-32px))] flex-col overflow-hidden rounded-window border border-white/10 bg-modbots-popover shadow-[0_18px_60px_rgba(0,0,0,0.58)]"
+            className="fixed inset-3 z-50 flex h-auto w-auto flex-col overflow-hidden rounded-window border border-white/10 bg-modbots-popover shadow-[0_18px_60px_rgba(0,0,0,0.58)] lg:absolute lg:inset-auto lg:bottom-full lg:left-0 lg:mb-2 lg:h-[420px] lg:w-[min(370px,calc(100vw-32px))]"
           >
             <div className="flex items-center gap-2 border-b border-white/[0.08] p-2.5">
               <label className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 focus-within:border-white/20">

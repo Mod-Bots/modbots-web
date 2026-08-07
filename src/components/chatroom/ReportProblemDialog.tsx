@@ -86,9 +86,9 @@ export function ReportProblemDialog({ onClose }: ReportProblemDialogProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="report-problem-title"
-        className="relative w-full max-w-[560px] overflow-hidden rounded-window border border-white/10 bg-modbots-dialog shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
+        className="relative flex max-h-[calc(100dvh-2rem)] w-full max-w-[560px] flex-col overflow-hidden rounded-window border border-white/10 bg-modbots-dialog shadow-[0_24px_70px_rgba(0,0,0,0.6)] sm:max-h-[calc(100dvh-3rem)]"
       >
-        <header className="flex items-start gap-4 border-b border-white/[0.08] px-5 py-4 sm:px-6">
+        <header className="flex shrink-0 items-start gap-4 border-b border-white/[0.08] px-5 py-4 sm:px-6">
           <div className="min-w-0 flex-1">
             <h2
               id="report-problem-title"
@@ -106,14 +106,17 @@ export function ReportProblemDialog({ onClose }: ReportProblemDialogProps) {
             title={t("Close")}
             disabled={submitting}
             onClick={onClose}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 disabled:cursor-default disabled:opacity-50"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 disabled:cursor-default disabled:opacity-50 lg:h-8 lg:w-8"
           >
             <X className="h-4 w-4" />
           </button>
         </header>
 
         {createdIssue === null ? (
-          <form onSubmit={submitProblem} className="space-y-5 p-5 sm:p-6">
+          <form
+            onSubmit={submitProblem}
+            className="modbots-scroll min-h-0 space-y-5 overflow-y-auto p-5 sm:p-6"
+          >
             <label className="block">
               <span className="text-sm font-medium text-zinc-200">
                 {t("Issue title")}
@@ -157,21 +160,21 @@ export function ReportProblemDialog({ onClose }: ReportProblemDialogProps) {
                 type="button"
                 disabled={submitting}
                 onClick={onClose}
-                className="h-10 rounded-window border border-white/10 px-4 text-sm font-medium text-zinc-300 hover:bg-white/[0.06] hover:text-white disabled:cursor-default disabled:opacity-50"
+                className="h-11 rounded-window border border-white/10 px-4 text-sm font-medium text-zinc-300 hover:bg-white/[0.06] hover:text-white disabled:cursor-default disabled:opacity-50 lg:h-10"
               >
                 {t("Cancel")}
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="h-10 rounded-window bg-white px-4 text-sm font-semibold text-black hover:bg-zinc-200 disabled:cursor-default disabled:opacity-60"
+                className="h-11 rounded-window bg-white px-4 text-sm font-semibold text-black hover:bg-zinc-200 disabled:cursor-default disabled:opacity-60 lg:h-10"
               >
                 {submitting ? t("Submitting...") : t("Submit")}
               </button>
             </div>
           </form>
         ) : (
-          <div className="p-5 sm:p-6">
+          <div className="modbots-scroll min-h-0 overflow-y-auto p-5 sm:p-6">
             <p className="text-sm leading-6 text-zinc-300">
               {t("The GitHub issue was created successfully.")}
             </p>
@@ -188,7 +191,7 @@ export function ReportProblemDialog({ onClose }: ReportProblemDialogProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="h-10 rounded-window bg-white px-4 text-sm font-semibold text-black hover:bg-zinc-200"
+                className="h-11 rounded-window bg-white px-4 text-sm font-semibold text-black hover:bg-zinc-200 lg:h-10"
               >
                 {t("Done")}
               </button>

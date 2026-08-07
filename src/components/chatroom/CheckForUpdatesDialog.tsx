@@ -145,9 +145,9 @@ export function CheckForUpdatesDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="check-updates-title"
-        className="relative w-full max-w-[440px] overflow-hidden rounded-window border border-white/10 bg-modbots-dialog shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
+        className="relative flex max-h-[calc(100dvh-2rem)] w-full max-w-[440px] flex-col overflow-hidden rounded-window border border-white/10 bg-modbots-dialog shadow-[0_24px_70px_rgba(0,0,0,0.6)] sm:max-h-[calc(100dvh-3rem)]"
       >
-        <header className="flex items-center gap-4 border-b border-white/[0.08] px-5 py-4 sm:px-6">
+        <header className="flex shrink-0 items-center gap-4 border-b border-white/[0.08] px-5 py-4 sm:px-6">
           <h2
             id="check-updates-title"
             className="min-w-0 flex-1 text-base font-semibold text-white"
@@ -160,14 +160,14 @@ export function CheckForUpdatesDialog({
               aria-label={t("Close")}
               title={t("Close")}
               onClick={onClose}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 lg:h-8 lg:w-8"
             >
               <X className="h-4 w-4" />
             </button>
           ) : null}
         </header>
 
-        <div className="p-5 sm:p-6">
+        <div className="modbots-scroll min-h-0 overflow-y-auto p-5 sm:p-6">
           {phase === "checking" ? (
             <div className="flex items-center gap-3 text-sm text-zinc-300">
               <RefreshCw className="h-4 w-4 animate-spin text-zinc-500" />
@@ -217,7 +217,7 @@ export function CheckForUpdatesDialog({
                 <button
                   type="button"
                   onClick={retry}
-                  className="h-10 rounded-window border border-white/10 px-4 text-sm font-medium text-zinc-300 hover:bg-white/[0.06] hover:text-white"
+                  className="h-11 rounded-window border border-white/10 px-4 text-sm font-medium text-zinc-300 hover:bg-white/[0.06] hover:text-white lg:h-10"
                 >
                   {t("Try again")}
                 </button>
@@ -225,7 +225,7 @@ export function CheckForUpdatesDialog({
               <button
                 type="button"
                 onClick={onClose}
-                className="h-10 rounded-window bg-white px-4 text-sm font-semibold text-black hover:bg-zinc-200"
+                className="h-11 rounded-window bg-white px-4 text-sm font-semibold text-black hover:bg-zinc-200 lg:h-10"
               >
                 {t("Done")}
               </button>

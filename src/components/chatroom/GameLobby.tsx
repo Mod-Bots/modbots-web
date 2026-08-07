@@ -96,7 +96,7 @@ function TicTacToeGame({
       <button
         type="button"
         onClick={onBack}
-        className="mb-5 inline-flex w-fit items-center gap-2 text-[12px] font-medium text-zinc-500 hover:text-zinc-200"
+        className="mb-5 inline-flex min-h-11 w-fit items-center gap-2 rounded-lg pr-3 text-[12px] font-medium text-zinc-500 hover:text-zinc-200"
       >
         <ArrowLeft className="h-4 w-4" /> {t("Game lobby")}
       </button>
@@ -171,7 +171,7 @@ function TicTacToeGame({
               type="button"
               disabled={busy || rematchRequested}
               onClick={onRematch}
-              className="rounded-lg bg-zinc-100 px-4 py-2.5 text-[12px] font-semibold text-zinc-950 disabled:opacity-50"
+              className="min-h-11 rounded-lg bg-zinc-100 px-4 py-2.5 text-[12px] font-semibold text-zinc-950 disabled:opacity-50"
             >
               {rematchRequested ? t("Waiting for rematch") : t("Play again")}
             </button>
@@ -181,7 +181,7 @@ function TicTacToeGame({
               type="button"
               disabled={busy}
               onClick={onLeave}
-              className="rounded-lg border border-white/10 px-4 py-2.5 text-[12px] font-semibold text-zinc-300 hover:bg-white/[0.05] disabled:opacity-50"
+              className="min-h-11 rounded-lg border border-white/10 px-4 py-2.5 text-[12px] font-semibold text-zinc-300 hover:bg-white/[0.05] disabled:opacity-50"
             >
               {game.state === "waiting" && isPlayer
                 ? t("Stop game")
@@ -370,7 +370,7 @@ export function GameLobby({
                                 : games.watch.mutateAsync(game.id),
                             )
                       }
-                      className="shrink-0 rounded-lg border border-white/10 px-3 py-2 text-[11px] font-semibold text-zinc-300 hover:bg-white/[0.05] disabled:opacity-40"
+                      className="min-h-11 shrink-0 rounded-lg border border-white/10 px-3 py-2 text-[11px] font-semibold text-zinc-300 hover:bg-white/[0.05] disabled:opacity-40"
                     >
                       {participant || watching
                         ? t("Open")
@@ -418,7 +418,7 @@ export function GameLobby({
                     <button
                       type="button"
                       onClick={() => setSelectedId(game.id)}
-                      className="shrink-0 rounded-lg border border-white/10 px-3 py-2 text-[11px] font-semibold text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
+                      className="min-h-11 shrink-0 rounded-lg border border-white/10 px-3 py-2 text-[11px] font-semibold text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
                     >
                       {t("View result")}
                     </button>
@@ -478,7 +478,7 @@ export function GameLobby({
                     type="button"
                     disabled={!game.playable || actorId === undefined || busy}
                     onClick={() => void act(() => games.create.mutateAsync())}
-                    className="rounded-lg bg-zinc-100 px-3 py-2 text-[12px] font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600"
+                    className="min-h-11 rounded-lg bg-zinc-100 px-3 py-2 text-[12px] font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600"
                   >
                     {t("Start game")}
                   </button>

@@ -1165,7 +1165,7 @@ function StatusBar({
               ? "alert"
               : "status"
           }
-          className="absolute bottom-[calc(100%+8px)] right-3 z-40 flex w-[min(360px,calc(100vw-24px))] items-start gap-2.5 rounded-window border border-white/10 bg-modbots-popover px-3 py-2.5 text-zinc-400 shadow-[0_16px_50px_rgba(0,0,0,0.55)]"
+          className="fixed left-3 right-3 top-[108px] z-40 flex w-auto items-start gap-2.5 rounded-window border border-white/10 bg-modbots-popover px-3 py-2.5 text-zinc-400 shadow-[0_16px_50px_rgba(0,0,0,0.55)] lg:absolute lg:bottom-[calc(100%+8px)] lg:left-auto lg:right-3 lg:top-auto lg:w-[min(360px,calc(100vw-24px))]"
         >
           <LatestToneIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <div className="min-w-0 flex-1">
@@ -1181,7 +1181,7 @@ function StatusBar({
           <button
             type="button"
             onClick={() => setVisibleToastId(null)}
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-zinc-600 hover:bg-white/[0.07] hover:text-zinc-300"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded text-zinc-600 hover:bg-white/[0.07] hover:text-zinc-300 lg:h-6 lg:w-6"
             aria-label={t("Dismiss notification banner")}
             title={t("Dismiss notification banner")}
           >
@@ -1320,7 +1320,7 @@ function MessageActions({
 
   return (
     <div
-      className={`modbots-print-hidden absolute right-4 top-0 z-20 flex items-center rounded-window border border-white/10 bg-modbots-popover p-0.5 shadow-xl lg:right-6 ${
+      className={`modbots-print-hidden relative z-20 ml-auto flex items-center rounded-window border border-white/10 bg-modbots-popover p-0.5 shadow-xl lg:absolute lg:right-6 lg:top-0 lg:ml-0 ${
         menuOpen
           ? "pointer-events-auto opacity-100"
           : "opacity-80 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100"
@@ -1330,7 +1330,7 @@ function MessageActions({
         type="button"
         onClick={onReply}
         disabled={onReply === undefined}
-        className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-zinc-500"
+        className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 hover:bg-white/[0.07] hover:text-white disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-zinc-500 lg:h-auto lg:w-auto lg:p-2"
         aria-label={t(quote ? "Quote message" : "Reply to message")}
         title={t(quote ? "Quote" : "Reply")}
       >
@@ -1342,7 +1342,7 @@ function MessageActions({
       </button>
       <button
         type="button"
-        className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white"
+        className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 hover:bg-white/[0.07] hover:text-white lg:h-auto lg:w-auto lg:p-2"
         aria-label={t("Add reaction")}
         title={t("Add reaction")}
       >
@@ -1359,7 +1359,7 @@ function MessageActions({
             }}
             aria-expanded={menuOpen}
             aria-haspopup="menu"
-            className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 hover:bg-white/[0.07] hover:text-white lg:h-auto lg:w-auto lg:p-2"
             aria-label={t("More message actions")}
             title={t("More actions")}
           >
@@ -1850,7 +1850,7 @@ function ChatMessage({
         </div>
       </div>
 
-      <div className="min-w-0 flex-1 pr-20">
+      <div className="min-w-0 flex-1 pr-0 lg:pr-20">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           <span
             className={`text-[12px] font-semibold ${
@@ -1874,6 +1874,7 @@ function ChatMessage({
           <time className="text-[10px] tabular-nums text-zinc-500">
             {formatTime(event.occurredAt)}
           </time>
+          {actions}
         </div>
         {isReply ? (
           <div className="mt-2 flex min-w-0 max-w-[64ch] items-stretch overflow-hidden rounded-xl border border-white/[0.08] bg-modbots-panel-raised shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
@@ -1909,8 +1910,6 @@ function ChatMessage({
           onPlaybackChange={onPlaybackChange}
         />
       </div>
-
-      {actions}
     </article>
   );
 }
@@ -2102,9 +2101,11 @@ function ActivityCountRow({ label, count }: { label: string; count: number }) {
 
 function ParticipantRow({
   actor,
+  onOpen,
   status,
 }: {
   actor: Actor;
+  onOpen: () => void;
   status: ParticipantStatus;
 }) {
   const { t } = useUiLanguage();
@@ -2114,9 +2115,11 @@ function ParticipantRow({
   const statusDot = participantStatusDot(actor, status);
 
   return (
-    <div
+    <button
+      type="button"
+      onClick={onOpen}
       data-participant-actor-id={actor.id}
-      className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-white/[0.04]"
+      className="flex min-h-11 w-full items-center gap-3 rounded-xl px-2 py-1.5 text-left hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
     >
       <div className="relative">
         <ActorProfilePicture
@@ -2145,7 +2148,7 @@ function ParticipantRow({
           {displayedStatus}
         </p>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -2470,7 +2473,7 @@ function ParticipantProfileDialog({
         role="dialog"
         aria-modal="true"
         aria-label={t(`${actor.display}'s profile`)}
-        className="relative z-10 flex max-h-[min(720px,calc(100vh-32px))] w-full max-w-md flex-col overflow-hidden rounded-window border border-white/10 bg-[image:var(--modbots-profile-background)] shadow-[0_28px_100px_rgba(0,0,0,0.72)]"
+        className="relative z-10 flex max-h-[min(720px,calc(100dvh-32px))] w-full max-w-md flex-col overflow-hidden rounded-window border border-white/10 bg-[image:var(--modbots-profile-background)] shadow-[0_28px_100px_rgba(0,0,0,0.72)]"
       >
         <header className="flex items-start gap-4 border-b border-white/[0.08] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.09),transparent_48%)] p-5">
           <ActorProfilePicture
@@ -2503,7 +2506,7 @@ function ParticipantProfileDialog({
             ref={closeButton}
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 lg:h-auto lg:w-auto lg:p-2"
             aria-label={t("Close profile")}
           >
             <X className="h-4 w-4" />
@@ -4790,7 +4793,7 @@ export function Chatroom() {
                         setMobilePanel(null);
                         setUserMenuOpen(false);
                       }}
-                      className="ml-auto rounded-lg p-2 text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:hidden"
+                      className="ml-auto flex h-11 w-11 items-center justify-center rounded-lg text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:hidden"
                       aria-label={t("Close participants")}
                     >
                       <X className="h-4 w-4" />
@@ -4821,7 +4824,7 @@ export function Chatroom() {
                                 voiceRecordingStatus !== "idle"
                               }
                               aria-current={selected ? "page" : undefined}
-                              className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-default ${
+                              className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-default lg:min-h-0 ${
                                 selected
                                   ? "bg-white/[0.08] text-white"
                                   : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100 disabled:opacity-60"
@@ -4872,6 +4875,10 @@ export function Chatroom() {
                                 <ParticipantRow
                                   key={member.actor.id}
                                   actor={member.actor}
+                                  onOpen={() => {
+                                    setProfileActorId(member.actor.id);
+                                    setMobilePanel(null);
+                                  }}
                                   status={member.status}
                                 />
                               ))}
@@ -5070,7 +5077,7 @@ export function Chatroom() {
                 <header className="modbots-print-chat-header z-10 flex h-14 shrink-0 items-center gap-2 border-b border-white/[0.08] bg-modbots-panel px-3 lg:h-[68px] lg:gap-4 lg:px-5">
                   {mobileSearchOpen ? (
                     <div className="flex min-w-0 flex-1 items-center gap-2 lg:hidden">
-                      <div className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/10 bg-modbots-popover px-3">
+                      <div className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/10 bg-modbots-popover px-3 lg:h-9">
                         <Search className="h-4 w-4 shrink-0 text-zinc-500" />
                         <input
                           ref={searchInput}
@@ -5088,7 +5095,7 @@ export function Chatroom() {
                           setSearchQuery("");
                           setMobileSearchOpen(false);
                         }}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:h-9 lg:w-9"
                         aria-label={t("Close search")}
                       >
                         <X className="h-4 w-4" />
@@ -5112,7 +5119,7 @@ export function Chatroom() {
                               role="tab"
                               aria-selected={roomView === view}
                               onClick={() => selectRoomView(view)}
-                              className={`rounded-md px-2 py-1.5 text-[11px] font-medium transition sm:px-3 ${
+                              className={`min-h-9 rounded-md px-2 py-1.5 text-[11px] font-medium transition sm:px-3 ${
                                 roomView === view
                                   ? "bg-white/[0.09] text-zinc-100"
                                   : "text-zinc-500 hover:text-zinc-300"
@@ -5154,7 +5161,7 @@ export function Chatroom() {
                           <button
                             type="button"
                             onClick={openSearch}
-                            className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+                            className="flex h-11 w-11 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white lg:h-9 lg:w-9"
                             aria-label={t("Search the chat")}
                           >
                             <Search className="h-[18px] w-[18px]" />
@@ -5167,7 +5174,7 @@ export function Chatroom() {
                             setMembersOpen(true);
                             setMobilePanel("participants");
                           }}
-                          className="relative flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+                          className="relative flex h-11 w-11 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white lg:h-9 lg:w-9"
                           aria-label={t("Show participants")}
                           aria-expanded={mobilePanel === "participants"}
                         >
@@ -5183,7 +5190,7 @@ export function Chatroom() {
                             setAboutPanelOpen(true);
                             setMobilePanel("about");
                           }}
-                          className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+                          className="flex h-11 w-11 items-center justify-center rounded-xl text-zinc-400 hover:bg-white/[0.06] hover:text-white lg:h-9 lg:w-9"
                           aria-label={t("Show room information")}
                           aria-expanded={mobilePanel === "about"}
                         >
@@ -5285,7 +5292,7 @@ export function Chatroom() {
                       </div>
                     </div>
 
-                    <div className="modbots-print-hidden shrink-0 px-3 pb-3 pt-2 sm:px-7 sm:pb-5">
+                    <div className="modbots-print-hidden shrink-0 px-3 pb-3 pt-2 lg:px-7 lg:pb-5">
                       {translationError !== null ? (
                         <div className="mb-2 flex items-center gap-2 rounded-window border border-white/10 bg-modbots-menu px-3 py-2 text-xs text-zinc-300">
                           <CircleAlert className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
@@ -5571,7 +5578,7 @@ export function Chatroom() {
                               ? "Preparing your session..."
                               : t("Message the room")
                           }
-                          className="max-h-40 min-h-[58px] w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[14px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-default"
+                          className="max-h-40 min-h-12 w-full resize-none bg-transparent px-4 pb-1 pt-3 text-[14px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-default lg:min-h-[58px] lg:pb-2 lg:pt-4"
                         />
                         <div className="relative flex items-center justify-between px-2 pb-2">
                           <div className="flex items-center gap-0.5">
@@ -5668,7 +5675,7 @@ export function Chatroom() {
                                   void startVoiceRecording();
                                 }
                               }}
-                              className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:cursor-default disabled:text-zinc-700 ${
+                              className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:cursor-default disabled:text-zinc-700 lg:h-10 lg:w-10 ${
                                 voiceRecordingStatus === "recording"
                                   ? "modbots-recording-control bg-red-500/20 text-red-400"
                                   : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
@@ -5685,7 +5692,7 @@ export function Chatroom() {
                             <button
                               type="submit"
                               disabled={!canSend}
-                              className="flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-modbots-field disabled:cursor-default disabled:bg-zinc-800 disabled:text-zinc-500"
+                              className="flex h-11 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-modbots-field disabled:cursor-default disabled:bg-zinc-800 disabled:text-zinc-500 lg:h-10"
                             >
                               <span>
                                 {translatingSubmission
@@ -5729,7 +5736,7 @@ export function Chatroom() {
                     <button
                       type="button"
                       onClick={() => setMobilePanel(null)}
-                      className="ml-auto rounded-lg p-2 text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:hidden"
+                      className="ml-auto flex h-11 w-11 items-center justify-center rounded-lg text-zinc-500 hover:bg-white/[0.06] hover:text-white lg:hidden"
                       aria-label={t("Close room information")}
                     >
                       <X className="h-4 w-4" />
@@ -6108,7 +6115,7 @@ export function Chatroom() {
         ) : null}
 
         {aboutOpen ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
             <button
               type="button"
               aria-label="Close About Mod Bots"
@@ -6119,7 +6126,7 @@ export function Chatroom() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="about-mod-bots-title"
-              className="relative w-[360px] rounded-window border border-white/10 bg-modbots-dialog p-6 shadow-[0_24px_70px_rgba(0,0,0,0.6)]"
+              className="relative w-full max-w-[360px] rounded-window border border-white/10 bg-modbots-dialog p-5 shadow-[0_24px_70px_rgba(0,0,0,0.6)] sm:p-6"
             >
               <div className="flex items-center gap-3">
                 <NextImage
@@ -6144,7 +6151,7 @@ export function Chatroom() {
               <button
                 type="button"
                 onClick={() => setAboutOpen(false)}
-                className="mt-5 w-full rounded-xl bg-white py-2 text-sm font-semibold text-black transition hover:bg-zinc-200"
+                className="mt-5 min-h-11 w-full rounded-xl bg-white py-2 text-sm font-semibold text-black transition hover:bg-zinc-200"
               >
                 Close
               </button>

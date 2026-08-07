@@ -236,13 +236,13 @@ function MobileMenu({
       className="w-full p-1"
     >
       {current !== undefined ? (
-        <div className="mb-1 flex h-8 items-center border-b border-white/[0.08] px-1">
+        <div className="mb-1 flex h-11 items-center border-b border-white/[0.08] px-1 lg:h-8">
           <button
             type="button"
             aria-label={t("Back")}
             title={t("Back")}
             onClick={() => setPath((currentPath) => currentPath.slice(0, -1))}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-400 hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded text-zinc-400 hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 lg:h-7 lg:w-7"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -276,7 +276,7 @@ function MobileMenu({
                   { id: item.id, label: item.label, items: item.items },
                 ])
               }
-              className="group flex h-9 w-full items-center gap-2.5 rounded px-2 text-left text-[14px] font-medium text-zinc-200 hover:bg-white/[0.08] focus-visible:bg-white/[0.08] focus-visible:outline-none"
+              className="group flex h-11 w-full items-center gap-2.5 rounded px-2 text-left text-[14px] font-medium text-zinc-200 hover:bg-white/[0.08] focus-visible:bg-white/[0.08] focus-visible:outline-none lg:h-9"
             >
               <ItemIcon className="h-4 w-4 shrink-0 text-zinc-500 group-hover:text-zinc-300" />
               <span className="min-w-0 flex-1 truncate">{item.label}</span>
@@ -294,7 +294,7 @@ function MobileMenu({
             role="menuitem"
             disabled={item.disabled}
             onClick={() => onAction(item.onSelect)}
-            className="group flex min-h-9 w-full items-center gap-2.5 rounded px-2 py-1.5 text-left text-[14px] font-medium text-zinc-200 hover:bg-white/[0.08] focus-visible:bg-white/[0.08] focus-visible:outline-none disabled:cursor-default disabled:text-zinc-600 disabled:hover:bg-transparent"
+            className="group flex min-h-11 w-full items-center gap-2.5 rounded px-2 py-1.5 text-left text-[14px] font-medium text-zinc-200 hover:bg-white/[0.08] focus-visible:bg-white/[0.08] focus-visible:outline-none disabled:cursor-default disabled:text-zinc-600 disabled:hover:bg-transparent lg:min-h-9"
           >
             <ItemIcon className="h-4 w-4 shrink-0 text-zinc-500 group-hover:text-zinc-300" />
             <span className="min-w-0 flex-1 truncate">{item.label}</span>
@@ -829,7 +829,7 @@ export function MenuBar({
             setOpenMenu(null);
             setMobileOpen((open) => !open);
           }}
-          className="flex h-9 w-9 items-center justify-center rounded text-zinc-400 hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded text-zinc-400 hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 lg:hidden"
         >
           <MenuIcon className="h-[18px] w-[18px]" />
         </button>

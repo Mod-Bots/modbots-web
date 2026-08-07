@@ -76,6 +76,7 @@ interface WindowResize {
 }
 
 const settingsWindowMargin = 12;
+const settingsWindowBreakpoint = 1024;
 const settingsResizeHandles: ReadonlyArray<{
   edge: WindowResizeEdge;
   className: string;
@@ -303,7 +304,7 @@ export function SettingsDialog({
   useEffect(() => {
     const dialog = dialogRef.current;
 
-    if (dialog === null || window.innerWidth < 640) {
+    if (dialog === null || window.innerWidth < settingsWindowBreakpoint) {
       return;
     }
 
@@ -314,7 +315,7 @@ export function SettingsDialog({
 
   useEffect(() => {
     const keepWindowVisible = () => {
-      if (window.innerWidth < 640) {
+      if (window.innerWidth < settingsWindowBreakpoint) {
         setWindowPosition(null);
         setWindowSize(null);
         return;
@@ -373,7 +374,7 @@ export function SettingsDialog({
 
     if (
       dialog === null ||
-      window.innerWidth < 640 ||
+      window.innerWidth < settingsWindowBreakpoint ||
       target.closest("[data-window-move-ignore]") !== null
     ) {
       return;
@@ -437,7 +438,7 @@ export function SettingsDialog({
     (edge: WindowResizeEdge) => (event: ReactPointerEvent<HTMLElement>) => {
       const dialog = dialogRef.current;
 
-      if (dialog === null || window.innerWidth < 640) {
+      if (dialog === null || window.innerWidth < settingsWindowBreakpoint) {
         return;
       }
 
@@ -562,7 +563,7 @@ export function SettingsDialog({
         };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch justify-center sm:items-center sm:p-3">
+    <div className="fixed inset-0 z-50 flex items-stretch justify-center lg:items-center lg:p-3">
       <button
         type="button"
         aria-label={t("Close settings")}
@@ -572,10 +573,10 @@ export function SettingsDialog({
       <div
         ref={dialogRef}
         style={positionedWindowStyle}
-        className={`modbots-settings-dialog relative z-10 flex h-dvh w-full flex-col overflow-hidden border border-white/10 bg-modbots-window shadow-[0_28px_90px_rgba(0,0,0,0.7)] sm:absolute sm:h-[min(720px,calc(100dvh-24px))] sm:min-h-[440px] sm:w-[min(880px,calc(100vw-24px))] sm:min-w-[600px] sm:max-h-[calc(100dvh-24px)] sm:max-w-[calc(100vw-24px)] sm:rounded-window ${
+        className={`modbots-settings-dialog relative z-10 flex h-dvh w-full flex-col overflow-hidden border border-white/10 bg-modbots-window shadow-[0_28px_90px_rgba(0,0,0,0.7)] lg:absolute lg:h-[min(720px,calc(100dvh-24px))] lg:min-h-[440px] lg:w-[min(880px,calc(100vw-24px))] lg:min-w-[600px] lg:max-h-[calc(100dvh-24px)] lg:max-w-[calc(100vw-24px)] lg:rounded-window ${
           windowPosition === null
-            ? "sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
-            : "sm:translate-x-0 sm:translate-y-0"
+            ? "lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2"
+            : "lg:translate-x-0 lg:translate-y-0"
         }`}
         role="dialog"
         aria-modal="true"
@@ -586,11 +587,11 @@ export function SettingsDialog({
           onPointerMove={moveWindow}
           onPointerUp={stopWindowMove}
           onPointerCancel={stopWindowMove}
-          className="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.08] bg-modbots-header px-4 sm:cursor-move sm:touch-none"
+          className="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.08] bg-modbots-header px-4 lg:cursor-move lg:touch-none"
         >
           <button
             type="button"
-            className="hidden h-8 w-8 shrink-0 touch-none cursor-move items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-white/[0.05] hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 sm:flex"
+            className="hidden h-8 w-8 shrink-0 touch-none cursor-move items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-white/[0.05] hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 lg:flex"
             aria-label={t("Move settings window")}
             title={t("Move settings window")}
           >
@@ -611,7 +612,7 @@ export function SettingsDialog({
             type="button"
             onClick={onClose}
             data-window-move-ignore
-            className="flex h-8 w-8 shrink-0 cursor-default items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+            className="flex h-11 w-11 shrink-0 cursor-default items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 lg:h-8 lg:w-8"
             aria-label={t("Close settings")}
           >
             <X className="h-4 w-4" />
@@ -1015,7 +1016,7 @@ export function SettingsDialog({
             onPointerMove={resizeWindow}
             onPointerUp={stopWindowResize}
             onPointerCancel={stopWindowResize}
-            className={`absolute z-20 hidden touch-none sm:block ${handle.className}`}
+            className={`absolute z-20 hidden touch-none lg:block ${handle.className}`}
           />
         ))}
       </div>
