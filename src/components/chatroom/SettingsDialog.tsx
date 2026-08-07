@@ -628,12 +628,6 @@ export function SettingsDialog({
                 onClick={() => onSectionChange("account")}
               />
               <SectionButton
-                label={t("Notifications")}
-                icon={<Bell className="h-4 w-4" />}
-                active={section === "notifications"}
-                onClick={() => onSectionChange("notifications")}
-              />
-              <SectionButton
                 label={t("Language")}
                 icon={<Languages className="h-4 w-4" />}
                 active={section === "language"}
@@ -644,6 +638,12 @@ export function SettingsDialog({
                 icon={<MessageSquare className="h-4 w-4" />}
                 active={section === "chat"}
                 onClick={() => onSectionChange("chat")}
+              />
+              <SectionButton
+                label={t("Notifications")}
+                icon={<Bell className="h-4 w-4" />}
+                active={section === "notifications"}
+                onClick={() => onSectionChange("notifications")}
               />
             </nav>
           </aside>
