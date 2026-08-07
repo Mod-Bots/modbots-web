@@ -1719,6 +1719,9 @@ function ChatMessage({
       label: part.caption ?? t(`${part.kind} attachment`),
     }));
   const canManage = ownMessage && itemId !== null;
+  const messageRowClass = ownMessage
+    ? "bg-[var(--modbots-own-message-surface)] shadow-[inset_3px_0_0_var(--modbots-own-message-accent)] hover:bg-[var(--modbots-own-message-surface-hover)]"
+    : "hover:bg-white/[0.03]";
   useEffect(() => {
     if (editing) {
       requestAnimationFrame(() => editInput.current?.focus());
@@ -1845,7 +1848,7 @@ function ChatMessage({
         data-room-message-copy-text={
           content.length > 0 ? content : eventContent(event)
         }
-        className="group relative flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6"
+        className={`group relative flex gap-3 px-4 py-1 transition-colors sm:px-6 ${messageRowClass}`}
       >
         <div className="flex w-8 shrink-0 justify-center">
           <time className="mt-1 hidden text-[10px] tabular-nums text-zinc-600 group-hover:block">
@@ -1873,20 +1876,34 @@ function ChatMessage({
       data-room-message-copy-text={
         content.length > 0 ? content : eventContent(event)
       }
-      className="group relative mt-5 flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6"
+      className={`group relative mt-5 flex gap-3 px-4 py-1 transition-colors sm:px-6 ${messageRowClass}`}
     >
       <div className="w-8 shrink-0">
-        <ActorProfilePicture
-          actor={actor}
-          actorId={event.actorId}
-          name={name}
-          size="sm"
-        />
+        <div
+          className={
+            ownMessage
+              ? "rounded-xl ring-2 ring-[var(--modbots-own-message-accent)] ring-offset-2 ring-offset-modbots-canvas"
+              : undefined
+          }
+        >
+          <ActorProfilePicture
+            actor={actor}
+            actorId={event.actorId}
+            name={name}
+            size="sm"
+          />
+        </div>
       </div>
 
       <div className="min-w-0 flex-1 pr-20">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span className="text-[12px] font-semibold text-zinc-100">
+          <span
+            className={`text-[12px] font-semibold ${
+              ownMessage
+                ? "text-[var(--modbots-own-message-text)]"
+                : "text-zinc-100"
+            }`}
+          >
             {name}
           </span>
           {actor?.type !== "human" && actor !== undefined ? (
@@ -1895,7 +1912,9 @@ function ChatMessage({
             </span>
           ) : null}
           {ownMessage ? (
-            <span className="text-[11px] text-zinc-500">{t("You")}</span>
+            <span className="rounded-full border border-[var(--modbots-own-message-accent)] bg-[var(--modbots-own-message-surface)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[var(--modbots-own-message-text)]">
+              {t("You")}
+            </span>
           ) : null}
           <time className="text-[10px] tabular-nums text-zinc-500">
             {formatTime(event.occurredAt)}
