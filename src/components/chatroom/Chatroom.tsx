@@ -12,6 +12,7 @@ import {
   CircleAlert,
   CornerUpLeft,
   DoorOpen,
+  FileAudio,
   FileText,
   Image,
   Info,
@@ -1772,6 +1773,10 @@ export function Chatroom() {
   });
   const [attachment, setAttachment] = useState<File | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
+  const [recordedVoiceDuration, setRecordedVoiceDuration] = useState<
+    number | null
+  >(null);
   const [composerMenu, setComposerMenu] = useState<
     "attachment" | "emoji" | null
   >(null);
@@ -2963,6 +2968,7 @@ export function Chatroom() {
   const startVoiceRecording = async () => {
     setComposerMenu(null);
     setAttachmentError(null);
+    setDeliveryError(null);
 
     if (
       navigator.mediaDevices?.getUserMedia === undefined ||
@@ -3009,6 +3015,11 @@ export function Chatroom() {
         setAttachmentError("The voice recording could not be created.");
       };
       recorder.onstop = () => {
+        const startedAt = voiceRecordingStartedAt.current;
+        const recordedDuration =
+          startedAt === null
+            ? 1
+            : Math.max(1, Math.round((Date.now() - startedAt) / 1_000));
         const recordedType = recorder.mimeType || mimeType || "audio/webm";
         const blob = new Blob(voiceChunks.current, { type: recordedType });
         releaseVoiceStream();
@@ -3031,6 +3042,7 @@ export function Chatroom() {
           .toISOString()
           .replace(/[:.]/g, "-")}.${recordingExtension(recordedType)}`;
         setAttachment(new File([blob], filename, { type: recordedType }));
+        setRecordedVoiceDuration(recordedDuration);
         setAttachmentError(null);
       };
       recorder.start(250);
@@ -3164,14 +3176,8 @@ export function Chatroom() {
     !sendMessage.isPending &&
     !sendContent.isPending &&
     !translatingSubmission;
-  const mutationError = sendMessage.error ?? sendContent.error;
-  const sendError = isMutedError(mutationError) ? null : mutationError;
   const error =
-    apiHealth.error ??
-    desktopSession.error ??
-    overview.error ??
-    events.error ??
-    sendError;
+    apiHealth.error ?? desktopSession.error ?? overview.error ?? events.error;
   const historyUnavailable = events.isError;
   const realtimeConnected = realtimeStatus.state === "connected";
   const connectionProblem = !apiConnected || !realtimeConnected;
@@ -3184,29 +3190,7 @@ export function Chatroom() {
           ? "Reconnecting"
           : "Connecting";
   const previousConnectionLabel = useRef<string | null>(null);
-  const previousSendError = useRef<string | null>(null);
   const hasConnected = useRef(false);
-
-  useEffect(() => {
-    const message =
-      sendError instanceof Error
-        ? sendError.message
-        : sendError === null || sendError === undefined
-          ? null
-          : "The message could not be delivered.";
-
-    if (message !== null && message !== previousSendError.current) {
-      notify({
-        category: "system",
-        dedupeKey: `message-delivery:${message}`,
-        title: "Message could not be sent",
-        message,
-        tone: "error",
-      });
-    }
-
-    previousSendError.current = message;
-  }, [notify, sendError]);
 
   useEffect(() => {
     const previous = previousConnectionLabel.current;
@@ -3416,6 +3400,7 @@ export function Chatroom() {
     setComposerMenu(null);
     setMutedNotice(null);
     setTranslationError(null);
+    setDeliveryError(null);
     const replyContentItemId =
       replyTarget === null ? null : payloadString(replyTarget, "contentItemId");
     const addressedTo = deriveAddressedTo(content, addressableParticipants);
@@ -3459,6 +3444,7 @@ export function Chatroom() {
           ...addressing,
         });
         setAttachment(null);
+        setRecordedVoiceDuration(null);
       }
       setReplyTarget(null);
     } catch (sendFailure) {
@@ -3471,6 +3457,12 @@ export function Chatroom() {
       } else if (!translationCompleted) {
         setTranslationError(
           "Your message could not be translated, so it was not sent.",
+        );
+      } else {
+        setDeliveryError(
+          sendFailure instanceof Error
+            ? sendFailure.message
+            : "The message could not be delivered.",
         );
       }
     } finally {
@@ -4083,18 +4075,59 @@ export function Chatroom() {
                             </button>
                           </div>
                         ) : null}
-                        {attachment !== null ? (
-                          <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-zinc-300">
-                            <Paperclip className="h-3.5 w-3.5 shrink-0" />
-                            <span className="min-w-0 flex-1 truncate">
-                              {attachment.name}
-                            </span>
-                            <span className="text-zinc-500">
-                              {(attachment.size / 1_048_576).toFixed(1)} MB
+                        {deliveryError !== null ? (
+                          <div className="mx-3 mt-2 flex w-[calc(100%-1.5rem)] max-w-2xl items-start gap-2 rounded-lg border border-red-400/20 bg-red-500/[0.08] px-3 py-2 text-xs text-zinc-300">
+                            <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-400" />
+                            <span className="min-w-0 flex-1">
+                              <span className="block font-medium text-zinc-100">
+                                {t("Message not sent")}
+                              </span>
+                              <span className="mt-0.5 block text-zinc-400">
+                                {deliveryError}
+                              </span>
                             </span>
                             <button
                               type="button"
-                              onClick={() => setAttachment(null)}
+                              onClick={() => setDeliveryError(null)}
+                              className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
+                              aria-label={t("Dismiss delivery error")}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ) : null}
+                        {attachment !== null ? (
+                          <div className="mx-3 mt-2 flex w-fit max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-2 pr-1 text-xs text-zinc-300">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black/20 text-zinc-400">
+                              {attachment.type.startsWith("audio/") ? (
+                                <FileAudio className="h-4 w-4" />
+                              ) : (
+                                <Paperclip className="h-4 w-4" />
+                              )}
+                            </span>
+                            <span className="min-w-0 max-w-72">
+                              <span
+                                className="block truncate font-medium text-zinc-200"
+                                title={attachment.name}
+                              >
+                                {recordedVoiceDuration === null
+                                  ? attachment.name
+                                  : t("Voice message")}
+                              </span>
+                              <span className="mt-0.5 block text-[11px] text-zinc-500">
+                                {recordedVoiceDuration === null
+                                  ? null
+                                  : `${recordingDurationLabel(recordedVoiceDuration)} · `}
+                                {(attachment.size / 1_048_576).toFixed(1)} MB
+                              </span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAttachment(null);
+                                setRecordedVoiceDuration(null);
+                                setDeliveryError(null);
+                              }}
                               className="rounded-md p-1 text-zinc-500 hover:bg-white/[0.06] hover:text-white"
                               aria-label={t("Remove attachment")}
                             >
@@ -4114,12 +4147,15 @@ export function Chatroom() {
                               file.size > 100 * 1024 * 1024
                             ) {
                               setAttachment(null);
+                              setRecordedVoiceDuration(null);
                               setAttachmentError(
                                 "Attachments cannot exceed 100 MB.",
                               );
                             } else {
                               setAttachment(file);
+                              setRecordedVoiceDuration(null);
                               setAttachmentError(null);
+                              setDeliveryError(null);
                             }
 
                             event.currentTarget.value = "";
@@ -4226,7 +4262,7 @@ export function Chatroom() {
                               }}
                               className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:cursor-default disabled:text-zinc-700 ${
                                 voiceRecordingStatus === "recording"
-                                  ? "bg-red-500/15 text-red-400 hover:bg-red-500/25"
+                                  ? "modbots-recording-control bg-red-500/20 text-red-400"
                                   : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
                               }`}
                             >
@@ -4237,9 +4273,6 @@ export function Chatroom() {
                               ) : (
                                 <Mic className="h-[18px] w-[18px]" />
                               )}
-                              {voiceRecordingStatus === "recording" ? (
-                                <span className="absolute right-1 top-1 h-1.5 w-1.5 animate-pulse rounded-full bg-red-400" />
-                              ) : null}
                             </button>
                             <button
                               type="submit"

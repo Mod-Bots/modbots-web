@@ -301,6 +301,24 @@ textarea {
   }
 }
 
+@keyframes modbots-recording-breathe {
+  0%,
+  100% {
+    background-color: rgb(239 68 68 / 0.16);
+    box-shadow: 0 0 0 0 rgb(248 113 113 / 0.2);
+    transform: scale(1);
+  }
+  50% {
+    background-color: rgb(239 68 68 / 0.28);
+    box-shadow: 0 0 0 7px rgb(248 113 113 / 0);
+    transform: scale(1.04);
+  }
+}
+
+.modbots-recording-control {
+  animation: modbots-recording-breathe 1.6s ease-in-out infinite;
+}
+
 .modbots-animated-emoji {
   transform-origin: 50% 70%;
   animation:
@@ -314,7 +332,8 @@ textarea {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .modbots-animated-emoji {
+  .modbots-animated-emoji,
+  .modbots-recording-control {
     animation: none;
   }
 }
