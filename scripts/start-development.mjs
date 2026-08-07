@@ -1,23 +1,7 @@
-import { spawn, spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import path from "node:path";
 
 const environment = { ...process.env };
-
-if (!environment.MODBOTS_GITHUB_ISSUES_TOKEN?.trim()) {
-  const githubToken = spawnSync("gh", ["auth", "token"], {
-    encoding: "utf8",
-    windowsHide: true,
-  });
-
-  if (githubToken.status !== 0 || !githubToken.stdout.trim()) {
-    console.error(
-      "GitHub issue forms require an authenticated GitHub CLI. Run 'gh auth login' and start the web app again.",
-    );
-    process.exit(1);
-  }
-
-  environment.MODBOTS_GITHUB_ISSUES_TOKEN = githubToken.stdout.trim();
-}
 
 const concurrently = path.join(
   process.cwd(),

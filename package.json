@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node scripts/start-development.mjs",
     "dev:next": "next dev",
+    "configure:github-app": "node scripts/configure-github-app.mjs",
     "styles:build": "sass src/styles/globals.scss src/app/globals.css --no-source-map && biome format --write src/app/globals.css",
     "styles:watch": "sass --watch src/styles/globals.scss:src/app/globals.css --no-source-map",
     "build": "npm run styles:build && next build",

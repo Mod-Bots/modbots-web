@@ -12,7 +12,7 @@ Mod Bots Web is the web client for the Mod Bots platform.
 ## Prerequisites
 
 - Node.js 24 or newer
-- GitHub CLI, authenticated with access to `Mod-Bots/modbots-web`
+- A GitHub App installed on `Mod-Bots/modbots-web` with read and write access to issues
 
 ## Run
 
@@ -37,8 +37,17 @@ Start the web app:
 Set-Location modbots-web
 Copy-Item .env.example .env
 npm install
-gh auth login
 npm run dev
+```
+
+Before starting the app, set `MODBOTS_GITHUB_APP_ID`,
+`MODBOTS_GITHUB_APP_INSTALLATION_ID`, and
+`MODBOTS_GITHUB_APP_PRIVATE_KEY_BASE64` in `.env`.
+
+They can also be saved to `.env.local` from a downloaded GitHub App private key:
+
+```powershell
+npm run configure:github-app -- --app-id <app-id> --installation-id <installation-id> --private-key <pem-path>
 ```
 
 ## License
