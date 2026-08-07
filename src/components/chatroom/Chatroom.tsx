@@ -16,6 +16,7 @@ import {
   Image,
   Info,
   Link as LinkIcon,
+  LoaderCircle,
   LogOut,
   MapPin,
   MessageSquare,
@@ -28,6 +29,7 @@ import {
   Send,
   Shield,
   SmilePlus,
+  Square,
   TriangleAlert,
   Users,
   X,
@@ -68,7 +70,10 @@ import {
 } from "@/notifications/room-notifications";
 import { releasedVersion } from "@/released-version";
 import { AutomaticUpdateChecker } from "./AutomaticUpdateChecker";
+import { ComposerAttachmentMenu } from "./ComposerAttachmentMenu";
+import { ComposerEmojiPicker } from "./ComposerEmojiPicker";
 import { DesktopContextMenu } from "./DesktopContextMenu";
+import { emojiOnlyGraphemes } from "./emoji-data";
 import { MenuBar } from "./MenuBar";
 import { ReportProblemDialog } from "./ReportProblemDialog";
 import { RequestFeatureDialog } from "./RequestFeatureDialog";
@@ -87,6 +92,12 @@ const appVersion = releasedVersion;
 const groupWindowMs = 45 * 1000;
 const participantActiveWindowMs = 5 * 60 * 1000;
 const conversationPageSize = 100;
+const preferredVoiceMimeTypes = [
+  "audio/webm;codecs=opus",
+  "audio/webm",
+  "audio/mp4",
+  "audio/ogg;codecs=opus",
+];
 
 const participantsPanel = { min: 200, max: 360, initial: 260 };
 const aboutPanel = { min: 230, max: 400, initial: 280 };
@@ -94,6 +105,23 @@ const panelResizeStep = 16;
 
 const clampWidth = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
+
+const recordingExtension = (mimeType: string): string => {
+  if (mimeType.includes("mp4")) {
+    return "m4a";
+  }
+
+  if (mimeType.includes("ogg")) {
+    return "ogg";
+  }
+
+  return "webm";
+};
+
+const recordingDurationLabel = (seconds: number): string => {
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
+};
 
 const profilePictureShades = [
   "#202020",
@@ -1285,7 +1313,23 @@ function ChatMessage({
   const hasTranslation = displayText !== originalText;
   const content = showOriginal && hasTranslation ? originalText : displayText;
   const isReply = payloadReply(event) !== null;
-  const body = renderMessageBody(content, mentionLabels, localActorId);
+  const emojiGraphemes = emojiOnlyGraphemes(content);
+  const body =
+    emojiGraphemes === null
+      ? renderMessageBody(content, mentionLabels, localActorId)
+      : emojiGraphemes.map((emoji, index) => (
+          <span
+            key={`${emoji}-${emojiGraphemes.slice(0, index).join("")}`}
+            className="modbots-animated-emoji inline-block"
+            style={{ "--modbots-emoji-index": index } as CSSProperties}
+          >
+            {emoji}
+          </span>
+        ));
+  const bodyClassName =
+    emojiGraphemes === null
+      ? "max-w-[76ch] whitespace-pre-wrap break-words text-[13px] leading-[22px] text-zinc-200"
+      : "flex min-h-12 items-center gap-1 text-[36px] leading-none";
 
   if (grouped) {
     return (
@@ -1299,11 +1343,7 @@ function ChatMessage({
           </time>
         </div>
         <div className="min-w-0 flex-1 pr-20">
-          {content.length > 0 ? (
-            <p className="max-w-[76ch] whitespace-pre-wrap break-words text-[13px] leading-[22px] text-zinc-200">
-              {body}
-            </p>
-          ) : null}
+          {content.length > 0 ? <p className={bodyClassName}>{body}</p> : null}
           {hasTranslation ? (
             <button
               type="button"
@@ -1377,9 +1417,7 @@ function ChatMessage({
           </div>
         ) : null}
         {content.length > 0 ? (
-          <p className="mt-1.5 max-w-[76ch] whitespace-pre-wrap break-words text-[13px] leading-[22px] text-zinc-200">
-            {body}
-          </p>
+          <p className={`mt-1.5 ${bodyClassName}`}>{body}</p>
         ) : null}
         {hasTranslation ? (
           <button
@@ -1734,6 +1772,13 @@ export function Chatroom() {
   });
   const [attachment, setAttachment] = useState<File | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
+  const [composerMenu, setComposerMenu] = useState<
+    "attachment" | "emoji" | null
+  >(null);
+  const [voiceRecordingStatus, setVoiceRecordingStatus] = useState<
+    "idle" | "requesting" | "recording"
+  >("idle");
+  const [voiceRecordingSeconds, setVoiceRecordingSeconds] = useState(0);
   const [mutedNotice, setMutedNotice] = useState<string | null>(null);
   const [membersOpen, setMembersOpen] = useState(true);
   const [aboutPanelOpen, setAboutPanelOpen] = useState(true);
@@ -1813,6 +1858,10 @@ export function Chatroom() {
   const draftUndoRef = useRef<string[]>([]);
   const draftRedoRef = useRef<string[]>([]);
   const attachmentInput = useRef<HTMLInputElement>(null);
+  const voiceRecorder = useRef<MediaRecorder | null>(null);
+  const voiceStream = useRef<MediaStream | null>(null);
+  const voiceChunks = useRef<Blob[]>([]);
+  const voiceRecordingStartedAt = useRef<number | null>(null);
   const profilePictureInput = useRef<HTMLInputElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
   const pendingTranslations = useRef(new Set<string>());
@@ -1835,6 +1884,44 @@ export function Chatroom() {
     setDraft(value);
     updateDraftHistoryAvailability();
   };
+
+  useEffect(() => {
+    if (voiceRecordingStatus !== "recording") {
+      setVoiceRecordingSeconds(0);
+      return;
+    }
+
+    const updateDuration = () => {
+      const startedAt = voiceRecordingStartedAt.current;
+      setVoiceRecordingSeconds(
+        startedAt === null ? 0 : Math.floor((Date.now() - startedAt) / 1000),
+      );
+    };
+    updateDuration();
+    const timer = window.setInterval(updateDuration, 1_000);
+    return () => window.clearInterval(timer);
+  }, [voiceRecordingStatus]);
+
+  useEffect(
+    () => () => {
+      const recorder = voiceRecorder.current;
+
+      if (recorder !== null) {
+        recorder.ondataavailable = null;
+        recorder.onstop = null;
+        recorder.onerror = null;
+
+        if (recorder.state !== "inactive") {
+          recorder.stop();
+        }
+      }
+
+      voiceStream.current?.getTracks().forEach((track) => {
+        track.stop();
+      });
+    },
+    [],
+  );
 
   const expectedNotificationScope =
     localActor === undefined ? null : `${roomId}:${localActor.id}`;
@@ -2842,6 +2929,124 @@ export function Chatroom() {
       attachmentInput.current.click();
     }
   };
+  const insertEmoji = (emoji: string) => {
+    const composer = composerRef.current;
+    const start = composer?.selectionStart ?? draftValueRef.current.length;
+    const end = composer?.selectionEnd ?? start;
+    const next = `${draftValueRef.current.slice(0, start)}${emoji}${draftValueRef.current.slice(end)}`;
+
+    if (next.length > 4_000) {
+      return;
+    }
+
+    applyDraft(next);
+    setMention(null);
+    requestAnimationFrame(() => {
+      composer?.focus();
+      const caret = start + emoji.length;
+      composer?.setSelectionRange(caret, caret);
+    });
+  };
+  const releaseVoiceStream = () => {
+    voiceStream.current?.getTracks().forEach((track) => {
+      track.stop();
+    });
+    voiceStream.current = null;
+  };
+  const stopVoiceRecording = () => {
+    const recorder = voiceRecorder.current;
+
+    if (recorder !== null && recorder.state !== "inactive") {
+      recorder.stop();
+    }
+  };
+  const startVoiceRecording = async () => {
+    setComposerMenu(null);
+    setAttachmentError(null);
+
+    if (
+      navigator.mediaDevices?.getUserMedia === undefined ||
+      typeof MediaRecorder === "undefined"
+    ) {
+      setAttachmentError("Voice recording is not supported in this browser.");
+      return;
+    }
+
+    setVoiceRecordingStatus("requesting");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      });
+      const mimeType = preferredVoiceMimeTypes.find((candidate) =>
+        MediaRecorder.isTypeSupported(candidate),
+      );
+      const recorder = new MediaRecorder(stream, {
+        audioBitsPerSecond: 64_000,
+        ...(mimeType === undefined ? {} : { mimeType }),
+      });
+
+      voiceStream.current = stream;
+      voiceRecorder.current = recorder;
+      voiceChunks.current = [];
+      let recordingFailed = false;
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          voiceChunks.current.push(event.data);
+        }
+      };
+      recorder.onerror = () => {
+        recordingFailed = true;
+        releaseVoiceStream();
+        voiceRecorder.current = null;
+        voiceRecordingStartedAt.current = null;
+        setVoiceRecordingStatus("idle");
+        setVoiceRecordingSeconds(0);
+        setAttachmentError("The voice recording could not be created.");
+      };
+      recorder.onstop = () => {
+        const recordedType = recorder.mimeType || mimeType || "audio/webm";
+        const blob = new Blob(voiceChunks.current, { type: recordedType });
+        releaseVoiceStream();
+        voiceRecorder.current = null;
+        voiceChunks.current = [];
+        voiceRecordingStartedAt.current = null;
+        setVoiceRecordingStatus("idle");
+        setVoiceRecordingSeconds(0);
+
+        if (recordingFailed) {
+          return;
+        }
+
+        if (blob.size === 0) {
+          setAttachmentError("The voice recording could not be created.");
+          return;
+        }
+
+        const filename = `voice-message-${new Date()
+          .toISOString()
+          .replace(/[:.]/g, "-")}.${recordingExtension(recordedType)}`;
+        setAttachment(new File([blob], filename, { type: recordedType }));
+        setAttachmentError(null);
+      };
+      recorder.start(250);
+      voiceRecordingStartedAt.current = Date.now();
+      setVoiceRecordingStatus("recording");
+    } catch {
+      releaseVoiceStream();
+      voiceRecorder.current = null;
+      voiceRecordingStartedAt.current = null;
+      setVoiceRecordingStatus("idle");
+      setVoiceRecordingSeconds(0);
+      setAttachmentError(
+        "Microphone access is needed to record a voice message.",
+      );
+    }
+  };
   const takeScreenshot = async () => {
     await new Promise<void>((resolve) => {
       requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
@@ -2955,6 +3160,7 @@ export function Chatroom() {
     localActor !== undefined &&
     apiConnected &&
     (draft.trim().length > 0 || attachment !== null) &&
+    voiceRecordingStatus === "idle" &&
     !sendMessage.isPending &&
     !sendContent.isPending &&
     !translatingSubmission;
@@ -3146,6 +3352,7 @@ export function Chatroom() {
         setAboutOpen(false);
         setSettingsOpen(false);
         setReplyTarget(null);
+        setComposerMenu(null);
         setUserMenuOpen(false);
         setMobilePanel(null);
         setMobileSearchOpen(false);
@@ -3159,6 +3366,12 @@ export function Chatroom() {
   // Signing out (or a stale identity being dropped) closes the door again.
   useEffect(() => {
     if (!hasIdentity) {
+      const recorder = voiceRecorder.current;
+
+      if (recorder !== null && recorder.state !== "inactive") {
+        recorder.stop();
+      }
+
       setEntered(false);
       presenceJoinedAs.current = null;
     }
@@ -3200,6 +3413,7 @@ export function Chatroom() {
 
     resetDraft("");
     setMention(null);
+    setComposerMenu(null);
     setMutedNotice(null);
     setTranslationError(null);
     const replyContentItemId =
@@ -3944,60 +4158,87 @@ export function Chatroom() {
                         />
                         <div className="flex items-center justify-between px-2 pb-2">
                           <div className="flex items-center gap-0.5">
-                            <button
-                              type="button"
+                            <ComposerAttachmentMenu
                               disabled={
-                                !apiConnected || localActor === undefined
+                                !apiConnected ||
+                                localActor === undefined ||
+                                voiceRecordingStatus !== "idle"
                               }
-                              onClick={() => openAttachmentPicker("")}
-                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-default"
-                              aria-label={t("Add files or media")}
-                              title={t("Add a file, image, audio, or video")}
-                            >
-                              <Paperclip className="h-[18px] w-[18px]" />
-                            </button>
-                            <button
-                              type="button"
-                              disabled={
-                                !apiConnected || localActor === undefined
+                              open={composerMenu === "attachment"}
+                              onOpenChange={(open) =>
+                                setComposerMenu(open ? "attachment" : null)
                               }
-                              onClick={() => openAttachmentPicker("image/*")}
-                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-default"
-                              aria-label={t("Add image")}
-                              title={t("Add an image")}
-                            >
-                              <Image className="h-[18px] w-[18px]" />
-                            </button>
-                            <button
-                              type="button"
-                              disabled={
-                                !apiConnected || localActor === undefined
-                              }
-                              onClick={() => openAttachmentPicker("audio/*")}
-                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-default"
-                              aria-label={t("Record voice message")}
-                              title={t("Add an audio recording")}
-                            >
-                              <Mic className="h-[18px] w-[18px]" />
-                            </button>
+                              onChoose={openAttachmentPicker}
+                            />
                             <span className="mx-1 h-5 w-px bg-white/10" />
-                            <button
-                              type="button"
-                              disabled
-                              className="rounded-lg p-2.5 text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200 disabled:cursor-default"
-                              aria-label={t("Add reaction")}
-                              title={t("Reactions are not connected yet")}
-                            >
-                              <SmilePlus className="h-[18px] w-[18px]" />
-                            </button>
+                            <ComposerEmojiPicker
+                              disabled={
+                                !apiConnected || localActor === undefined
+                              }
+                              open={composerMenu === "emoji"}
+                              onOpenChange={(open) =>
+                                setComposerMenu(open ? "emoji" : null)
+                              }
+                              onSelect={insertEmoji}
+                            />
                           </div>
 
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <span className="hidden text-[11px] text-zinc-600 sm:block">
-                              {draft.length > 0
-                                ? `${draft.length}/4000`
-                                : t("Shift + Enter for a new line")}
+                              {voiceRecordingStatus === "recording"
+                                ? `${t("Recording")} ${recordingDurationLabel(
+                                    voiceRecordingSeconds,
+                                  )}`
+                                : draft.length > 0
+                                  ? `${draft.length}/4000`
+                                  : t("Shift + Enter for a new line")}
                             </span>
+                            <button
+                              type="button"
+                              disabled={
+                                !apiConnected ||
+                                localActor === undefined ||
+                                voiceRecordingStatus === "requesting" ||
+                                (attachment !== null &&
+                                  voiceRecordingStatus !== "recording")
+                              }
+                              aria-pressed={
+                                voiceRecordingStatus === "recording"
+                              }
+                              aria-label={
+                                voiceRecordingStatus === "recording"
+                                  ? t("Stop voice recording")
+                                  : t("Record voice message")
+                              }
+                              title={
+                                voiceRecordingStatus === "recording"
+                                  ? t("Stop voice recording")
+                                  : t("Record voice message")
+                              }
+                              onClick={() => {
+                                if (voiceRecordingStatus === "recording") {
+                                  stopVoiceRecording();
+                                } else {
+                                  void startVoiceRecording();
+                                }
+                              }}
+                              className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:cursor-default disabled:text-zinc-700 ${
+                                voiceRecordingStatus === "recording"
+                                  ? "bg-red-500/15 text-red-400 hover:bg-red-500/25"
+                                  : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
+                              }`}
+                            >
+                              {voiceRecordingStatus === "requesting" ? (
+                                <LoaderCircle className="h-[18px] w-[18px] animate-spin" />
+                              ) : voiceRecordingStatus === "recording" ? (
+                                <Square className="h-3.5 w-3.5 fill-current" />
+                              ) : (
+                                <Mic className="h-[18px] w-[18px]" />
+                              )}
+                              {voiceRecordingStatus === "recording" ? (
+                                <span className="absolute right-1 top-1 h-1.5 w-1.5 animate-pulse rounded-full bg-red-400" />
+                              ) : null}
+                            </button>
                             <button
                               type="submit"
                               disabled={!canSend}

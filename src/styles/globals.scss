@@ -273,4 +273,50 @@ textarea {
   font-family: inherit;
 }
 
+@keyframes modbots-emoji-arrive {
+  0% {
+    opacity: 0;
+    transform: translateY(0.4em) scale(0.35) rotate(-10deg);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-0.08em) scale(1.12) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes modbots-emoji-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  45% {
+    transform: translateY(-0.08em) rotate(-2deg);
+  }
+  70% {
+    transform: translateY(0.02em) rotate(2deg);
+  }
+}
+
+.modbots-animated-emoji {
+  transform-origin: 50% 70%;
+  animation:
+    modbots-emoji-arrive 420ms
+      calc(var(--modbots-emoji-index, 0) * 90ms)
+      cubic-bezier(0.2, 0.9, 0.25, 1.25) both,
+    modbots-emoji-float 2.6s
+      calc(520ms + var(--modbots-emoji-index, 0) * 140ms)
+      ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modbots-animated-emoji {
+    animation: none;
+  }
+}
+
 @include meta.load-css("overrides");

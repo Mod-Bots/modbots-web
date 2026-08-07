@@ -1,0 +1,328 @@
+export type EmojiCategoryId =
+  | "smileys"
+  | "gestures"
+  | "people"
+  | "animals"
+  | "food"
+  | "activities"
+  | "travel"
+  | "objects"
+  | "symbols";
+
+export interface EmojiEntry {
+  emoji: string;
+  keywords: string;
+  name: string;
+}
+
+export interface EmojiCategory {
+  icon: string;
+  id: EmojiCategoryId;
+  label: string;
+  emojis: EmojiEntry[];
+}
+
+const entries = (
+  values: Array<[emoji: string, name: string, keywords?: string]>,
+): EmojiEntry[] =>
+  values.map(([emoji, name, keywords = ""]) => ({ emoji, name, keywords }));
+
+export const emojiCategories: EmojiCategory[] = [
+  {
+    id: "smileys",
+    icon: "😀",
+    label: "Smileys",
+    emojis: entries([
+      ["😀", "Grinning face", "happy smile"],
+      ["😃", "Smiling face", "happy joy"],
+      ["😄", "Smiling eyes", "happy laugh"],
+      ["😁", "Beaming face", "grin"],
+      ["😆", "Squinting face", "laugh funny"],
+      ["😅", "Sweat smile", "relief nervous"],
+      ["😂", "Tears of joy", "laugh cry"],
+      ["🤣", "Rolling laughing", "rofl funny"],
+      ["😊", "Warm smile", "blush happy"],
+      ["🙂", "Slight smile", "friendly"],
+      ["🙃", "Upside-down face", "silly irony"],
+      ["😉", "Wink", "playful"],
+      ["😍", "Heart eyes", "love"],
+      ["🥰", "Smiling hearts", "love affection"],
+      ["😘", "Blowing a kiss", "love"],
+      ["😎", "Cool face", "sunglasses"],
+      ["🤩", "Star struck", "excited wow"],
+      ["🥳", "Party face", "celebrate birthday"],
+      ["😏", "Smirk", "confident"],
+      ["😌", "Relieved face", "calm"],
+      ["😔", "Pensive face", "sad thoughtful"],
+      ["😢", "Crying face", "sad tear"],
+      ["😭", "Loudly crying", "sad tears"],
+      ["😤", "Huffing face", "frustrated"],
+      ["😠", "Angry face", "mad"],
+      ["🤯", "Exploding head", "mind blown"],
+      ["😳", "Flushed face", "surprised"],
+      ["🥺", "Pleading face", "please"],
+      ["🤔", "Thinking face", "question"],
+      ["🫡", "Saluting face", "respect"],
+      ["🤗", "Hugging face", "hug"],
+      ["🫠", "Melting face", "awkward heat"],
+    ]),
+  },
+  {
+    id: "gestures",
+    icon: "👋",
+    label: "Gestures",
+    emojis: entries([
+      ["👋", "Waving hand", "hello goodbye"],
+      ["🤚", "Raised back of hand", "stop"],
+      ["🖐️", "Hand with fingers spread", "five"],
+      ["✋", "Raised hand", "stop high five"],
+      ["🫱", "Rightwards hand", "reach"],
+      ["🫲", "Leftwards hand", "reach"],
+      ["👌", "OK hand", "okay good"],
+      ["🤌", "Pinched fingers", "what gesture"],
+      ["🤏", "Pinching hand", "small"],
+      ["✌️", "Victory hand", "peace"],
+      ["🤞", "Crossed fingers", "luck hope"],
+      ["🫶", "Heart hands", "love support"],
+      ["🤟", "Love-you gesture", "love"],
+      ["🤘", "Rock on", "music"],
+      ["👍", "Thumbs up", "yes approve"],
+      ["👎", "Thumbs down", "no disapprove"],
+      ["👏", "Clapping hands", "applause"],
+      ["🙌", "Raising hands", "celebrate"],
+      ["👐", "Open hands", "welcome"],
+      ["🤝", "Handshake", "agreement"],
+      ["🙏", "Folded hands", "thanks please"],
+      ["💪", "Flexed biceps", "strong"],
+      ["🫵", "Pointing at viewer", "you"],
+      ["☝️", "Index pointing up", "one"],
+    ]),
+  },
+  {
+    id: "people",
+    icon: "🧑",
+    label: "People",
+    emojis: entries([
+      ["👶", "Baby", "child"],
+      ["🧒", "Child", "young"],
+      ["🧑", "Person", "adult"],
+      ["👩", "Woman", "person"],
+      ["👨", "Man", "person"],
+      ["🧓", "Older person", "elder"],
+      ["👩‍💻", "Woman technologist", "coder developer"],
+      ["👨‍💻", "Man technologist", "coder developer"],
+      ["🧑‍🔬", "Scientist", "research"],
+      ["🧑‍🎨", "Artist", "creative"],
+      ["🧑‍🍳", "Cook", "chef"],
+      ["🧑‍🚀", "Astronaut", "space"],
+      ["🧑‍🏫", "Teacher", "education"],
+      ["🧑‍⚕️", "Health worker", "doctor nurse"],
+      ["🧑‍🚒", "Firefighter", "rescue"],
+      ["🕵️", "Detective", "investigate"],
+      ["💂", "Guard", "watch"],
+      ["🥷", "Ninja", "stealth"],
+      ["🦸", "Superhero", "hero"],
+      ["🧙", "Mage", "magic"],
+    ]),
+  },
+  {
+    id: "animals",
+    icon: "🐾",
+    label: "Animals",
+    emojis: entries([
+      ["🐶", "Dog face", "pet puppy"],
+      ["🐱", "Cat face", "pet kitten"],
+      ["🐭", "Mouse face", "animal"],
+      ["🐹", "Hamster", "pet"],
+      ["🐰", "Rabbit face", "bunny"],
+      ["🦊", "Fox", "animal"],
+      ["🐻", "Bear", "animal"],
+      ["🐼", "Panda", "animal"],
+      ["🐨", "Koala", "animal"],
+      ["🐯", "Tiger face", "animal"],
+      ["🦁", "Lion", "animal"],
+      ["🐸", "Frog", "animal"],
+      ["🐵", "Monkey face", "animal"],
+      ["🙈", "See-no-evil monkey", "shy"],
+      ["🙉", "Hear-no-evil monkey", "listen"],
+      ["🙊", "Speak-no-evil monkey", "secret"],
+      ["🐧", "Penguin", "bird"],
+      ["🐦", "Bird", "animal"],
+      ["🦉", "Owl", "wise"],
+      ["🦋", "Butterfly", "nature"],
+      ["🐝", "Bee", "insect"],
+      ["🐢", "Turtle", "slow"],
+      ["🐙", "Octopus", "ocean"],
+      ["🐬", "Dolphin", "ocean"],
+    ]),
+  },
+  {
+    id: "food",
+    icon: "🍜",
+    label: "Food",
+    emojis: entries([
+      ["🍎", "Red apple", "fruit"],
+      ["🍊", "Tangerine", "fruit orange"],
+      ["🍋", "Lemon", "fruit"],
+      ["🍉", "Watermelon", "fruit"],
+      ["🍇", "Grapes", "fruit"],
+      ["🍓", "Strawberry", "fruit"],
+      ["🍒", "Cherries", "fruit"],
+      ["🥑", "Avocado", "food"],
+      ["🍕", "Pizza", "food"],
+      ["🍔", "Hamburger", "food"],
+      ["🍟", "French fries", "food"],
+      ["🌮", "Taco", "food"],
+      ["🍜", "Steaming bowl", "noodles soup"],
+      ["🍣", "Sushi", "food"],
+      ["🍛", "Curry rice", "food"],
+      ["🍰", "Shortcake", "dessert"],
+      ["🧁", "Cupcake", "dessert"],
+      ["🍪", "Cookie", "dessert"],
+      ["🍫", "Chocolate bar", "dessert"],
+      ["☕", "Hot beverage", "coffee tea"],
+      ["🧋", "Bubble tea", "drink"],
+      ["🥤", "Cup with straw", "drink"],
+      ["🍻", "Clinking beer mugs", "cheers"],
+      ["🥂", "Clinking glasses", "celebrate"],
+    ]),
+  },
+  {
+    id: "activities",
+    icon: "🎉",
+    label: "Activities",
+    emojis: entries([
+      ["⚽", "Soccer ball", "football sport"],
+      ["🏀", "Basketball", "sport"],
+      ["🏈", "American football", "sport"],
+      ["⚾", "Baseball", "sport"],
+      ["🎾", "Tennis", "sport"],
+      ["🏐", "Volleyball", "sport"],
+      ["🎱", "Pool ball", "billiards"],
+      ["🏓", "Table tennis", "ping pong"],
+      ["🏆", "Trophy", "winner"],
+      ["🎮", "Video game", "controller gaming"],
+      ["🎲", "Game die", "games"],
+      ["🧩", "Puzzle piece", "game"],
+      ["🎨", "Artist palette", "art"],
+      ["🎭", "Performing arts", "theatre"],
+      ["🎤", "Microphone", "sing music"],
+      ["🎧", "Headphones", "music"],
+      ["🎸", "Guitar", "music"],
+      ["🎹", "Musical keyboard", "music"],
+      ["🎉", "Party popper", "celebrate"],
+      ["🎊", "Confetti ball", "celebrate"],
+    ]),
+  },
+  {
+    id: "travel",
+    icon: "🌍",
+    label: "Travel",
+    emojis: entries([
+      ["🚗", "Car", "vehicle travel"],
+      ["🚕", "Taxi", "vehicle"],
+      ["🚌", "Bus", "vehicle"],
+      ["🚑", "Ambulance", "vehicle"],
+      ["🚒", "Fire engine", "vehicle"],
+      ["🚲", "Bicycle", "bike"],
+      ["✈️", "Airplane", "flight travel"],
+      ["🚀", "Rocket", "space"],
+      ["🚁", "Helicopter", "flight"],
+      ["🚆", "Train", "travel"],
+      ["🚢", "Ship", "boat travel"],
+      ["🏠", "House", "home"],
+      ["🏙️", "Cityscape", "city"],
+      ["🏖️", "Beach", "holiday"],
+      ["🏔️", "Snowy mountain", "nature"],
+      ["🌋", "Volcano", "nature"],
+      ["🌍", "Globe Europe Africa", "world earth"],
+      ["🌎", "Globe Americas", "world earth"],
+      ["🌙", "Crescent moon", "night"],
+      ["⭐", "Star", "night"],
+      ["🌈", "Rainbow", "weather"],
+      ["☀️", "Sun", "weather"],
+      ["⛈️", "Thunder cloud", "weather storm"],
+      ["❄️", "Snowflake", "weather winter"],
+    ]),
+  },
+  {
+    id: "objects",
+    icon: "💡",
+    label: "Objects",
+    emojis: entries([
+      ["⌚", "Watch", "time"],
+      ["📱", "Mobile phone", "technology"],
+      ["💻", "Laptop", "computer technology"],
+      ["⌨️", "Keyboard", "computer"],
+      ["🖥️", "Desktop computer", "technology"],
+      ["📷", "Camera", "photo"],
+      ["🎥", "Movie camera", "video"],
+      ["📺", "Television", "screen"],
+      ["📻", "Radio", "audio"],
+      ["💡", "Light bulb", "idea"],
+      ["🔦", "Flashlight", "light"],
+      ["📚", "Books", "read study"],
+      ["📖", "Open book", "read"],
+      ["📝", "Memo", "write note"],
+      ["📌", "Pushpin", "pin"],
+      ["📎", "Paperclip", "attachment"],
+      ["🔒", "Locked", "security"],
+      ["🔑", "Key", "security"],
+      ["🔧", "Wrench", "tool"],
+      ["🔬", "Microscope", "science"],
+      ["🔭", "Telescope", "space"],
+      ["🧠", "Brain", "thinking intelligence"],
+      ["🧪", "Test tube", "science"],
+      ["🧭", "Compass", "direction"],
+    ]),
+  },
+  {
+    id: "symbols",
+    icon: "❤️",
+    label: "Symbols",
+    emojis: entries([
+      ["❤️", "Red heart", "love"],
+      ["🧡", "Orange heart", "love"],
+      ["💛", "Yellow heart", "love"],
+      ["💚", "Green heart", "love"],
+      ["💙", "Blue heart", "love"],
+      ["💜", "Purple heart", "love"],
+      ["🖤", "Black heart", "love"],
+      ["🤍", "White heart", "love"],
+      ["💔", "Broken heart", "sad love"],
+      ["💕", "Two hearts", "love"],
+      ["💯", "Hundred points", "perfect"],
+      ["💥", "Collision", "boom"],
+      ["💫", "Dizzy", "star"],
+      ["💦", "Sweat droplets", "water"],
+      ["🔥", "Fire", "hot excellent"],
+      ["✨", "Sparkles", "shine"],
+      ["✅", "Check mark", "yes done"],
+      ["❌", "Cross mark", "no"],
+      ["❗", "Exclamation mark", "important"],
+      ["❓", "Question mark", "question"],
+      ["⚠️", "Warning", "alert"],
+      ["♻️", "Recycling", "environment"],
+      ["🎵", "Musical note", "music"],
+      ["💬", "Speech balloon", "chat"],
+    ]),
+  },
+];
+
+const emojiResiduePattern =
+  /(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji_Modifier}|\p{Regional_Indicator}|\u200d|\ufe0f|\u20e3|\s)/gu;
+
+export const emojiOnlyGraphemes = (content: string): string[] | null => {
+  const trimmed = content.trim();
+
+  if (trimmed.length === 0 || trimmed.replace(emojiResiduePattern, "") !== "") {
+    return null;
+  }
+
+  const graphemes = Array.from(
+    new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(trimmed),
+    ({ segment }) => segment,
+  ).filter((segment) => segment.trim().length > 0);
+
+  return graphemes.length >= 1 && graphemes.length <= 3 ? graphemes : null;
+};
