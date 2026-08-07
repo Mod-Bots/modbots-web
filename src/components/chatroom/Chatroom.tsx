@@ -27,12 +27,14 @@ import {
   MicOff,
   MoreHorizontal,
   Paperclip,
+  Pencil,
   Reply,
   Search,
   Send,
   Shield,
   SmilePlus,
   Square,
+  Trash2,
   TriangleAlert,
   Users,
   X,
@@ -49,11 +51,13 @@ import type {
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import appLogo from "@/assets/logo.svg";
 import startScreenBg from "@/assets/start-screen-bg.png";
+import { projectContentLifecycle } from "@/data/content-lifecycle";
 import type {
   Actor,
   ActorType,
   ChatLanguage,
   ContentAddress,
+  ContentPartInput,
   RoomEvent,
 } from "@/data/contracts";
 import { accountBaseUrl, consumeEnterAfterLogin } from "@/data/oauth";
@@ -166,6 +170,7 @@ interface EventAssetPart {
   kind: "image" | "audio" | "video" | "file";
   mediaAssetId: string;
   caption: string | null;
+  altText: string | null;
 }
 
 type EventContentPart =
@@ -173,6 +178,7 @@ type EventContentPart =
       partId: string;
       kind: "text";
       text: string;
+      language: string | null;
       sourceText: string | null;
       sourceLanguage: string | null;
     }
@@ -203,6 +209,7 @@ const contentParts = (event: RoomEvent): EventContentPart[] => {
         partId: part.partId,
         kind: "text",
         text: part.text,
+        language: typeof part.language === "string" ? part.language : null,
         sourceText:
           typeof part.sourceText === "string" ? part.sourceText : null,
         sourceLanguage:
@@ -223,11 +230,62 @@ const contentParts = (event: RoomEvent): EventContentPart[] => {
         kind: part.kind,
         mediaAssetId: part.mediaAssetId,
         caption: typeof part.caption === "string" ? part.caption : null,
+        altText: typeof part.altText === "string" ? part.altText : null,
       });
     }
   }
 
   return parts;
+};
+
+const contentPartInputs = (event: RoomEvent): ContentPartInput[] => {
+  const parsed = contentParts(event);
+
+  if (parsed.length === 0) {
+    const text = payloadString(event, "content");
+    const sourceText = payloadString(event, "sourceText");
+    const sourceLanguage = payloadString(event, "sourceLanguage");
+
+    return text === null
+      ? []
+      : [
+          {
+            kind: "text",
+            text,
+            language: "en",
+            ...(sourceText === null || sourceLanguage === null
+              ? {}
+              : { sourceText, sourceLanguage }),
+          },
+        ];
+  }
+
+  return parsed.map((part) => {
+    if (part.kind === "text") {
+      return {
+        partId: part.partId,
+        kind: part.kind,
+        text: part.text,
+        ...(part.language === null ? {} : { language: part.language }),
+        ...(part.sourceText === null || part.sourceLanguage === null
+          ? {}
+          : {
+              sourceText: part.sourceText,
+              sourceLanguage: part.sourceLanguage,
+            }),
+      };
+    }
+
+    return {
+      partId: part.partId,
+      kind: part.kind,
+      mediaAssetId: part.mediaAssetId,
+      ...(part.caption === null ? {} : { caption: part.caption }),
+      ...(part.kind !== "image" || part.altText === null
+        ? {}
+        : { altText: part.altText }),
+    };
+  });
 };
 
 const eventText = (event: RoomEvent): string => {
@@ -1147,11 +1205,67 @@ function StatusBar({
   );
 }
 
-function MessageActions({ onReply }: { onReply?: () => void }) {
+interface AttachmentMessageAction {
+  partId: string;
+  label: string;
+}
+
+function MessageActions({
+  attachments,
+  onDeleteAttachment,
+  onDeleteMessage,
+  onEdit,
+  onReply,
+}: {
+  attachments: AttachmentMessageAction[];
+  onDeleteAttachment?: (partId: string) => Promise<void>;
+  onDeleteMessage?: () => Promise<void>;
+  onEdit?: () => void;
+  onReply?: () => void;
+}) {
   const { t } = useUiLanguage();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmation, setConfirmation] = useState<
+    { kind: "message" } | { kind: "attachment"; partId: string } | null
+  >(null);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const hasOwnerActions =
+    onEdit !== undefined ||
+    onDeleteMessage !== undefined ||
+    (onDeleteAttachment !== undefined && attachments.length > 0);
+  const confirmDelete = async () => {
+    if (confirmation === null) {
+      return;
+    }
+
+    setPending(true);
+    setError(null);
+
+    try {
+      if (confirmation.kind === "message") {
+        await onDeleteMessage?.();
+      } else {
+        await onDeleteAttachment?.(confirmation.partId);
+      }
+
+      setConfirmation(null);
+      setMenuOpen(false);
+    } catch {
+      setError(t("The item could not be deleted."));
+    } finally {
+      setPending(false);
+    }
+  };
 
   return (
-    <div className="modbots-print-hidden absolute right-4 top-0 flex items-center rounded-window border border-white/10 bg-modbots-popover p-0.5 opacity-80 shadow-xl lg:right-6 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100">
+    <div
+      className={`modbots-print-hidden absolute right-4 top-0 z-20 flex items-center rounded-window border border-white/10 bg-modbots-popover p-0.5 shadow-xl lg:right-6 ${
+        menuOpen
+          ? "pointer-events-auto opacity-100"
+          : "opacity-80 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100"
+      }`}
+    >
       <button
         type="button"
         onClick={onReply}
@@ -1170,14 +1284,117 @@ function MessageActions({ onReply }: { onReply?: () => void }) {
       >
         <SmilePlus className="h-3.5 w-3.5" />
       </button>
-      <button
-        type="button"
-        className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white"
-        aria-label={t("More message actions")}
-        title={t("More actions")}
-      >
-        <MoreHorizontal className="h-3.5 w-3.5" />
-      </button>
+      {hasOwnerActions ? (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen((open) => !open);
+              setConfirmation(null);
+              setError(null);
+            }}
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+            className="rounded-lg p-2 text-zinc-500 hover:bg-white/[0.07] hover:text-white"
+            aria-label={t("More message actions")}
+            title={t("More actions")}
+          >
+            <MoreHorizontal className="h-3.5 w-3.5" />
+          </button>
+          {menuOpen ? (
+            <div
+              role="menu"
+              className="absolute right-0 top-full mt-1 w-56 rounded-xl border border-white/10 bg-modbots-popover p-1.5 shadow-2xl"
+            >
+              {confirmation === null ? (
+                <>
+                  {onEdit !== undefined ? (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        onEdit();
+                        setMenuOpen(false);
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-zinc-200 hover:bg-white/[0.07]"
+                    >
+                      <Pencil className="h-3.5 w-3.5 text-zinc-500" />
+                      {t("Edit message")}
+                    </button>
+                  ) : null}
+                  {onDeleteMessage !== undefined ? (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => setConfirmation({ kind: "message" })}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-red-300 hover:bg-red-500/10"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      {t("Delete message")}
+                    </button>
+                  ) : null}
+                  {onDeleteAttachment === undefined
+                    ? null
+                    : attachments.map((attachment) => (
+                        <button
+                          key={attachment.partId}
+                          type="button"
+                          role="menuitem"
+                          title={attachment.label}
+                          onClick={() =>
+                            setConfirmation({
+                              kind: "attachment",
+                              partId: attachment.partId,
+                            })
+                          }
+                          className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-red-300 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">
+                            {attachments.length === 1
+                              ? t("Delete attachment")
+                              : attachment.label}
+                          </span>
+                        </button>
+                      ))}
+                </>
+              ) : (
+                <div className="p-1.5">
+                  <p className="text-xs font-medium text-zinc-100">
+                    {confirmation.kind === "message"
+                      ? t("Delete this message?")
+                      : t("Delete this attachment?")}
+                  </p>
+                  <p className="mt-1 text-[11px] leading-4 text-zinc-500">
+                    {t("It will be removed from the chatroom.")}
+                  </p>
+                  {error === null ? null : (
+                    <p className="mt-2 text-[11px] text-red-300">{error}</p>
+                  )}
+                  <div className="mt-3 flex justify-end gap-1.5">
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => setConfirmation(null)}
+                      className="rounded-lg px-2.5 py-1.5 text-[11px] text-zinc-400 hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
+                    >
+                      {t("Cancel")}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => void confirmDelete()}
+                      className="rounded-lg bg-red-500/15 px-2.5 py-1.5 text-[11px] font-medium text-red-200 hover:bg-red-500/25 disabled:opacity-50"
+                    >
+                      {pending ? t("Deleting...") : t("Delete")}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </>
+      ) : null}
     </div>
   );
 }
@@ -1313,6 +1530,9 @@ function ChatMessage({
   displayText,
   originalText,
   repliedDisplayText,
+  onDeleteAttachment,
+  onDeleteMessage,
+  onEditMessage,
   onReply,
 }: {
   actors: Map<string, Actor>;
@@ -1324,6 +1544,9 @@ function ChatMessage({
   displayText: string;
   originalText: string;
   repliedDisplayText: string | null;
+  onDeleteAttachment: (event: RoomEvent, partId: string) => Promise<void>;
+  onDeleteMessage: (event: RoomEvent) => Promise<void>;
+  onEditMessage: (event: RoomEvent, text: string) => Promise<void>;
   onReply?: () => void;
 }) {
   const { t } = useUiLanguage();
@@ -1331,6 +1554,11 @@ function ChatMessage({
   const ownMessage = event.actorId === localActorId;
   const name = actorLabel(event.actorId, actors);
   const [showOriginal, setShowOriginal] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editDraft, setEditDraft] = useState("");
+  const [editPending, setEditPending] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const editInput = useRef<HTMLTextAreaElement>(null);
   const hasTranslation = displayText !== originalText;
   const content = showOriginal && hasTranslation ? originalText : displayText;
   const isReply = payloadReply(event) !== null;
@@ -1351,6 +1579,121 @@ function ChatMessage({
     emojiGraphemes === null
       ? "max-w-[76ch] whitespace-pre-wrap break-words text-[13px] leading-[22px] text-zinc-200"
       : "flex min-h-12 items-center gap-1 text-[36px] leading-none";
+  const itemId = payloadString(event, "contentItemId");
+  const parts = contentPartInputs(event);
+  const hasText = parts.some((part) => part.kind === "text");
+  const attachments = contentParts(event)
+    .filter((part): part is EventAssetPart => part.kind !== "text")
+    .map((part) => ({
+      partId: part.partId,
+      label: part.caption ?? t(`${part.kind} attachment`),
+    }));
+  const canManage = ownMessage && itemId !== null;
+  const edited = payloadString(event, "editedAt") !== null;
+  useEffect(() => {
+    if (editing) {
+      requestAnimationFrame(() => editInput.current?.focus());
+    }
+  }, [editing]);
+  const startEditing = () => {
+    const source = eventSource(event);
+    setEditDraft(source?.text ?? eventText(event));
+    setEditError(null);
+    setEditing(true);
+  };
+  const saveEdit = async () => {
+    const nextText = editDraft.trim();
+
+    if (nextText.length === 0 || nextText.length > 4_000) {
+      setEditError(t("Messages must contain 1 to 4,000 characters."));
+      return;
+    }
+
+    setEditPending(true);
+    setEditError(null);
+
+    try {
+      await onEditMessage(event, nextText);
+      setEditing(false);
+    } catch {
+      setEditError(t("The message could not be edited."));
+    } finally {
+      setEditPending(false);
+    }
+  };
+  const messageBody = editing ? (
+    <div className="mt-1.5 max-w-[64ch] rounded-xl border border-white/10 bg-white/[0.035] p-2.5">
+      <textarea
+        ref={editInput}
+        value={editDraft}
+        maxLength={4_000}
+        onChange={(changeEvent) =>
+          setEditDraft(changeEvent.currentTarget.value)
+        }
+        onKeyDown={(keyEvent) => {
+          if (keyEvent.key === "Escape") {
+            setEditing(false);
+          }
+
+          if (keyEvent.key === "Enter" && !keyEvent.shiftKey) {
+            keyEvent.preventDefault();
+            void saveEdit();
+          }
+        }}
+        className="modbots-scroll min-h-20 w-full resize-y bg-transparent text-[13px] leading-[22px] text-zinc-100 outline-none placeholder:text-zinc-600"
+        aria-label={t("Edit message")}
+      />
+      {editError === null ? null : (
+        <p className="mt-1 text-[11px] text-red-300">{editError}</p>
+      )}
+      <div className="mt-2 flex justify-end gap-2">
+        <button
+          type="button"
+          disabled={editPending}
+          onClick={() => setEditing(false)}
+          className="rounded-lg px-3 py-1.5 text-[11px] text-zinc-400 hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
+        >
+          {t("Cancel")}
+        </button>
+        <button
+          type="button"
+          disabled={editPending || editDraft.trim().length === 0}
+          onClick={() => void saveEdit()}
+          className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-black hover:bg-zinc-200 disabled:opacity-50"
+        >
+          {editPending ? t("Saving...") : t("Save")}
+        </button>
+      </div>
+    </div>
+  ) : (
+    <>
+      {content.length > 0 ? <p className={bodyClassName}>{body}</p> : null}
+      {hasTranslation ? (
+        <button
+          type="button"
+          onClick={() => setShowOriginal((current) => !current)}
+          className="modbots-print-hidden mt-1 text-[11px] text-zinc-500 hover:text-zinc-300"
+        >
+          {showOriginal ? t("View translation") : t("View original")}
+        </button>
+      ) : null}
+    </>
+  );
+  const actions = (
+    <MessageActions
+      attachments={canManage ? attachments : []}
+      onEdit={canManage && hasText ? startEditing : undefined}
+      onDeleteMessage={
+        canManage && hasText ? () => onDeleteMessage(event) : undefined
+      }
+      onDeleteAttachment={
+        canManage && attachments.length > 0
+          ? (partId) => onDeleteAttachment(event, partId)
+          : undefined
+      }
+      onReply={onReply}
+    />
+  );
 
   if (grouped) {
     return (
@@ -1364,19 +1707,13 @@ function ChatMessage({
           </time>
         </div>
         <div className="min-w-0 flex-1 pr-20">
-          {content.length > 0 ? <p className={bodyClassName}>{body}</p> : null}
-          {hasTranslation ? (
-            <button
-              type="button"
-              onClick={() => setShowOriginal((current) => !current)}
-              className="modbots-print-hidden mt-1 text-[11px] text-zinc-500 hover:text-zinc-300"
-            >
-              {showOriginal ? t("View translation") : t("View original")}
-            </button>
+          {messageBody}
+          {edited ? (
+            <span className="text-[10px] text-zinc-600">{t("Edited")}</span>
           ) : null}
           <MessageMedia event={event} />
         </div>
-        <MessageActions onReply={onReply} />
+        {actions}
       </article>
     );
   }
@@ -1411,6 +1748,9 @@ function ChatMessage({
           <time className="text-[10px] tabular-nums text-zinc-500">
             {formatTime(event.occurredAt)}
           </time>
+          {edited ? (
+            <span className="text-[10px] text-zinc-600">{t("Edited")}</span>
+          ) : null}
         </div>
         {isReply ? (
           <div className="mt-2 flex min-w-0 max-w-[64ch] items-stretch overflow-hidden rounded-xl border border-white/[0.08] bg-modbots-panel-raised shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
@@ -1437,22 +1777,11 @@ function ChatMessage({
             </div>
           </div>
         ) : null}
-        {content.length > 0 ? (
-          <p className={`mt-1.5 ${bodyClassName}`}>{body}</p>
-        ) : null}
-        {hasTranslation ? (
-          <button
-            type="button"
-            onClick={() => setShowOriginal((current) => !current)}
-            className="modbots-print-hidden mt-1 text-[11px] text-zinc-500 hover:text-zinc-300"
-          >
-            {showOriginal ? t("View translation") : t("View original")}
-          </button>
-        ) : null}
+        <div className="mt-1.5">{messageBody}</div>
         <MessageMedia event={event} />
       </div>
 
-      <MessageActions onReply={onReply} />
+      {actions}
     </article>
   );
 }
@@ -1503,6 +1832,9 @@ const ConversationTimeline = memo(function ConversationTimeline({
   messagesByContentItem,
   chatLanguage,
   translatedEventText,
+  onDeleteAttachment,
+  onDeleteMessage,
+  onEditMessage,
   onReply,
   ruleTitles,
 }: {
@@ -1513,6 +1845,9 @@ const ConversationTimeline = memo(function ConversationTimeline({
   messagesByContentItem: Map<string, RoomEvent>;
   chatLanguage: ChatLanguage;
   translatedEventText: ReadonlyMap<string, string>;
+  onDeleteAttachment: (event: RoomEvent, partId: string) => Promise<void>;
+  onDeleteMessage: (event: RoomEvent) => Promise<void>;
+  onEditMessage: (event: RoomEvent, text: string) => Promise<void>;
   onReply: (event: RoomEvent) => void;
   ruleTitles: Map<string, string>;
 }) {
@@ -1563,6 +1898,9 @@ const ConversationTimeline = memo(function ConversationTimeline({
         displayText={displayText}
         originalText={originalText}
         repliedDisplayText={repliedDisplayText}
+        onDeleteAttachment={onDeleteAttachment}
+        onDeleteMessage={onDeleteMessage}
+        onEditMessage={onEditMessage}
         onReply={canReply ? () => onReply(item.event) : undefined}
       />
     );
@@ -1778,6 +2116,8 @@ export function Chatroom() {
     realtimeStatus,
     rules,
     refresh,
+    editContent,
+    removeContent,
     sendContent,
     sendMessage,
     signOut,
@@ -2280,10 +2620,14 @@ export function Chatroom() {
         "offline");
   const localParticipantStatusStyle =
     participantStatusStyles[localParticipantStatus];
+  const projectedEvents = useMemo(
+    () => projectContentLifecycle(events.data ?? []),
+    [events.data],
+  );
   const roomEvents = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase();
 
-    return (events.data ?? [])
+    return projectedEvents
       .filter(
         (event) =>
           event.type === "message_posted" ||
@@ -2304,7 +2648,7 @@ export function Chatroom() {
           displayed.length > 0 ? displayed : eventContent(event);
         return searchable.toLocaleLowerCase().includes(query);
       });
-  }, [chatLanguage, events.data, searchQuery, translatedEventText]);
+  }, [chatLanguage, projectedEvents, searchQuery, translatedEventText]);
   const hiddenEventCount = Math.max(0, roomEvents.length - visibleEventCount);
   const visibleRoomEvents = useMemo(
     () => roomEvents.slice(-visibleEventCount),
@@ -2322,7 +2666,7 @@ export function Chatroom() {
     const candidates: Array<{ sequence: string; text: string }> = [];
     let totalCharacters = 0;
 
-    for (const event of (events.data ?? []).slice(-visibleEventCount)) {
+    for (const event of projectedEvents.slice(-visibleEventCount)) {
       if (
         (event.type !== "message_posted" && event.type !== "content_posted") ||
         translatedEventText.has(event.sequence) ||
@@ -2393,7 +2737,7 @@ export function Chatroom() {
   }, [
     chatLanguage,
     localActor,
-    events.data,
+    projectedEvents,
     translate,
     translatedEventText,
     visibleEventCount,
@@ -2406,7 +2750,7 @@ export function Chatroom() {
   const messagesByContentItem = useMemo(() => {
     const map = new Map<string, RoomEvent>();
 
-    for (const event of events.data ?? []) {
+    for (const event of projectedEvents) {
       if (event.type !== "message_posted" && event.type !== "content_posted") {
         continue;
       }
@@ -2419,7 +2763,90 @@ export function Chatroom() {
     }
 
     return map;
-  }, [events.data]);
+  }, [projectedEvents]);
+  const editMessage = useCallback(
+    async (event: RoomEvent, nextText: string): Promise<void> => {
+      const contentItemId = payloadString(event, "contentItemId");
+      const parts = contentPartInputs(event);
+      const textIndex = parts.findIndex((part) => part.kind === "text");
+
+      if (contentItemId === null || textIndex < 0) {
+        throw new Error("This message cannot be edited.");
+      }
+
+      const current = parts[textIndex];
+
+      if (current === undefined || current.kind !== "text") {
+        throw new Error("This message cannot be edited.");
+      }
+
+      let replacement: ContentPartInput;
+
+      if (current.sourceLanguage === "zh-CN") {
+        const [translated] = await translate([nextText], "zh-CN", "en");
+
+        if (translated === undefined) {
+          throw new Error("Translation returned no message.");
+        }
+
+        replacement = {
+          ...current,
+          text: translated,
+          sourceText: nextText,
+          sourceLanguage: "zh-CN",
+        };
+      } else {
+        replacement = {
+          ...current,
+          text: nextText,
+          ...(current.sourceText === undefined ? {} : { sourceText: nextText }),
+        };
+      }
+
+      const nextParts = [...parts];
+      nextParts[textIndex] = replacement;
+      await editContent.mutateAsync({ contentItemId, parts: nextParts });
+      setTranslatedEventText((currentTranslations) => {
+        const next = new Map(currentTranslations);
+        next.delete(event.sequence);
+        return next;
+      });
+    },
+    [editContent, translate],
+  );
+  const deleteMessage = useCallback(
+    async (event: RoomEvent): Promise<void> => {
+      const contentItemId = payloadString(event, "contentItemId");
+
+      if (contentItemId === null) {
+        throw new Error("This message cannot be deleted.");
+      }
+
+      await removeContent.mutateAsync(contentItemId);
+    },
+    [removeContent],
+  );
+  const deleteAttachment = useCallback(
+    async (event: RoomEvent, partId: string): Promise<void> => {
+      const contentItemId = payloadString(event, "contentItemId");
+
+      if (contentItemId === null) {
+        throw new Error("This attachment cannot be deleted.");
+      }
+
+      const remainingParts = contentPartInputs(event).filter(
+        (part) => part.partId !== partId,
+      );
+
+      if (remainingParts.length === 0) {
+        await removeContent.mutateAsync(contentItemId);
+        return;
+      }
+
+      await editContent.mutateAsync({ contentItemId, parts: remainingParts });
+    },
+    [editContent, removeContent],
+  );
   // The dictionary the message renderer matches `@mentions` against.
   const mentionLabels = useMemo(() => buildMentionLabels(actors), [actors]);
   const ruleTitles = useMemo(
@@ -3947,6 +4374,9 @@ export function Chatroom() {
                             messagesByContentItem={messagesByContentItem}
                             chatLanguage={chatLanguage}
                             translatedEventText={translatedEventText}
+                            onDeleteAttachment={deleteAttachment}
+                            onDeleteMessage={deleteMessage}
+                            onEditMessage={editMessage}
                             onReply={selectReplyTarget}
                             ruleTitles={ruleTitles}
                           />

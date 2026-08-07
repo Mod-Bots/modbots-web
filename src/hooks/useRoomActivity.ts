@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   Actor,
   ContentAddress,
+  ContentPartInput,
   RealtimeStatus,
   RoomEvent,
   RoomRoster,
@@ -20,6 +21,7 @@ import {
 } from "../data/identity";
 import type { BrowserLoginOutcome } from "../data/oauth";
 import {
+  editRoomContent,
   getActor,
   getApiHealth,
   getRealtimeConfig,
@@ -34,6 +36,7 @@ import {
   postRoomMediaAsset,
   postRoomMessage,
   removeActorProfilePicture,
+  removeRoomContent,
   setRoomPresence,
   setSessionToken,
   translateTexts,
@@ -358,6 +361,44 @@ export const useRoomActivity = (roomId: string) => {
       void queryClient.invalidateQueries({ queryKey: rosterKey });
     },
   });
+  const editContent = useMutation({
+    mutationFn: async (request: {
+      contentItemId: string;
+      parts: ContentPartInput[];
+    }) => {
+      if (localActor === undefined) {
+        throw new Error("Join the room before editing content.");
+      }
+
+      return editRoomContent(
+        roomId,
+        localActor.id,
+        request.contentItemId,
+        request.parts,
+      );
+    },
+    onSuccess: ({ event }) => {
+      queryClient.setQueryData<RoomEvent[]>(eventsKey, (existing) =>
+        mergeEvents(existing, [event]),
+      );
+      void queryClient.invalidateQueries({ queryKey: overviewKey });
+    },
+  });
+  const removeContent = useMutation({
+    mutationFn: async (contentItemId: string) => {
+      if (localActor === undefined) {
+        throw new Error("Join the room before removing content.");
+      }
+
+      return removeRoomContent(roomId, localActor.id, contentItemId);
+    },
+    onSuccess: ({ event }) => {
+      queryClient.setQueryData<RoomEvent[]>(eventsKey, (existing) =>
+        mergeEvents(existing, [event]),
+      );
+      void queryClient.invalidateQueries({ queryKey: overviewKey });
+    },
+  });
   const translate = useCallback(
     async (
       texts: string[],
@@ -412,6 +453,8 @@ export const useRoomActivity = (roomId: string) => {
     join.reset();
     sendMessage.reset();
     sendContent.reset();
+    editContent.reset();
+    removeContent.reset();
     queryClient.removeQueries({ queryKey: ["desktop-session"] });
   };
 
@@ -624,6 +667,8 @@ export const useRoomActivity = (roomId: string) => {
     rules,
     realtimeStatus,
     refresh,
+    editContent,
+    removeContent,
     sendMessage,
     sendContent,
     signOut,

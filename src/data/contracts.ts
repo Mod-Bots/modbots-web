@@ -65,6 +65,7 @@ export interface MediaAsset {
 
 export type ContentPartInput =
   | {
+      partId?: string;
       kind: "text";
       text: string;
       language?: string;
@@ -72,6 +73,7 @@ export type ContentPartInput =
       sourceLanguage?: string;
     }
   | {
+      partId?: string;
       kind: MediaKind;
       mediaAssetId: string;
       caption?: string;

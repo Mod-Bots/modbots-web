@@ -329,6 +329,39 @@ export const postRoomContent = (
     }),
   });
 
+export const editRoomContent = (
+  roomId: string,
+  actorId: string,
+  contentItemId: string,
+  parts: ContentPartInput[],
+): Promise<{ contentItem: unknown; event: RoomEvent }> =>
+  requestJson(
+    apiUrl(
+      `/api/rooms/${encodeURIComponent(roomId)}/content/${encodeURIComponent(contentItemId)}`,
+    ),
+    {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ actorId, parts }),
+    },
+  );
+
+export const removeRoomContent = (
+  roomId: string,
+  actorId: string,
+  contentItemId: string,
+): Promise<{ contentItem: unknown; event: RoomEvent }> =>
+  requestJson(
+    apiUrl(
+      `/api/rooms/${encodeURIComponent(roomId)}/content/${encodeURIComponent(contentItemId)}/remove`,
+    ),
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ actorId }),
+    },
+  );
+
 export const getRoomEvents = async (roomId: string): Promise<RoomEvent[]> => {
   const page = await requestJson<{
     data: RoomEvent[];
