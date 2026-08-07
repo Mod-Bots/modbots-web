@@ -1,14 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import {
-  File,
-  FileAudio,
-  FileText,
-  Image,
-  Paperclip,
-  Video,
-} from "lucide-react";
+import { FileAudio, FileText, Image, Paperclip, Video } from "lucide-react";
 import { useUiLanguage } from "@/i18n/UiLanguageProvider";
 
 interface AttachmentCategory {
@@ -48,13 +41,6 @@ const categories: AttachmentCategory[] = [
     icon: FileText,
     id: "document",
     label: "Document",
-  },
-  {
-    accept: "",
-    description: "Choose another supported file",
-    icon: File,
-    id: "other",
-    label: "Other file",
   },
 ];
 
