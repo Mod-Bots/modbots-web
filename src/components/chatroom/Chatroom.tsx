@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ChevronDown,
   CircleAlert,
+  Clock3,
   CornerUpLeft,
   DoorOpen,
   FileAudio,
@@ -109,12 +110,7 @@ const preferredVoiceMimeTypes = [
   "audio/mp4",
   "audio/ogg;codecs=opus",
 ];
-const profileStatusPresets = [
-  "Available",
-  "Away",
-  "Busy",
-  "Do not disturb",
-] as const;
+const profileStatusPresets = ["Available", "Away"] as const;
 
 const participantsPanel = { min: 200, max: 360, initial: 260 };
 const aboutPanel = { min: 230, max: 400, initial: 280 };
@@ -2182,24 +2178,30 @@ function ProfileStatusControl({
     }
   };
 
+  const selectedStatusValue = customSelected
+    ? "custom"
+    : actor.statusMode === "preset"
+      ? (actor.statusText ?? "")
+      : actor.statusMode === "media"
+        ? "media"
+        : "";
+  const SelectedStatusIcon =
+    selectedStatusValue === "Available"
+      ? CheckCircle2
+      : selectedStatusValue === "Away"
+        ? Clock3
+        : selectedStatusValue === "media"
+          ? Film
+          : MessageSquare;
+
   return (
     <div>
       <div className="relative">
-        <MessageSquare className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+        <SelectedStatusIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
         <select
           aria-label={t("Status")}
           disabled={saving}
-          value={
-            customSelected
-              ? "custom"
-              : actor.statusMode === "preset"
-                ? (actor.statusText ?? "")
-                : actor.statusMode === "media"
-                  ? "media"
-                  : actor.statusMode === "game"
-                    ? "game"
-                    : ""
-          }
+          value={selectedStatusValue}
           onChange={(event) => {
             const value = event.currentTarget.value;
 
@@ -2222,21 +2224,16 @@ function ProfileStatusControl({
           }}
           className="h-10 w-full appearance-none rounded-xl border border-white/[0.08] bg-white/[0.025] pl-10 pr-9 text-[13px] text-zinc-200 outline-none transition-colors hover:border-white/[0.14] hover:bg-white/[0.05] focus:border-white/20 disabled:cursor-wait disabled:opacity-60"
         >
-          <option value="">{t("Set a status")}</option>
+          <option value="" disabled hidden>
+            {t("Set a status")}
+          </option>
           {profileStatusPresets.map((preset) => (
             <option key={preset} value={preset}>
               {t(preset)}
             </option>
           ))}
-          <option value="custom">
-            {actor.statusMode === "custom" && actor.statusText !== null
-              ? actor.statusText
-              : t("Custom...")}
-          </option>
+          <option value="custom">{t("Set status message")}</option>
           <option value="media">{t("Share the media I play")}</option>
-          {actor.statusMode === "game" && actor.statusText !== null ? (
-            <option value="game">{actor.statusText}</option>
-          ) : null}
         </select>
         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
       </div>
