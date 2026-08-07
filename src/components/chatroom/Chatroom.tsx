@@ -4156,7 +4156,7 @@ export function Chatroom() {
                           }
                           className="max-h-40 min-h-[58px] w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[14px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-default"
                         />
-                        <div className="flex items-center justify-between px-2 pb-2">
+                        <div className="relative flex items-center justify-between px-2 pb-2">
                           <div className="flex items-center gap-0.5">
                             <ComposerAttachmentMenu
                               disabled={
@@ -4183,16 +4183,18 @@ export function Chatroom() {
                             />
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            <span className="hidden text-[11px] text-zinc-600 sm:block">
+                          {voiceRecordingStatus === "recording" ||
+                          draft.length > 0 ? (
+                            <span className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 text-center text-[11px] text-zinc-600 sm:block">
                               {voiceRecordingStatus === "recording"
                                 ? `${t("Recording")} ${recordingDurationLabel(
                                     voiceRecordingSeconds,
                                   )}`
-                                : draft.length > 0
-                                  ? `${draft.length}/4000`
-                                  : t("Shift + Enter for a new line")}
+                                : `${draft.length}/4000`}
                             </span>
+                          ) : null}
+
+                          <div className="flex items-center gap-2">
                             <button
                               type="button"
                               disabled={
