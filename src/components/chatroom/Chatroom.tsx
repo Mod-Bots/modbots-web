@@ -1335,7 +1335,11 @@ function MessageActions({
           {menuOpen ? (
             <div
               role="menu"
-              className="absolute right-0 top-full mt-1 w-56 rounded-xl border border-white/10 bg-modbots-popover p-1.5 shadow-2xl"
+              className={`absolute right-0 top-full mt-1 rounded-xl border border-white/10 bg-modbots-popover shadow-2xl ${
+                confirmation === null
+                  ? "w-max min-w-44 max-w-56 p-1"
+                  : "w-56 p-1.5"
+              }`}
             >
               {confirmation === null ? (
                 <>
@@ -1347,7 +1351,7 @@ function MessageActions({
                         onEdit();
                         setMenuOpen(false);
                       }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-zinc-200 hover:bg-white/[0.07]"
+                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs text-zinc-200 hover:bg-white/[0.07]"
                     >
                       <Pencil className="h-3.5 w-3.5 text-zinc-500" />
                       {t("Edit message")}
@@ -1358,7 +1362,7 @@ function MessageActions({
                       type="button"
                       role="menuitem"
                       onClick={() => setConfirmation({ kind: "message" })}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-red-300 hover:bg-red-500/10"
+                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs text-red-300 hover:bg-red-500/10"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       {t("Delete message")}
@@ -1378,7 +1382,7 @@ function MessageActions({
                               partId: attachment.partId,
                             })
                           }
-                          className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-red-300 hover:bg-red-500/10"
+                          className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs text-red-300 hover:bg-red-500/10"
                         >
                           <Trash2 className="h-3.5 w-3.5 shrink-0" />
                           <span className="truncate">
