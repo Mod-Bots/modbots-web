@@ -2,6 +2,7 @@
 
 import html2canvas from "html2canvas-pro";
 import {
+  Activity,
   AtSign,
   Bell,
   Bot,
@@ -623,7 +624,7 @@ const participantStatusStyles: Record<
   },
   idle: {
     dot: "bg-amber-400",
-    label: "Idle",
+    label: "Away",
     text: "text-amber-300",
   },
   offline: {
@@ -2242,42 +2243,57 @@ function ProfileStatusControl({
 
   const selectedStatusValue = customSelected
     ? "custom"
-    : actor.statusMode === "preset" &&
-        (actor.statusText === "Available" || actor.statusText === "Away")
-      ? actor.statusText
-      : actor.statusMode === "media" && mediaStatusAvailable
-        ? "media"
-        : "";
+    : actor.statusMode === null
+      ? "auto"
+      : actor.statusMode === "preset" &&
+          (actor.statusText === "Available" || actor.statusText === "Away")
+        ? actor.statusText
+        : actor.statusMode === "media" && mediaStatusAvailable
+          ? "media"
+          : actor.statusMode === "game"
+            ? "game"
+            : "auto";
   const selectedStatusLabel =
     selectedStatusValue === "custom"
       ? actor.statusMode === "custom" && actor.statusText !== null
         ? actor.statusText
         : t("Set status message")
-      : selectedStatusValue === "media"
-        ? t("Share the media I play")
-        : selectedStatusValue === ""
-          ? t("Set a status")
-          : t(selectedStatusValue);
-  const SelectedStatusIcon =
-    selectedStatusValue === "Available"
-      ? CheckCircle2
-      : selectedStatusValue === "Away"
-        ? Clock3
+      : selectedStatusValue === "auto"
+        ? t("Auto")
         : selectedStatusValue === "media"
-          ? Film
-          : selectedStatusValue === "custom"
-            ? Pencil
-            : MessageSquare;
+          ? t("Share the media I play")
+          : selectedStatusValue === "game"
+            ? (actor.statusText ?? t("Auto"))
+            : t(selectedStatusValue);
+  const SelectedStatusIcon =
+    selectedStatusValue === "auto"
+      ? Activity
+      : selectedStatusValue === "Available"
+        ? CheckCircle2
+        : selectedStatusValue === "Away"
+          ? Clock3
+          : selectedStatusValue === "media"
+            ? Film
+            : selectedStatusValue === "game"
+              ? Gamepad2
+              : selectedStatusValue === "custom"
+                ? Pencil
+                : Activity;
   const selectedStatusTone =
     selectedStatusValue === "Available"
       ? "text-emerald-400"
       : selectedStatusValue === "Away"
         ? "text-amber-400"
-        : selectedStatusValue === "custom" || selectedStatusValue === "media"
+        : selectedStatusValue === "auto" ||
+            selectedStatusValue === "custom" ||
+            selectedStatusValue === "game" ||
+            selectedStatusValue === "media"
           ? "text-sky-400"
           : "text-zinc-400";
 
-  const chooseStatus = (value: "Available" | "Away" | "custom" | "media") => {
+  const chooseStatus = (
+    value: "auto" | "Available" | "Away" | "custom" | "media",
+  ) => {
     setStatusMenuOpen(false);
 
     if (value === "custom") {
@@ -2286,6 +2302,11 @@ function ProfileStatusControl({
     }
 
     setCustomSelected(false);
+    if (value === "auto") {
+      void saveStatus({ statusMode: null, statusText: null });
+      return;
+    }
+
     if (value === "media") {
       if (!mediaStatusAvailable) {
         return;
@@ -2298,6 +2319,12 @@ function ProfileStatusControl({
   };
 
   const statusOptions = [
+    {
+      value: "auto",
+      label: t("Auto"),
+      icon: Activity,
+      tone: "text-sky-400",
+    },
     {
       value: "Available",
       label: t("Available"),
