@@ -1545,7 +1545,7 @@ function MessageMedia({
               >
                 <NextImage
                   src={url}
-                  alt={part.caption ?? "Shared image"}
+                  alt={part.altText ?? part.caption ?? "Shared image"}
                   fill
                   sizes="(max-width: 480px) 100vw, 400px"
                   unoptimized
