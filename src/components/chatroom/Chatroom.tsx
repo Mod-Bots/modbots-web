@@ -3236,7 +3236,7 @@ export function Chatroom() {
     const onlineHumans = visibleOnlineActors.filter(
       (actor) => actor.type === "human",
     );
-    const botResidents = [...actors.values()]
+    const botResidents = visibleOnlineActors
       .filter(
         (actor) =>
           actor.retiredAt === null &&
@@ -3291,7 +3291,6 @@ export function Chatroom() {
       members: membersByType[type],
     }));
   }, [
-    actors,
     localActor?.id,
     localWindowActive,
     onlineActorIds,
