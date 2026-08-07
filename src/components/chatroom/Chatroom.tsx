@@ -2069,6 +2069,8 @@ function ParticipantRow({
 }) {
   const { t } = useUiLanguage();
   const currentStatus = participantStatusStyles[status];
+  const displayedStatus = actor.statusText?.trim() || t(currentStatus.label);
+  const hasProfileStatus = actor.statusText?.trim().length > 0;
 
   return (
     <div
@@ -2092,9 +2094,14 @@ function ParticipantRow({
           {actor.display}
         </p>
         <p
-          className={`mt-0.5 text-[10px] font-medium uppercase tracking-[0.08em] ${currentStatus.text}`}
+          className={`mt-0.5 truncate text-[10px] font-medium ${
+            hasProfileStatus
+              ? "normal-case tracking-normal text-zinc-400"
+              : `uppercase tracking-[0.08em] ${currentStatus.text}`
+          }`}
+          title={displayedStatus}
         >
-          {t(currentStatus.label)}
+          {displayedStatus}
         </p>
       </div>
     </div>
