@@ -3,7 +3,7 @@
   "version": "0.0.1-beta",
   "private": true,
   "scripts": {
-    "dev": "concurrently --names styles,next --prefix-colors magenta,cyan \"npm:styles:watch\" \"npm:dev:next\"",
+    "dev": "node scripts/start-development.mjs",
     "dev:next": "next dev",
     "styles:build": "sass src/styles/globals.scss src/app/globals.css --no-source-map && biome format --write src/app/globals.css",
     "styles:watch": "sass --watch src/styles/globals.scss:src/app/globals.css --no-source-map",
@@ -12,6 +12,7 @@
     "lint": "biome check --error-on-warnings",
     "test:composer": "node --experimental-strip-types --test src/components/chatroom/emoji-data.test.mjs src/components/chatroom/media-player-data.test.mjs src/data/content-lifecycle.test.mjs",
     "test:notifications": "node --experimental-strip-types --test src/notifications/room-notifications.test.mjs",
+    "test:forms": "node --experimental-strip-types --test src/app/api/github-issue-routes.test.mjs",
     "format": "biome format --write"
   },
   "dependencies": {
