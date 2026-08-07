@@ -4847,22 +4847,25 @@ export function Chatroom() {
                   </div>
                   <div className="modbots-scroll min-h-0 flex-1 overflow-y-auto p-3">
                     <div className="space-y-4">
-                      {roster.map((group) => (
-                        <div key={group.type}>
-                          <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
-                            {t(roleLabels[group.type])} · {group.members.length}
-                          </p>
-                          <div className="space-y-0.5">
-                            {group.members.map((member) => (
-                              <ParticipantRow
-                                key={member.actor.id}
-                                actor={member.actor}
-                                status={member.status}
-                              />
-                            ))}
+                      {roster
+                        .filter((group) => group.members.length > 0)
+                        .map((group) => (
+                          <div key={group.type}>
+                            <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
+                              {t(roleLabels[group.type])} ·{" "}
+                              {group.members.length}
+                            </p>
+                            <div className="space-y-0.5">
+                              {group.members.map((member) => (
+                                <ParticipantRow
+                                  key={member.actor.id}
+                                  actor={member.actor}
+                                  status={member.status}
+                                />
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
                   <div className="relative shrink-0 border-t border-white/[0.08] p-3">
