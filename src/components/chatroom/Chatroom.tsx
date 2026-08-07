@@ -2284,8 +2284,7 @@ function ProfileStatusControl({
       ? "text-emerald-400"
       : selectedStatusValue === "Away"
         ? "text-amber-400"
-        : selectedStatusValue === "auto" ||
-            selectedStatusValue === "custom" ||
+        : selectedStatusValue === "custom" ||
             selectedStatusValue === "game" ||
             selectedStatusValue === "media"
           ? "text-sky-400"
@@ -2323,7 +2322,7 @@ function ProfileStatusControl({
       value: "auto",
       label: t("Auto"),
       icon: Activity,
-      tone: "text-sky-400",
+      tone: "text-zinc-400",
     },
     {
       value: "Available",
