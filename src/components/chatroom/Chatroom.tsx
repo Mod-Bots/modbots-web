@@ -110,8 +110,6 @@ const preferredVoiceMimeTypes = [
   "audio/mp4",
   "audio/ogg;codecs=opus",
 ];
-const profileStatusPresets = ["Available", "Away"] as const;
-
 const participantsPanel = { min: 200, max: 360, initial: 260 };
 const aboutPanel = { min: 230, max: 400, initial: 280 };
 const panelResizeStep = 16;
@@ -2066,7 +2064,7 @@ function ParticipantRow({
   const { t } = useUiLanguage();
   const currentStatus = participantStatusStyles[status];
   const displayedStatus = actor.statusText?.trim() || t(currentStatus.label);
-  const hasProfileStatus = actor.statusText?.trim().length > 0;
+  const hasProfileStatus = (actor.statusText?.trim().length ?? 0) > 0;
 
   return (
     <div
@@ -2151,8 +2149,10 @@ function ProfileStatusControl({
   const [customStatus, setCustomStatus] = useState(
     actor.statusMode === "custom" ? (actor.statusText ?? "") : "",
   );
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
 
   useEffect(() => {
+    setCustomSelected(actor.statusMode === "custom");
     if (actor.statusMode === "custom") {
       setCustomStatus(actor.statusText ?? "");
     }
@@ -2180,11 +2180,22 @@ function ProfileStatusControl({
 
   const selectedStatusValue = customSelected
     ? "custom"
-    : actor.statusMode === "preset"
-      ? (actor.statusText ?? "")
+    : actor.statusMode === "preset" &&
+        (actor.statusText === "Available" || actor.statusText === "Away")
+      ? actor.statusText
       : actor.statusMode === "media"
         ? "media"
         : "";
+  const selectedStatusLabel =
+    selectedStatusValue === "custom"
+      ? actor.statusMode === "custom" && actor.statusText !== null
+        ? actor.statusText
+        : t("Set status message")
+      : selectedStatusValue === "media"
+        ? t("Share the media I play")
+        : selectedStatusValue === ""
+          ? t("Set a status")
+          : t(selectedStatusValue);
   const SelectedStatusIcon =
     selectedStatusValue === "Available"
       ? CheckCircle2
@@ -2192,51 +2203,94 @@ function ProfileStatusControl({
         ? Clock3
         : selectedStatusValue === "media"
           ? Film
-          : MessageSquare;
+          : selectedStatusValue === "custom"
+            ? Pencil
+            : MessageSquare;
+
+  const chooseStatus = (value: "Available" | "Away" | "custom" | "media") => {
+    setStatusMenuOpen(false);
+
+    if (value === "custom") {
+      setCustomSelected(true);
+      return;
+    }
+
+    setCustomSelected(false);
+    if (value === "media") {
+      void saveStatus({ statusMode: "media", statusText: null });
+      return;
+    }
+
+    void saveStatus({ statusMode: "preset", statusText: value });
+  };
+
+  const statusOptions = [
+    { value: "Available", label: t("Available"), icon: CheckCircle2 },
+    { value: "Away", label: t("Away"), icon: Clock3 },
+    {
+      value: "custom",
+      label: t("Set status message"),
+      icon: Pencil,
+    },
+    {
+      value: "media",
+      label: t("Share the media I play"),
+      icon: Film,
+    },
+  ] as const;
 
   return (
     <div>
-      <div className="relative">
+      <fieldset
+        aria-label={t("Status")}
+        className="relative min-w-0 border-0 p-0"
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setStatusMenuOpen(false);
+          }
+        }}
+      >
         <SelectedStatusIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-        <select
-          aria-label={t("Status")}
+        <button
+          type="button"
+          aria-label={`${t("Status")}: ${selectedStatusLabel}`}
+          aria-haspopup="menu"
+          aria-expanded={statusMenuOpen}
           disabled={saving}
-          value={selectedStatusValue}
-          onChange={(event) => {
-            const value = event.currentTarget.value;
-
-            if (value === "custom") {
-              setCustomSelected(true);
-              return;
-            }
-
-            setCustomSelected(false);
-            if (value === "media") {
-              void saveStatus({ statusMode: "media", statusText: null });
-              return;
-            }
-            if (value === "") {
-              void saveStatus({ statusMode: null, statusText: null });
-              return;
-            }
-
-            void saveStatus({ statusMode: "preset", statusText: value });
-          }}
-          className="h-10 w-full appearance-none rounded-xl border border-white/[0.08] bg-white/[0.025] pl-10 pr-9 text-[13px] text-zinc-200 outline-none transition-colors hover:border-white/[0.14] hover:bg-white/[0.05] focus:border-white/20 disabled:cursor-wait disabled:opacity-60"
+          onClick={() => setStatusMenuOpen((open) => !open)}
+          className="flex h-10 w-full items-center rounded-xl border border-white/[0.08] bg-white/[0.025] pl-10 pr-9 text-left text-[13px] text-zinc-200 outline-none transition-colors hover:border-white/[0.14] hover:bg-white/[0.05] focus:border-white/20 disabled:cursor-wait disabled:opacity-60"
         >
-          <option value="" disabled hidden>
-            {t("Set a status")}
-          </option>
-          {profileStatusPresets.map((preset) => (
-            <option key={preset} value={preset}>
-              {t(preset)}
-            </option>
-          ))}
-          <option value="custom">{t("Set status message")}</option>
-          <option value="media">{t("Share the media I play")}</option>
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
-      </div>
+          <span className="truncate">{selectedStatusLabel}</span>
+        </button>
+        <ChevronDown
+          className={`pointer-events-none absolute right-3 top-5 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600 transition-transform ${statusMenuOpen ? "rotate-180" : ""}`}
+        />
+        {statusMenuOpen ? (
+          <div
+            role="menu"
+            aria-label={t("Status")}
+            className="absolute left-0 right-0 top-full z-50 mt-1.5 space-y-1 rounded-xl border border-white/[0.1] bg-modbots-popover p-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.5)]"
+          >
+            {statusOptions.map(({ value, label, icon: OptionIcon }) => (
+              <button
+                key={value}
+                type="button"
+                role="menuitemradio"
+                aria-checked={selectedStatusValue === value}
+                onClick={() => chooseStatus(value)}
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 ${
+                  selectedStatusValue === value
+                    ? "bg-white/[0.09] text-white"
+                    : "text-zinc-300 hover:bg-white/[0.06] hover:text-white"
+                }`}
+              >
+                <OptionIcon className="h-4 w-4 shrink-0 text-zinc-500" />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </fieldset>
 
       {customSelected ? (
         <form onSubmit={submitCustomStatus} className="mt-2 flex gap-1.5">
