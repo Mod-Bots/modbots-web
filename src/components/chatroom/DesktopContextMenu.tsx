@@ -241,31 +241,36 @@ export function DesktopContextMenu({
     const messageSequence = context.messageSequence;
 
     if (messageSequence !== null) {
-      editItems.push({
-        icon: Reply,
-        id: "reply",
-        label: t("Reply"),
-        onSelect: () => onReplyToMessage(messageSequence),
-      });
-
-      if (context.editableMessage) {
-        editItems.push({
-          icon: Pencil,
-          id: "edit-message",
-          label: t("Edit message"),
-          onSelect: () => onEditMessage(messageSequence),
-        });
-      }
-
       if (context.ownMessage) {
-        editItems.push({
-          icon: Trash2,
-          id: "delete-message",
-          label: t("Delete message"),
-          onSelect: () => onDeleteMessage(messageSequence),
-          requiresConfirmation: true,
-        });
+        return [
+          ...(context.editableMessage
+            ? [
+                {
+                  icon: Pencil,
+                  id: "edit-message",
+                  label: t("Edit"),
+                  onSelect: () => onEditMessage(messageSequence),
+                },
+              ]
+            : []),
+          {
+            icon: Trash2,
+            id: "delete-message",
+            label: t("Delete"),
+            onSelect: () => onDeleteMessage(messageSequence),
+            requiresConfirmation: true,
+          },
+        ];
       }
+
+      return [
+        {
+          icon: Reply,
+          id: "reply",
+          label: t("Reply"),
+          onSelect: () => onReplyToMessage(messageSequence),
+        },
+      ];
     }
 
     if (context.editable !== null) {
