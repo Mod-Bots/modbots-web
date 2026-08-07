@@ -161,7 +161,7 @@ export const useRoomActivity = (roomId: string) => {
     retry: 1,
   });
   const desktopSession = useQuery({
-    queryKey: ["desktop-session", roomId, identity?.actorId ?? "none"],
+    queryKey: ["desktop-session", identity?.actorId ?? "none"],
     enabled: identity !== null,
     queryFn: async (): Promise<Actor | null> => {
       if (identity === null) {
@@ -193,7 +193,7 @@ export const useRoomActivity = (roomId: string) => {
   });
   const localActor = desktopSession.data ?? undefined;
   const cacheActor = (actor: Actor): void => {
-    queryClient.setQueryData(["desktop-session", roomId, actor.id], actor);
+    queryClient.setQueryData(["desktop-session", actor.id], actor);
     queryClient.setQueryData(["actor", actor.id], actor);
     queryClient.setQueryData<RoomRoster | undefined>(rosterKey, (current) =>
       current === undefined
@@ -231,7 +231,7 @@ export const useRoomActivity = (roomId: string) => {
       saveStoredIdentity(stored);
       setSessionToken(stored.token);
       queryClient.setQueryData(
-        ["desktop-session", roomId, outcome.actor.id],
+        ["desktop-session", outcome.actor.id],
         outcome.actor,
       );
       return stored;
@@ -310,7 +310,7 @@ export const useRoomActivity = (roomId: string) => {
     saveStoredIdentity(stored);
     setSessionToken(stored.token);
     queryClient.setQueryData(
-      ["desktop-session", roomId, outcome.actor.id],
+      ["desktop-session", outcome.actor.id],
       outcome.actor,
     );
     setIdentity(stored);
@@ -600,7 +600,7 @@ export const useRoomActivity = (roomId: string) => {
             updateCachedActor,
           );
           queryClient.setQueryData<Actor | undefined>(
-            ["desktop-session", roomId, event.actorId],
+            ["desktop-session", event.actorId],
             updateCachedActor,
           );
           queryClient.setQueryData<RoomRoster | undefined>(
