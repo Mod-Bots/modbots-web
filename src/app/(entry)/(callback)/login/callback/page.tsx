@@ -48,7 +48,7 @@ const LoginCallback = (): React.ReactElement => {
         });
         setSessionToken(outcome.session.token);
         markEnterAfterLogin();
-        window.location.replace("/chatroom");
+        window.location.replace("/chat");
       },
       (error: unknown) => {
         setManualCode(

@@ -27,7 +27,7 @@ export function RegisterForm() {
       });
       setSessionToken(outcome.session.token);
       markEnterAfterLogin();
-      router.replace("/chatroom");
+      router.replace("/chat");
     },
     [router],
   );

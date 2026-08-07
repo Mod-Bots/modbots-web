@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: "/chatroom",
+      disallow: "/chat",
     },
     sitemap: "https://modbots.ai/sitemap.xml",
   };

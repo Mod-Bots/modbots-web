@@ -20,7 +20,7 @@ export function LoginForm() {
     }
 
     if (loadStoredIdentity() !== null) {
-      router.replace("/chatroom");
+      router.replace("/chat");
       return undefined;
     }
 
