@@ -68,6 +68,7 @@ import {
 } from "@/notifications/room-notifications";
 import { releasedVersion } from "@/released-version";
 import { AutomaticUpdateChecker } from "./AutomaticUpdateChecker";
+import { DesktopContextMenu } from "./DesktopContextMenu";
 import { MenuBar } from "./MenuBar";
 import { ReportProblemDialog } from "./ReportProblemDialog";
 import { RequestFeatureDialog } from "./RequestFeatureDialog";
@@ -1288,7 +1289,10 @@ function ChatMessage({
 
   if (grouped) {
     return (
-      <article className="group relative flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6">
+      <article
+        data-room-message-sequence={event.sequence}
+        className="group relative flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6"
+      >
         <div className="flex w-8 shrink-0 justify-center">
           <time className="mt-1 hidden text-[10px] tabular-nums text-zinc-600 group-hover:block">
             {formatTime(event.occurredAt)}
@@ -1317,7 +1321,10 @@ function ChatMessage({
   }
 
   return (
-    <article className="group relative mt-5 flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6">
+    <article
+      data-room-message-sequence={event.sequence}
+      className="group relative mt-5 flex gap-3 px-4 py-1 hover:bg-white/[0.03] sm:px-6"
+    >
       <div className="w-8 shrink-0">
         <ActorProfilePicture
           actor={actor}
@@ -2924,6 +2931,21 @@ export function Chatroom() {
       notify({ title: "Screenshot could not be saved.", tone: "error" });
     }
   };
+  const replyToContextMessage = useCallback(
+    (sequence: string) => {
+      const target = (events.data ?? []).find(
+        (event) => event.sequence === sequence,
+      );
+
+      if (target === undefined) {
+        return;
+      }
+
+      setReplyTarget(target);
+      requestAnimationFrame(() => composerRef.current?.focus());
+    },
+    [events.data],
+  );
   const logOut = () => {
     setUserMenuOpen(false);
     void signOut();
@@ -3273,6 +3295,14 @@ export function Chatroom() {
             onReportProblem={() => setReportProblemOpen(true)}
             onRequestFeature={() => setRequestFeatureOpen(true)}
             onOpenAbout={() => setAboutOpen(true)}
+            onTakeScreenshot={() => void takeScreenshot()}
+          />
+          <DesktopContextMenu
+            enabled={entered}
+            rootRef={chatroomRoot}
+            onOpenSearch={openSearch}
+            onOpenSettings={() => openSettings("account")}
+            onReplyToMessage={replyToContextMessage}
             onTakeScreenshot={() => void takeScreenshot()}
           />
         </>
